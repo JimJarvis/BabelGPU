@@ -55,9 +55,6 @@ public class GpuBlas
 		int k = A.col;  // = B.row
 		int n = B.col;
 
-		// int ldc = m; // = C's column length	
-
-		// Store the result to C. Init C's memory to 0. 
 		cublasSgemm(handle, A.getOp(), B.getOp(), 
 				m, n, k, GpuUtil.toPointer(alpha), 
 				pa, A.ldim, pb, B.ldim, 
@@ -67,7 +64,7 @@ public class GpuBlas
 	}
 
 	/**
-	 * Multiply two FloatMat and add onto an existing FloatMat
+	 * Multiply two FloatMat and add onto an existing FloatMat.
 	 * C = A * B;
 	 * @return input parameter C
 	 */
@@ -93,6 +90,60 @@ public class GpuBlas
 	{	
 		return mult(A, B, 1);
 	}
+	
+	/**
+	 * Matrix multiplies vector and add onto an existing vector (col=1)
+	 * The most complete method. All others overload from this.
+	 * y = alpha * A * x + beta * y
+	 * @return input parameter y
+	 */
+	public static FloatMat multVec(FloatMat A, FloatMat x, FloatMat y, float alpha, float beta)
+	{
+		Pointer pa = A.getDevice();
+		Pointer px = x.getDevice();
+		Pointer py = y.getDevice();
+		// Here is an inconsistency in the API
+		// m and n are the original row/col dimension
+		int m = A.getOriginalRow();
+		int n = A.getOriginalCol();
+		
+		cublasSgemv(handle, A.getOp(),
+				m, n, 
+				GpuUtil.toPointer(alpha), pa, A.ldim, 
+				px, 1, 
+				GpuUtil.toPointer(beta), py, 1);
+
+		return y;
+	}
+	
+	/**
+	 * Matrix multiplies vector and add onto an existing vector (col=1)
+	 * y = A * x
+	 * @return input parameter y
+	 */
+	public static FloatMat multVec(FloatMat A, FloatMat x, FloatMat y)
+	{
+		return multVec(A, x, y, 1, 0);
+	}
+	
+	/**
+	 * Matrix multiplies vector
+	 * @return y = alpha * A * x + beta * y
+	 */
+	public static FloatMat multVec(FloatMat A, FloatMat x, float alpha, float beta)
+	{
+		return multVec(A, x, new FloatMat(A.row, 1), alpha, beta);
+	}
+	
+	/**
+	 * Matrix multiplies vector
+	 * @return y = A * x
+	 */
+	public static FloatMat multVec(FloatMat A, FloatMat x)
+	{
+		return multVec(A, x, new FloatMat(A.row, 1), 1, 0);
+	}
+	
 
 	/**
 	 * Add two FloatMat.

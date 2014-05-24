@@ -37,6 +37,14 @@ public class FloatMat
 	{
 		this(flatten(host), host.length, host[0].length);
 	}
+	
+	/**
+	 * Ctor for 1D vector (column vector)
+	 */
+	public FloatMat(float[] host)
+	{
+		this(host, host.length, 1);
+	}
 
 	/**
 	 * Ctor from device data
@@ -93,6 +101,22 @@ public class FloatMat
 	}
 	
 	public int getOp() {	return this.op;	}
+	
+	/**
+	 * Invariant to transpose
+	 */
+	public int getOriginalRow()
+	{
+		return op == CUBLAS_OP_N ? row : col;
+	}
+
+	/**
+	 * Invariant to transpose
+	 */
+	public int getOriginalCol()
+	{
+		return op == CUBLAS_OP_N ? col : row;
+	}
 	
 	/**
 	 * Get the device pointer
