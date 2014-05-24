@@ -8,7 +8,7 @@ import jcuda.Pointer;
 public class GpuUtil
 {
 	/**
-	 * From device pointer to host float array
+	 * cudaMemcpy from device pointer to host float array
 	 */
 	public static float[] deviceToHostFloat(Pointer device, int n)
 	{
@@ -21,7 +21,7 @@ public class GpuUtil
 	}
 
 	/**
-	 * From device pointer to host int array
+	 * cudaMemcpy from device pointer to host int array
 	 */
 	public static int[] deviceToHostInt(Pointer device, int n)
 	{
@@ -34,7 +34,7 @@ public class GpuUtil
 	}
 	
 	/**
-	 * From device pointer to host double array
+	 * cudaMemcpy from device pointer to host double array
 	 */
 	public static double[] deviceToHostDouble(Pointer device, int n)
 	{
@@ -47,9 +47,9 @@ public class GpuUtil
 	}
 	
 	/**
-	 * A single float to host pointer
+	 * A single float to a pointer wrapper on the host
 	 */
-	public static Pointer toHostFloatPointer(float a)
+	public static Pointer toFloatPointer(float a)
 	{
 		return Pointer.to(new float[] {a});
 	}

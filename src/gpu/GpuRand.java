@@ -8,6 +8,7 @@ import static jcuda.Sizeof.*;
 
 import java.util.Random;
 
+import utils.GpuUtil;
 import jcuda.Pointer;
 import jcuda.jcurand.curandGenerator;
 
@@ -17,8 +18,8 @@ import jcuda.jcurand.curandGenerator;
 public class GpuRand
 {
 	private curandGenerator generator;
-	private Pointer deviceData;
-	private float[] hostData;
+	private Pointer device;
+	private float[] host;
 	private int N; // size
 	private boolean automaticFree = true;
 	
@@ -45,11 +46,11 @@ public class GpuRand
 	private void init(int N)
 	{
 		this.N = N;
-		hostData = null;
-		if (automaticFree && deviceData != null)
-			cudaFree(deviceData);
-		deviceData = new Pointer();
-		cudaMalloc(deviceData, N * FLOAT);
+		host = null;
+		if (automaticFree && device != null)
+			cudaFree(device);
+		device = new Pointer();
+		cudaMalloc(device, N * FLOAT);
 	}
 	
 	/**
@@ -58,7 +59,7 @@ public class GpuRand
 	public void genUniformFloat(int N)
 	{
 		init(N);
-		curandGenerateUniform(generator, deviceData, N);
+		curandGenerateUniform(generator, device, N);
 		automaticFree = true;
 	}
 	
@@ -70,7 +71,7 @@ public class GpuRand
 	public void genNormalFloat(int N, float mean, float stdev)
 	{
 		init(N);
-		curandGenerateNormal(generator, deviceData, N, mean, stdev);
+		curandGenerateNormal(generator, device, N, mean, stdev);
 		automaticFree = true;
 	}
 	
@@ -81,7 +82,7 @@ public class GpuRand
 	public Pointer getDevice()
 	{
 		automaticFree = false;
-		return deviceData;
+		return device;
 	}
 	
 	/**
@@ -89,15 +90,10 @@ public class GpuRand
 	 */
 	public float[] getHost()
 	{
-		if (hostData != null)
-			return hostData;
+		if (host != null)
+			return host;
 		
-    	// Copy device memory to host 
-		hostData = new float[this.N];
-		cudaMemcpy(Pointer.to(hostData), deviceData, 
-				this.N * FLOAT, cudaMemcpyDeviceToHost);
-		
-		return hostData;
+		return host = GpuUtil.deviceToHostFloat(device, N);
 	}
 	
 	/**
@@ -107,7 +103,7 @@ public class GpuRand
 	{
 		if (generator != null)
     		curandDestroyGenerator(generator);
-		if (automaticFree && deviceData != null)
-			cudaFree(deviceData);
+		if (automaticFree && device != null)
+			cudaFree(device);
 	}
 }
