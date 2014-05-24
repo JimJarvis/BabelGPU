@@ -57,9 +57,9 @@ public class GpuBlas
 		int n = B.col;
 
 		cublasSgemm(handle, A.getOp(), B.getOp(), 
-				m, n, k, GpuUtil.toHostFloatPointer(alpha), 
+				m, n, k, GpuUtil.toFloatPointer(alpha), 
 				pa, A.ldim, pb, B.ldim, 
-				GpuUtil.toHostFloatPointer(beta), pc, C.ldim);
+				GpuUtil.toFloatPointer(beta), pc, C.ldim);
 
 		return C;
 	}
@@ -110,9 +110,9 @@ public class GpuBlas
 		
 		cublasSgemv(handle, A.getOp(),
 				m, n, 
-				GpuUtil.toHostFloatPointer(alpha), pa, A.ldim, 
+				GpuUtil.toFloatPointer(alpha), pa, A.ldim, 
 				px, 1, 
-				GpuUtil.toHostFloatPointer(beta), py, 1);
+				GpuUtil.toFloatPointer(beta), py, 1);
 
 		return y;
 	}
@@ -162,8 +162,8 @@ public class GpuBlas
 
 		cublasSgeam(handle, A.getOp(), B.getOp(), 
 				m, n, 
-				GpuUtil.toHostFloatPointer(alpha), pa, A.ldim, 
-				GpuUtil.toHostFloatPointer(beta), pb, B.ldim, 
+				GpuUtil.toFloatPointer(alpha), pa, A.ldim, 
+				GpuUtil.toFloatPointer(beta), pb, B.ldim, 
 				pc, C.ldim);
 
 		return C;
@@ -261,7 +261,7 @@ public class GpuBlas
 	public static FloatMat scaleAdd(FloatMat x, FloatMat y, float alpha)
 	{
 		cublasSaxpy(handle, x.size(), 
-				GpuUtil.toHostFloatPointer(alpha), 
+				GpuUtil.toFloatPointer(alpha), 
 				x.getDevice(), 1, 
 				y.getDevice(), 1);
 		return y;
@@ -285,7 +285,7 @@ public class GpuBlas
 	public static FloatMat scale(FloatMat x, float alpha)
 	{
 		cublasSscal(handle, x.size(), 
-				GpuUtil.toHostFloatPointer(alpha), 
+				GpuUtil.toFloatPointer(alpha), 
 				x.getDevice(), 1);
 		return x;
 	}
