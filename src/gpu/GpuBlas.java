@@ -15,7 +15,7 @@ public class GpuBlas
 {
 	// Cublas context
 	private static cublasHandle handle = null;
-	
+
 	/**
 	 * Initialize cublas context
 	 */
@@ -27,7 +27,7 @@ public class GpuBlas
 			cublasCreate(handle);
 		}
 	}
-	
+
 	/**
 	 * Destroy cublas context
 	 */
@@ -36,10 +36,11 @@ public class GpuBlas
 		cublasDestroy(handle);
 		handle = null;
 	}
-	
+
 
 	/**
-	 * Multiply two FloatMat and add onto an existing FloatMat
+	 * Multiply two FloatMat and add onto an existing FloatMat.
+	 * The most complete method. All others overload from this.
 	 * C = alpha * A * B + beta * C;
 	 * @return input parameter C
 	 */
@@ -47,23 +48,24 @@ public class GpuBlas
 	{
 		Pointer pa = A.getDevice();
 		Pointer pb = B.getDevice();
+		Pointer pc = C.getDevice();
 		// m, n, k are named according to the online documentation
 		// http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm
 		int m = A.row;
 		int k = A.col;  // = B.row
 		int n = B.col;
-		
+
 		// int ldc = m; // = C's column length	
 
 		// Store the result to C. Init C's memory to 0. 
 		cublasSgemm(handle, A.getOp(), B.getOp(), 
 				m, n, k, GpuUtil.toPointer(alpha), 
 				pa, A.ldim, pb, B.ldim, 
-				GpuUtil.toPointer(beta), C.getDevice(), m);
-		
+				GpuUtil.toPointer(beta), pc, C.ldim);
+
 		return C;
 	}
-	
+
 	/**
 	 * Multiply two FloatMat and add onto an existing FloatMat
 	 * C = A * B;
@@ -73,7 +75,7 @@ public class GpuBlas
 	{
 		return mult(A, B, C, 1, 0);
 	}
-	
+
 	/**
 	 * Multiply two FloatMat
 	 * @return C = alpha * A *B
@@ -82,22 +84,67 @@ public class GpuBlas
 	{
 		return mult(A, B, new FloatMat(A.row, B.col), alpha, 0);
 	}
-	
+
 	/**
 	 * Multiply two FloatMat
 	 * @return C = A * B
 	 */
-	public static FloatMat mult(FloatMat A, FloatMat B) {	return mult(A, B, 1); }
+	public static FloatMat mult(FloatMat A, FloatMat B)
+	{	
+		return mult(A, B, 1);
+	}
+
+	/**
+	 * Add two FloatMat.
+	 * The most complete method. All others overload from this. 
+	 * C = alpha * A + beta * B;
+	 * @return input parameter C
+	 */
+	public static FloatMat add(FloatMat A, FloatMat B, FloatMat C, float alpha, float beta)
+	{
+		Pointer pa = A.getDevice();
+		Pointer pb = B.getDevice();
+		Pointer pc = C.getDevice();
+		int m = A.row;
+		int n = A.col;
+
+		cublasSgeam(handle, A.getOp(), B.getOp(), 
+				m, n, 
+				GpuUtil.toPointer(alpha), pa, A.ldim, 
+				GpuUtil.toPointer(beta), pb, B.ldim, 
+				pc, C.ldim);
+
+		return C;
+	}
+
+	/**
+	 * Add two FloatMat
+	 * C = A + B
+	 * @return input parameter C
+	 */
+	public static FloatMat add(FloatMat A, FloatMat B, FloatMat C)
+	{
+		return add(A, B, C, 1, 1);
+	}
 	
 	/**
 	 * Add two FloatMat
-	 * @return C = alpha * A + beta * B;
+	 * @return C = alpha * A + beta * B
 	 */
-	 public static FloatMat add(FloatMat A, FloatMat B)
-	 {
-		 return null;
-	 }
-	
+	public static FloatMat add(FloatMat A, FloatMat B, float alpha, float beta)
+	{
+		return add(A, B, new FloatMat(A.row, A.col), alpha, beta);
+	}
+	/**
+	 * Add two FloatMat
+	 * @return C = A + B
+	 */
+	public static FloatMat add(FloatMat A, FloatMat B)
+	{
+		return add(A, B, 1, 1);
+	}
+
+
 	/**
 	 * Create and copy to Cublas device vector
 	 */
@@ -105,12 +152,12 @@ public class GpuBlas
 	{
 		int n = host.length;
 		Pointer p = GpuUtil.createDeviceFloat(n);
-		
+
 		cublasSetVector(n, FLOAT, Pointer.to(host), 1, p, 1);
-		
+
 		return p;
 	}
-	
+
 	/**
 	 * Copy the device vector at Cublas back to host
 	 */

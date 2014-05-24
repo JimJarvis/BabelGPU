@@ -50,36 +50,55 @@ public class BlasTest
 		int n = B[0].length;
 
 		// Allocate memory on the device
-		FloatMat matA = new FloatMat(flatten(A), m, k);
-		FloatMat matB = new FloatMat(flatten(B), k, n);
+		FloatMat matA = new FloatMat(A);
+		FloatMat matB = new FloatMat(B);
 		
-		// C = A * B
-		FloatMat matC = GpuBlas.mult(matA, matB, 1);
-		PP.po(deflatten(matC.getHost(), m));
+		// A * B
+		FloatMat matAB = GpuBlas.mult(matA, matB, 1);
+		PP.po(matAB.deflatten());
 		
-		// D = 2 * A * B + (A*B)
-		FloatMat matD = new FloatMat(m, n);
-		GpuBlas.mult(matA, matB, matD);
-		GpuBlas.mult(matA, matB, matD, 2, 1);
-		PP.po(deflatten(matD.getHost(), m));
+		// 2 * A * B + (A*B)
+		FloatMat mat3AB = new FloatMat(m, n);
+		GpuBlas.mult(matA, matB, mat3AB);
+		GpuBlas.mult(matA, matB, mat3AB, 2, 1);
+		PP.po(mat3AB.deflatten());
 		
 		// T = B' * A'
 		FloatMat matT = GpuBlas.mult(matB.transpose(), matA.transpose());
-		PP.po(deflatten(matT.getHost(), n));
+		PP.po(matT.deflatten());
 		matT.destroy();
 
 		matT = new FloatMat(m, m);
 		GpuBlas.mult(matA, matA.transpose(), matT, 0.5f, 0);
-		PP.po(deflatten(matT.getHost(), m));
+		PP.po(matT.deflatten());
 		matT.destroy();
 		
 		matT = new FloatMat(n, n);
 		GpuBlas.mult(matB.transpose(), matB, matT, 1f, 0);
-		PP.po(deflatten(matT.getHost(), n));
+		PP.po(matT.deflatten());
 		
+		PP.pSectionLine();
+		PP.p("Matrix Addition");
+		
+        float C[][] = new float[][] {{3, 0},
+                                				{-5, -1},
+                                				{10, 4},
+                                				{-9, -5}};
+        FloatMat matC = new FloatMat(C);
+        
+        FloatMat mat1 = GpuBlas.add(matA, matC);
+        PP.po(mat1.deflatten());
+        
+        FloatMat mat2 = new FloatMat(m, k);
+        GpuBlas.add(matA, matC, mat2, 2, -1);
+        PP.po(mat2.deflatten());
+        
+        FloatMat mat3 = new FloatMat(k, m);
+        GpuBlas.add(matC.transpose(), matA.transpose(), mat3);
+        PP.po(mat3.deflatten());
 
 		// Clean up
-		FloatMat[] mats = new FloatMat[] {matA, matB, matC, matD, matT};
+		FloatMat[] mats = new FloatMat[] {matA, matB, matAB, mat3AB, matC, matT, mat1, mat2, mat3};
 		for (FloatMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();

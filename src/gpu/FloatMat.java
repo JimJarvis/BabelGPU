@@ -29,6 +29,14 @@ public class FloatMat
 		this.host = host;
 		initDim(row, col);
 	}
+	
+	/**
+	 * Ctor from 2D host data
+	 */
+	public FloatMat(float[][] host)
+	{
+		this(flatten(host), host.length, host[0].length);
+	}
 
 	/**
 	 * Ctor from device data
@@ -151,5 +159,13 @@ public class FloatMat
 				ans[i][j] = A[pt ++];
 
 		return ans;
+	}
+	
+	/**
+	 * Deflatten this to a 2D float array, column major
+	 */
+	public float[][] deflatten()
+	{
+		return deflatten(getHost(), this.row);
 	}
 }
