@@ -143,6 +143,7 @@ public class FloatMat
 	/**
 	 * Get the device pointer
 	 * No matter whether 'device' field is null or not, we copy host to GPU
+	 * Syncs device w.r.t. host
 	 */
 	public Pointer getDeviceFromHost()
 	{
@@ -171,6 +172,7 @@ public class FloatMat
 	/**
 	 * Get the host pointer
 	 * No matter whether 'host' field is null or not, we copy device to CPU
+	 * Syncs host w.r.t. device
 	 */
 	public float[] getHostFromDevice()
 	{

@@ -18,6 +18,25 @@ public class Thrust
         public native @Name("operator()") int call(int x, int y);
     }
 	
+	 /*public static class UnaryOp extends FunctionPointer
+	 { 
+         static { Loader.load(); } 
+         public    UnaryOp(Pointer p) { super(p); } 
+         public UnaryOp() { allocate(0); }
+         public UnaryOp(long n) { allocate(n); }
+         public UnaryOp(UnaryOp v) { allocate(v); }
+         private native void allocate(long n);
+         private native void allocate(@ByRef UnaryOp v);
+         protected final native void allocate(); 
+         public native float call(float x); 
+     } 
+	 
+	 public static UnaryOp exp = new UnaryOp()
+	 {
+		 public float call(float x) {	return (float) Math.exp(x);	}
+	 };*/
+     
+	
 	@Name("host_vector<float>")
     public static class FloatHostVector extends Pointer
     {
@@ -77,12 +96,8 @@ public class Thrust
         public native void resize(long n);
     }
     
+    
     public static native void sort(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last);
-    public static native float reduce(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, int init, @ByVal FloatPlus binary_op);
-    
-    
-    public static void main(String[] args)
-	{
-		
-	}
+    public static native float reduce(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, float init, @ByVal FloatPlus binary_op);
+//    public static native FloatDevicePointer transform(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, @ByVal FloatDevicePointer out, @ByVal UnaryOp unaryOp);
 }
