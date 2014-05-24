@@ -10,6 +10,14 @@ public class Thrust
 {
 	static { Loader.load(); }
 	
+	@Name("plus<float>")
+    public static class FloatPlus extends Pointer {
+        static { Loader.load(); }
+        public FloatPlus() { allocate(); }
+        private native void allocate();
+        public native @Name("operator()") int call(int x, int y);
+    }
+	
 	@Name("host_vector<float>")
     public static class FloatHostVector extends Pointer
     {
@@ -34,8 +42,20 @@ public class Thrust
         static { Loader.load(); }
         public FloatDevicePointer() { allocate(null); }
         public FloatDevicePointer(FloatPointer ptr) { allocate(ptr); }
+        public FloatDevicePointer(final jcuda.Pointer p)
+        { 
+        	this(new FloatPointer((FloatPointer)null)
+        	{ 
+        		{ 
+        			address = new jcuda.Pointer(p) 
+        			{ 
+        				long a = getNativePointer();
+        			}.a;
+        		} 
+        	}); 
+        } 
+        
         private native void allocate(FloatPointer ptr);
-
         public native FloatPointer get();
     }
     
@@ -56,6 +76,10 @@ public class Thrust
         public native long size();
         public native void resize(long n);
     }
+    
+    public static native void sort(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last);
+    public static native float reduce(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, int init, @ByVal FloatPlus binary_op);
+    
     
     public static void main(String[] args)
 	{

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-main="demo/ThrustDemo"
+main="test/ThrustTest"
 
 cd bin
-java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" $main -properties windows-x86_64-cuda > stderr.log
+java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" gpu/Thrust -properties windows-x86_64-cuda > stderr.log
 
 echo ;echo ;echo
 echo 'Testing ...'; echo
