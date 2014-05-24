@@ -276,12 +276,49 @@ public class GpuBlas
 	{	
 		return scaleAdd(x, y, 1);
 	}
+	
+	/**
+	 * Scale and overwrite an existing matrix
+	 * x *= alpha
+	 * @return input parameter x
+	 */
+	public static FloatMat scale(FloatMat x, float alpha)
+	{
+		cublasSscal(handle, x.size(), 
+				GpuUtil.toHostFloatPointer(alpha), 
+				x.getDevice(), 1);
+		return x;
+	}
+	
+	/**
+	 * @return dot product of vectors x and y
+	 */
+	public static float dot(FloatMat x, FloatMat y)
+	{
+		float[] val = new float[1];
+		Pointer valPtr = Pointer.to(val);
+		cublasSdot(handle, x.size(), 
+				x.getDevice(), 1, 
+				y.getDevice(), 1, 
+				valPtr);
+		return val[0];
+	}
+	
+	/**
+	 * Swap two FloatMat's device data
+	 */
+	public static void swap(FloatMat x, FloatMat y)
+	{
+		cublasSswap(handle, x.size(), 
+				x.getDevice(), 1, 
+				y.getDevice(), 1);
+	}
 
 
 	/**
 	 * Create and copy to Cublas device vector
 	 */
-	public static Pointer toCublasFloat(float[] host)
+	public static Pointer hostToCublasFloat(float[] host)
 	{
 		int n = host.length;
 		Pointer p = GpuUtil.createDeviceFloat(n);
@@ -294,7 +331,7 @@ public class GpuBlas
 	/**
 	 * Copy the device vector at Cublas back to host
 	 */
-	public static void toHostFloat(Pointer device, float[] host)
+	public static void cublasToHostFloat(Pointer device, float[] host)
 	{
 		cublasGetVector(host.length, FLOAT, device, 1, Pointer.to(host), 1);
 	}

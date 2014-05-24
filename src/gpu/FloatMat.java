@@ -136,7 +136,7 @@ public class FloatMat
 	public Pointer getDevice()
 	{
 		if (device == null)
-			device = GpuBlas.toCublasFloat(host);
+			device = GpuBlas.hostToCublasFloat(host);
 		return device;
 	}
 	
@@ -154,7 +154,7 @@ public class FloatMat
 		if (host == null)
 		{
 			host = new float[row * col];
-			GpuBlas.toHostFloat(device, host);
+			GpuBlas.cublasToHostFloat(device, host);
 		}
 		return host;
 	}

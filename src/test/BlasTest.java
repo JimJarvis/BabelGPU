@@ -156,11 +156,27 @@ public class BlasTest
         
 		// **************************************
         PP.pSectionLine();
-        PP.p("L2-Norm");
+        PP.p("Scale and Add");
         FloatMat ansvBpvC = new FloatMat(4, 1);
         // -5, -10, 0, 3
         PP.p(GpuBlas.scaleAdd(vecB, ansvBpvC, 6).transpose());
         PP.p(GpuBlas.scaleAdd(vecC, ansvBpvC, -1).transpose());
+        
+        // Scale itself
+        PP.p(GpuBlas.scale(ansvBpvC, 0.5f).transpose());
+        
+     // **************************************
+        PP.pSectionLine();
+        PP.p("Dot product");
+        PP.p(GpuBlas.dot(vecC, vecB));
+
+     // **************************************
+        PP.pSectionLine();
+        PP.p("Swap");
+        GpuBlas.swap(vecB, vecC);
+        PP.p("vecB:", vecB.transpose(), "and vecC:", vecC.transpose());
+        GpuBlas.swap(vecB, vecC);
+        PP.p("Swap back!\nvecB:", vecB.transpose(), "and vecC:", vecC.transpose());
 
 		// Clean up
 		FloatMat[] mats = new FloatMat[] 
@@ -169,7 +185,8 @@ public class BlasTest
 				  vecA, vecB, ansAvA, ans3AtvB, ans1CtvB, 
 				  ansCopy,
 				  matM,
-				  vecC};
+				  vecC,
+				  ansvBpvC};
 		for (FloatMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();
