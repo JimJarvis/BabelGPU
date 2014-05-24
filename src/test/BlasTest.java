@@ -53,19 +53,35 @@ public class BlasTest
 		FloatMat matA = new FloatMat(flatten(A), m, k);
 		FloatMat matB = new FloatMat(flatten(B), k, n);
 		
-		FloatMat matC = GpuBlas.mult(matA, matB, 2);
+		// C = A * B
+		FloatMat matC = GpuBlas.mult(matA, matB, 1);
 		PP.po(deflatten(matC.getHost(), m));
 		
+		// D = 2 * A * B + (A*B)
 		FloatMat matD = new FloatMat(m, n);
 		GpuBlas.mult(matA, matB, matD);
 		GpuBlas.mult(matA, matB, matD, 2, 1);
 		PP.po(deflatten(matD.getHost(), m));
+		
+		// T = B' * A'
+		FloatMat matT = GpuBlas.mult(matB.transpose(), matA.transpose());
+		PP.po(deflatten(matT.getHost(), n));
+		matT.destroy();
+
+		matT = new FloatMat(m, m);
+		GpuBlas.mult(matA, matA.transpose(), matT, 0.5f, 0);
+		PP.po(deflatten(matT.getHost(), m));
+		matT.destroy();
+		
+		matT = new FloatMat(n, n);
+		GpuBlas.mult(matB.transpose(), matB, matT, 1f, 0);
+		PP.po(deflatten(matT.getHost(), n));
+		
 
 		// Clean up
-		matA.destroy();
-		matB.destroy();
-		matC.destroy();
-		matD.destroy();
+		FloatMat[] mats = new FloatMat[] {matA, matB, matC, matD, matT};
+		for (FloatMat mat : mats)
+			mat.destroy();
 		GpuBlas.destroy();
 	}
 }

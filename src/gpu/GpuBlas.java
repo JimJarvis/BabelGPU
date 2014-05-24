@@ -4,7 +4,7 @@ import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
 import jcuda.jcublas.cublasHandle;
-import jcuda.jcublas.cublasOperation;
+import static jcuda.jcublas.cublasOperation.*;
 import static jcuda.Sizeof.*;
 import static jcuda.jcublas.JCublas2.*;
 
@@ -15,7 +15,6 @@ public class GpuBlas
 {
 	// Cublas context
 	private static cublasHandle handle = null;
-	private static final int NOP = cublasOperation.CUBLAS_OP_N;
 	
 	/**
 	 * Initialize cublas context
@@ -52,16 +51,13 @@ public class GpuBlas
 		int k = A.col;  // = B.row
 		int n = B.col;
 
-		/* leading dimension args:
-		int lda = m; // = A's column length, which is row dim
-		int ldb = k; // = B's column length
-		int ldc = m; // = C's column length */		
+		// int ldc = m; // = C's column length
 
 		// Store the result to C. Init C's memory to 0. 
 		Pointer pc = GpuUtil.createDeviceFloat(m * n, true);
-		cublasSgemm(handle, NOP, NOP, 
+		cublasSgemm(handle, A.getOp(), B.getOp(), 
 				m, n, k, GpuUtil.toPointer(alpha), 
-				pa, m, pb, k, 
+				pa, A.ldim, pb, B.ldim, 
 				GpuUtil.toPointer(0), pc, m);
 		
 		return new FloatMat(pc, m, n);
@@ -87,16 +83,13 @@ public class GpuBlas
 		int m = A.row;
 		int k = A.col;  // = B.row
 		int n = B.col;
-
-		/* leading dimension args:
-		int lda = m; // = A's column length, which is row dim
-		int ldb = k; // = B's column length
-		int ldc = m; // = C's column length */		
+		
+		// int ldc = m; // = C's column length	
 
 		// Store the result to C. Init C's memory to 0. 
-		cublasSgemm(handle, NOP, NOP, 
+		cublasSgemm(handle, A.getOp(), B.getOp(), 
 				m, n, k, GpuUtil.toPointer(alpha), 
-				pa, m, pb, k, 
+				pa, A.ldim, pb, B.ldim, 
 				GpuUtil.toPointer(beta), C.getDevice(), m);
 		
 		return C;

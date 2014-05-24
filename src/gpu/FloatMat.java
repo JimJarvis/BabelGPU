@@ -4,6 +4,7 @@ import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
 import static jcuda.runtime.JCuda.*;
+import static jcuda.jcublas.cublasOperation.*;
 
 /**
  * Struct around a matrix with row/col dimension info
@@ -12,8 +13,13 @@ public class FloatMat
 {
 	private float[] host = null;
 	private Pointer device = null;
+	// This field records whether the matrix should be transposed or not
+	private int op = CUBLAS_OP_N; 
 	public int row;
 	public int col;
+	// Leading dimension: column length (i.e. row dim)
+	// Doesn't change even with transpose
+	public int ldim; 
 	
 	/**
 	 * Ctor from host data
@@ -21,8 +27,7 @@ public class FloatMat
 	public FloatMat(float[] host, int row, int col)
 	{
 		this.host = host;
-		this.row = row;
-		this.col = col;
+		initDim(row, col);
 	}
 
 	/**
@@ -31,8 +36,7 @@ public class FloatMat
 	public FloatMat(Pointer device, int row, int col)
 	{
 		this.device = device;
-		this.row = row;
-		this.col = col;
+		initDim(row, col);
 	}
 	
 	/**
@@ -41,9 +45,46 @@ public class FloatMat
 	public FloatMat(int row, int col)
 	{
 		this.device = GpuUtil.createDeviceFloat(row * col, true);
+		initDim(row, col);
+	}
+	
+	/**
+	 * Copy ctor for clone()
+	 */
+	private FloatMat(FloatMat other)
+	{
+		this.host = other.host;
+		this.device = other.device;
+		this.row = other.row;
+		this.col = other.col;
+		this.ldim = other.ldim;
+	}
+	
+	// Ctor helper
+	private void initDim(int row, int col)
+	{
 		this.row = row;
 		this.col = col;
+		this.ldim = row;
 	}
+	
+	/**
+	 * Transpose the matrix and return a new one
+	 * Nothing in the real data actually changes, but only a flag
+	 * @return new instance
+	 */
+	public FloatMat transpose()
+	{
+		FloatMat mat = new FloatMat(this);
+		mat.op = (op != CUBLAS_OP_N) ? 
+				CUBLAS_OP_N : CUBLAS_OP_T;
+		// Swap row and col dimension
+		mat.row = this.col;
+		mat.col = this.row;
+		return mat;
+	}
+	
+	public int getOp() {	return this.op;	}
 	
 	/**
 	 * Get the device pointer
