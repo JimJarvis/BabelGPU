@@ -7,6 +7,7 @@ import jcuda.jcublas.cublasHandle;
 import static jcuda.jcublas.cublasOperation.*;
 import static jcuda.Sizeof.*;
 import static jcuda.jcublas.JCublas2.*;
+import static jcuda.runtime.JCuda.*;
 
 /**
  * JCublas context
@@ -56,9 +57,9 @@ public class GpuBlas
 		int n = B.col;
 
 		cublasSgemm(handle, A.getOp(), B.getOp(), 
-				m, n, k, GpuUtil.toPointer(alpha), 
+				m, n, k, GpuUtil.toHostFloatPointer(alpha), 
 				pa, A.ldim, pb, B.ldim, 
-				GpuUtil.toPointer(beta), pc, C.ldim);
+				GpuUtil.toHostFloatPointer(beta), pc, C.ldim);
 
 		return C;
 	}
@@ -109,9 +110,9 @@ public class GpuBlas
 		
 		cublasSgemv(handle, A.getOp(),
 				m, n, 
-				GpuUtil.toPointer(alpha), pa, A.ldim, 
+				GpuUtil.toHostFloatPointer(alpha), pa, A.ldim, 
 				px, 1, 
-				GpuUtil.toPointer(beta), py, 1);
+				GpuUtil.toHostFloatPointer(beta), py, 1);
 
 		return y;
 	}
@@ -161,8 +162,8 @@ public class GpuBlas
 
 		cublasSgeam(handle, A.getOp(), B.getOp(), 
 				m, n, 
-				GpuUtil.toPointer(alpha), pa, A.ldim, 
-				GpuUtil.toPointer(beta), pb, B.ldim, 
+				GpuUtil.toHostFloatPointer(alpha), pa, A.ldim, 
+				GpuUtil.toHostFloatPointer(beta), pb, B.ldim, 
 				pc, C.ldim);
 
 		return C;
@@ -214,6 +215,42 @@ public class GpuBlas
 	public static FloatMat copy(FloatMat from)
 	{
 		return copy(from, new FloatMat(from.row, from.col, false));
+	}
+	
+	/**
+	 * @return the index of the maximum absolute value
+	 * NOTE: absolute value, no sign
+	 */
+	public static int maxAbsIndex(FloatMat A)
+	{
+		int[] hostIdx = new int[1];
+		Pointer deviceIdx = Pointer.to(hostIdx);
+		cublasIsamax(handle, A.row * A.col, A.getDevice(), 1, deviceIdx);
+		cudaFree(deviceIdx);
+		return hostIdx[0] - 1; // adjust to 0-based
+	}
+	
+	/**
+	 * @return the index of the minimum absolute value
+	 * NOTE: absolute value, no sign
+	 */
+	public static int minAbsIndex(FloatMat A)
+	{
+		int[] idx = new int[1];
+		Pointer idxPtr = Pointer.to(idx);
+		cublasIsamin(handle, A.row * A.col, A.getDevice(), 1, idxPtr);
+		return idx[0] - 1; // adjust to 0-based
+	}
+	
+	/**
+	 * @return L2-norm of a vector
+	 */
+	public static float norm(FloatMat A)
+	{
+		float[] val = new float[1];
+		Pointer valPtr = Pointer.to(val);
+		cublasSnrm2(handle, A.row * A.col, A.getDevice(), 1, valPtr);
+		return val[0];
 	}
 
 

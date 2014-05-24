@@ -94,6 +94,7 @@ public class FloatMat
 		this.ldim = row;
 	}
 	
+	
 	/**
 	 * Transpose the matrix and return a new one
 	 * Nothing in the real data actually changes, but only a flag
@@ -206,5 +207,44 @@ public class FloatMat
 	public float[][] deflatten()
 	{
 		return deflatten(getHost(), this.row);
+	}
+	
+	/**
+	 * Inner class for 2D coordinate in the matrix
+	 */
+	public static class Coord
+	{
+		public int i; // row
+		public int j; // col
+		public Coord(int i, int j)
+		{
+			this.i = i; 
+			this.j = j;
+		}
+		
+		public String toString() { return String.format("<%d, %d>", i, j); }
+	}
+	
+	/**
+	 * Transform an index to a coordinate (column major)
+	 */
+	public Coord toCoord(int idx)
+	{
+		return new Coord(idx%row, idx/row);
+	}
+	
+	/**
+	 * Transform a 2D coordinate to index (column major)
+	 */
+	public int toIndex(int i, int j)
+	{
+		return j * row + i;
+	}
+	/**
+	 * Transform a 2D coordinate to index (column major)
+	 */
+	public int toIndex(Coord c)
+	{
+		return c.j * row + c.i;
 	}
 }

@@ -10,33 +10,46 @@ public class GpuUtil
 	/**
 	 * From device pointer to host float array
 	 */
-	public static float[] toHostFloat(Pointer deviceData, int n)
+	public static float[] deviceToHostFloat(Pointer device, int n)
 	{
 		 // Copy device memory to host 
-		float[] hostData = new float[n];
-        cudaMemcpy(Pointer.to(hostData), deviceData, 
+		float[] host = new float[n];
+        cudaMemcpy(Pointer.to(host), device, 
             n * FLOAT, cudaMemcpyDeviceToHost);
         
-        return hostData;
+        return host;
+	}
+
+	/**
+	 * From device pointer to host int array
+	 */
+	public static int[] deviceToHostInt(Pointer device, int n)
+	{
+		// Copy device memory to host 
+		int[] host = new int[n];
+		cudaMemcpy(Pointer.to(host), device, 
+				n * INT, cudaMemcpyDeviceToHost);
+
+		return host;
 	}
 	
 	/**
 	 * From device pointer to host double array
 	 */
-	public static double[] toHostDouble(Pointer deviceData, int n)
+	public static double[] deviceToHostDouble(Pointer device, int n)
 	{
 		 // Copy device memory to host 
-		double[] hostData = new double[n];
-        cudaMemcpy(Pointer.to(hostData), deviceData, 
+		double[] host = new double[n];
+        cudaMemcpy(Pointer.to(host), device, 
             n * DOUBLE, cudaMemcpyDeviceToHost);
         
-        return hostData;
+        return host;
 	}
 	
 	/**
-	 * A single float to GPU pointer
+	 * A single float to host pointer
 	 */
-	public static Pointer toPointer(float a)
+	public static Pointer toHostFloatPointer(float a)
 	{
 		return Pointer.to(new float[] {a});
 	}
@@ -60,5 +73,17 @@ public class GpuUtil
 	public static Pointer createDeviceFloat(int n)
 	{
 		return createDeviceFloat(n, false);
+	}
+	
+	/**
+	 * Create an int array on device
+	 * @param memsetToZero true to initialize the memory to 0. Default false.
+	 */
+	public static Pointer createDeviceInt(int n)
+	{
+		Pointer p = new Pointer();
+		cudaMalloc(p, n * INT);
+		cudaMemset(p, 0, n * INT);
+		return p;
 	}
 }

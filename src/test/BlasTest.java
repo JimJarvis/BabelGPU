@@ -129,13 +129,41 @@ public class BlasTest
         FloatMat ansCopy = GpuBlas.copy(matA);
         PP.po(ansCopy.deflatten());
         
+		// **************************************
+        PP.pSectionLine();
+        PP.p("Max/Min absolute value index");
+        FloatMat matM = new FloatMat(
+        		new float[][] {{1, 3, 0},
+                              		  {2, 5, 7},
+                              		  {3, -5, 10},
+                              		  {6, -100, 10}});
+
+        int maxIdx = GpuBlas.maxAbsIndex(matM);
+        PP.p("Max:", maxIdx);
+        PP.p(matM.toCoord(maxIdx));
+        PP.p(matM.toIndex(matM.toCoord(maxIdx))); // = maxIdx
+
+        int minIdx = GpuBlas.minAbsIndex(matM);
+        PP.p("Min:", minIdx);
+        PP.p(matM.toCoord(minIdx));
+        PP.p(matM.toIndex(matM.toCoord(minIdx))); // = maxIdx
+        
+		// **************************************
+        PP.pSectionLine();
+        PP.p("L2-Norm");
+        FloatMat vecNorm = new FloatMat(new float[] {1, 2, -3, 4});
+        PP.p(GpuBlas.norm(vecNorm));
+        
+        
 
 		// Clean up
 		FloatMat[] mats = new FloatMat[] 
 				{matA, matB, ansAB, ans3AB, ansT, 
 				  matC, ansApC, ans2AmC, ansCtpAt,
 				  vecA, vecB, ansAvA, ans3AtvB, ans1CtvB, 
-				  ansCopy};
+				  ansCopy,
+				  matM,
+				  vecNorm};
 		for (FloatMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();

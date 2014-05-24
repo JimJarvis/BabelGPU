@@ -1,5 +1,11 @@
 package test;
 
+import jcuda.Pointer;
+
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
 import gpu.FloatMat;
 import utils.PP;
 
@@ -15,5 +21,10 @@ public class MiscTest
 		
 		PP.po(FloatMat.deflatten(A, 3));
 		PP.po(FloatMat.flatten(B));
+		
+		FloatMat m = new FloatMat(4, 3);
+		PP.p(m.toCoord(10));
+		PP.p(m.toIndex(3, 2));
+		
 	}
 }
