@@ -303,16 +303,6 @@ public class GpuBlas
 				valPtr);
 		return val[0];
 	}
-	
-	/**
-	 * Swap two FloatMat's device data
-	 */
-	public static void swap(FloatMat x, FloatMat y)
-	{
-		cublasSswap(handle, x.size(), 
-				x.getDevice(), 1, 
-				y.getDevice(), 1);
-	}
 
 
 	/**

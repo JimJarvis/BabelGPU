@@ -170,13 +170,6 @@ public class BlasTest
         PP.p("Dot product");
         PP.p(GpuBlas.dot(vecC, vecB));
 
-     // **************************************
-        PP.pSectionLine();
-        PP.p("Swap");
-        GpuBlas.swap(vecB, vecC);
-        PP.p("vecB:", vecB.transpose(), "and vecC:", vecC.transpose());
-        GpuBlas.swap(vecB, vecC);
-        PP.p("Swap back!\nvecB:", vecB.transpose(), "and vecC:", vecC.transpose());
 
 		// Clean up
 		FloatMat[] mats = new FloatMat[] 
