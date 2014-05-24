@@ -131,7 +131,7 @@ public class FloatMat
 	
 	/**
 	 * Get the device pointer
-	 * If not currently on Cublas, we copy it to GPU
+	 * If 'device' field is currently null, we copy host to GPU
 	 */
 	public Pointer getDevice()
 	{
@@ -140,22 +140,46 @@ public class FloatMat
 		return device;
 	}
 	
-	public void setDevice(Pointer device)
+	/**
+	 * Get the device pointer
+	 * No matter whether 'device' field is null or not, we copy host to GPU
+	 */
+	public Pointer getDeviceFromHost()
 	{
-		this.device = device;
+		if (host == null)  return null;
+		if (device != null)
+		{
+			cudaFree(device);
+			GpuBlas.hostToCublasFloat(host, device);
+		}
+		else // device is null
+    		device = GpuBlas.hostToCublasFloat(host);
+		return device;
 	}
 
 	/**
 	 * Get the host pointer
-	 * If not currently populated, we copy it to CPU
+	 * If host is currently null, we copy device to CPU
 	 */
 	public float[] getHost()
 	{
 		if (host == null)
-		{
-			host = new float[row * col];
+			host = GpuBlas.cublasToHostFloat(device, size());
+		return host;
+	}
+	
+	/**
+	 * Get the host pointer
+	 * No matter whether 'host' field is null or not, we copy device to CPU
+	 */
+	public float[] getHostFromDevice()
+	{
+		if (device == null) 	return null;
+		if (host != null)
 			GpuBlas.cublasToHostFloat(device, host);
-		}
+		else // host is null
+			host = GpuBlas.cublasToHostFloat(device, size());
+		
 		return host;
 	}
 	

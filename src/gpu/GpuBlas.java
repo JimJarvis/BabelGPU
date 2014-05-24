@@ -307,15 +307,37 @@ public class GpuBlas
 
 	/**
 	 * Create and copy to Cublas device vector
+	 * @return new device pointer
 	 */
 	public static Pointer hostToCublasFloat(float[] host)
 	{
 		int n = host.length;
-		Pointer p = GpuUtil.createDeviceFloat(n);
-
-		cublasSetVector(n, FLOAT, Pointer.to(host), 1, p, 1);
-
-		return p;
+		Pointer device = GpuUtil.createDeviceFloat(n);
+		cublasSetVector(n, FLOAT, 
+				Pointer.to(host), 1, 
+				device, 1);
+		return device;
+	}
+	
+	/**
+	 * Create and copy to Cublas device vector
+	 */
+	public static void hostToCublasFloat(float[] host, Pointer device)
+	{
+		cublasSetVector(host.length, FLOAT, 
+				Pointer.to(host), 1, 
+				device, 1);
+	}
+	
+	/**
+	 * Copy the device vector at Cublas back to host
+	 * @return new host array
+	 */
+	public static float[] cublasToHostFloat(Pointer device, int size)
+	{
+		float[] host = new float[size];
+		cublasGetVector(size, FLOAT, device, 1, Pointer.to(host), 1);
+		return host;
 	}
 
 	/**
