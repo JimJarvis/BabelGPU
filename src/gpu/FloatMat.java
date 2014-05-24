@@ -56,12 +56,22 @@ public class FloatMat
 	}
 	
 	/**
-	 * Ctor that initializes device to 0
+	 * Ctor with dimensions
+	 * @param memsetToZero true to initialize the device data to 0. Default true. 
+	 */
+	public FloatMat(int row, int col, boolean memsetToZero)
+	{
+		this.device = GpuUtil.createDeviceFloat(row * col, memsetToZero);
+		initDim(row, col);
+	}
+	
+	/**
+	 * Ctor with dimensions
+	 * The device data will be initialized to all 0
 	 */
 	public FloatMat(int row, int col)
 	{
-		this.device = GpuUtil.createDeviceFloat(row * col, true);
-		initDim(row, col);
+		this(row, col, true);
 	}
 	
 	/**
@@ -127,6 +137,11 @@ public class FloatMat
 		if (device == null)
 			device = GpuBlas.toCublasFloat(host);
 		return device;
+	}
+	
+	public void setDevice(Pointer device)
+	{
+		this.device = device;
 	}
 
 	/**

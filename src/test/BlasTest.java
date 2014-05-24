@@ -53,6 +53,7 @@ public class BlasTest
 		FloatMat matA = new FloatMat(A);
 		FloatMat matB = new FloatMat(B);
 		
+		// **************************************
 		PP.pSectionLine();
 		PP.p("Matrix-matrix Multiplication");
 		// A * B
@@ -79,6 +80,7 @@ public class BlasTest
 		GpuBlas.mult(matB.transpose(), matB, ansT, 1f, 0);
 		PP.po(ansT.deflatten());
 		
+		// **************************************
 		PP.pSectionLine();
 		PP.p("Matrix Addition");
 		
@@ -93,15 +95,16 @@ public class BlasTest
         PP.po(ansApC.deflatten());
         
         // 2 * A + (-1) C
-        FloatMat ans2AmC = new FloatMat(m, k);
+        FloatMat ans2AmC = new FloatMat(m, k, false);
         GpuBlas.add(matA, matC, ans2AmC, 2, -1);
         PP.po(ans2AmC.deflatten());
         
         // C' + A'
-        FloatMat ansCtpAt = new FloatMat(k, m);
+        FloatMat ansCtpAt = new FloatMat(k, m, false);
         GpuBlas.add(matC.transpose(), matA.transpose(), ansCtpAt);
         PP.po(ansCtpAt.deflatten());
         
+		// **************************************
         PP.pSectionLine();
         PP.p("Matrix-vector multiplication");
         float Va[] = new float[] {10, 20};
@@ -120,12 +123,19 @@ public class BlasTest
         FloatMat ans1CtvB = GpuBlas.multVec(matC.transpose(), vecB, -1, 2);
         PP.po(ans1CtvB.transpose().deflatten());
         
+		// **************************************
+        PP.pSectionLine();
+        PP.p("Copy");
+        FloatMat ansCopy = GpuBlas.copy(matA);
+        PP.po(ansCopy.deflatten());
+        
 
 		// Clean up
 		FloatMat[] mats = new FloatMat[] 
 				{matA, matB, ansAB, ans3AB, ansT, 
 				  matC, ansApC, ans2AmC, ansCtpAt,
-				  vecA, vecB, ansAvA, ans3AtvB, ans1CtvB};
+				  vecA, vecB, ansAvA, ans3AtvB, ans1CtvB, 
+				  ansCopy};
 		for (FloatMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();

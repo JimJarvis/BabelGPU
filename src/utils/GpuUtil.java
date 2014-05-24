@@ -43,13 +43,13 @@ public class GpuUtil
 	
 	/**
 	 * Create a float array on device
-	 * @param memset true to initialize the memory to 0. Default false.
+	 * @param memsetToZero true to initialize the memory to 0. Default false.
 	 */
-	public static Pointer createDeviceFloat(int n, boolean memset)
+	public static Pointer createDeviceFloat(int n, boolean memsetToZero)
 	{
 		Pointer p = new Pointer();
 		cudaMalloc(p, n * FLOAT);
-		if (memset)
+		if (memsetToZero)
     		cudaMemset(p, 0, n * FLOAT);
 		return p;
 	}

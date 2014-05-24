@@ -184,7 +184,7 @@ public class GpuBlas
 	 */
 	public static FloatMat add(FloatMat A, FloatMat B, float alpha, float beta)
 	{
-		return add(A, B, new FloatMat(A.row, A.col), alpha, beta);
+		return add(A, B, new FloatMat(A.row, A.col, false), alpha, beta);
 	}
 	/**
 	 * Add two FloatMat
@@ -193,6 +193,27 @@ public class GpuBlas
 	public static FloatMat add(FloatMat A, FloatMat B)
 	{
 		return add(A, B, 1, 1);
+	}
+	
+	/**
+	 * Copies a matrix device data to another. They should have the same dim. 
+	 * @return input parameter 'to'
+	 */
+	public static FloatMat copy(FloatMat from, FloatMat to)
+	{
+		cublasScopy(handle, from.row * from.col, 
+				from.getDevice(), 1, 
+				to.getDevice(), 1);
+		return to;
+	}
+	
+	/**
+	 * Copies a matrix device data to another. 
+	 * @return the new clone
+	 */
+	public static FloatMat copy(FloatMat from)
+	{
+		return copy(from, new FloatMat(from.row, from.col, false));
 	}
 
 
