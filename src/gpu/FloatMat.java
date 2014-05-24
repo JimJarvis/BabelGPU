@@ -160,6 +160,14 @@ public class FloatMat
 	}
 	
 	/**
+	 * @return row * col
+	 */
+	public int size()
+	{
+		return row * col;
+	}
+	
+	/**
 	 * Free the device pointer
 	 */
 	public void destroy()
@@ -208,6 +216,15 @@ public class FloatMat
 	{
 		return deflatten(getHost(), this.row);
 	}
+	
+	/**
+	 * @return its deflattened 2D float array representation
+	 */
+	public String toString()
+	{
+		return PP.o2str(this.deflatten());
+	}
+
 	
 	/**
 	 * Inner class for 2D coordinate in the matrix

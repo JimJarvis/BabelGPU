@@ -202,7 +202,7 @@ public class GpuBlas
 	 */
 	public static FloatMat copy(FloatMat from, FloatMat to)
 	{
-		cublasScopy(handle, from.row * from.col, 
+		cublasScopy(handle, from.size(), 
 				from.getDevice(), 1, 
 				to.getDevice(), 1);
 		return to;
@@ -225,7 +225,7 @@ public class GpuBlas
 	{
 		int[] hostIdx = new int[1];
 		Pointer deviceIdx = Pointer.to(hostIdx);
-		cublasIsamax(handle, A.row * A.col, A.getDevice(), 1, deviceIdx);
+		cublasIsamax(handle, A.size(), A.getDevice(), 1, deviceIdx);
 		cudaFree(deviceIdx);
 		return hostIdx[0] - 1; // adjust to 0-based
 	}
@@ -238,7 +238,7 @@ public class GpuBlas
 	{
 		int[] idx = new int[1];
 		Pointer idxPtr = Pointer.to(idx);
-		cublasIsamin(handle, A.row * A.col, A.getDevice(), 1, idxPtr);
+		cublasIsamin(handle, A.size(), A.getDevice(), 1, idxPtr);
 		return idx[0] - 1; // adjust to 0-based
 	}
 	
@@ -249,8 +249,32 @@ public class GpuBlas
 	{
 		float[] val = new float[1];
 		Pointer valPtr = Pointer.to(val);
-		cublasSnrm2(handle, A.row * A.col, A.getDevice(), 1, valPtr);
+		cublasSnrm2(handle, A.size(), A.getDevice(), 1, valPtr);
 		return val[0];
+	}
+	
+	/**
+	 * Scale and add onto an existing matrix
+	 * y = alpha * x + y
+	 * @return input parameter y
+	 */
+	public static FloatMat scaleAdd(FloatMat x, FloatMat y, float alpha)
+	{
+		cublasSaxpy(handle, x.size(), 
+				GpuUtil.toHostFloatPointer(alpha), 
+				x.getDevice(), 1, 
+				y.getDevice(), 1);
+		return y;
+	}
+	
+	/**
+	 * Scale and add onto an existing matrix
+	 * y += x
+	 * @return input parameter y
+	 */
+	public static FloatMat scaleAdd(FloatMat x, FloatMat y)
+	{	
+		return scaleAdd(x, y, 1);
 	}
 
 

@@ -58,27 +58,27 @@ public class BlasTest
 		PP.p("Matrix-matrix Multiplication");
 		// A * B
 		FloatMat ansAB = GpuBlas.mult(matA, matB, 1);
-		PP.po(ansAB.deflatten());
+		PP.po(ansAB);
 		
 		// 2 * A * B + (A*B)
 		FloatMat ans3AB = new FloatMat(m, n);
 		GpuBlas.mult(matA, matB, ans3AB);
 		GpuBlas.mult(matA, matB, ans3AB, 2, 1);
-		PP.po(ans3AB.deflatten());
+		PP.po(ans3AB);
 		
 		// T = B' * A'
 		FloatMat ansT = GpuBlas.mult(matB.transpose(), matA.transpose());
-		PP.po(ansT.deflatten());
+		PP.po(ansT);
 		ansT.destroy();
 
 		ansT = new FloatMat(m, m);
 		GpuBlas.mult(matA, matA.transpose(), ansT, 0.5f, 0);
-		PP.po(ansT.deflatten());
+		PP.po(ansT);
 		ansT.destroy();
 		
 		ansT = new FloatMat(n, n);
 		GpuBlas.mult(matB.transpose(), matB, ansT, 1f, 0);
-		PP.po(ansT.deflatten());
+		PP.po(ansT);
 		
 		// **************************************
 		PP.pSectionLine();
@@ -92,17 +92,17 @@ public class BlasTest
         
         // A + C
         FloatMat ansApC = GpuBlas.add(matA, matC);
-        PP.po(ansApC.deflatten());
+        PP.po(ansApC);
         
         // 2 * A + (-1) C
         FloatMat ans2AmC = new FloatMat(m, k, false);
         GpuBlas.add(matA, matC, ans2AmC, 2, -1);
-        PP.po(ans2AmC.deflatten());
+        PP.po(ans2AmC);
         
         // C' + A'
         FloatMat ansCtpAt = new FloatMat(k, m, false);
         GpuBlas.add(matC.transpose(), matA.transpose(), ansCtpAt);
-        PP.po(ansCtpAt.deflatten());
+        PP.po(ansCtpAt);
         
 		// **************************************
         PP.pSectionLine();
@@ -114,20 +114,20 @@ public class BlasTest
         FloatMat vecB = new FloatMat(Vb);
         
         FloatMat ansAvA = GpuBlas.multVec(matA, vecA);
-        PP.po(ansAvA.transpose().deflatten());
+        PP.po(ansAvA.transpose());
         
         FloatMat ans3AtvB = new FloatMat(2, 1);
         GpuBlas.multVec(matA.transpose(), vecB, ans3AtvB, 3, 100);
-        PP.po(ans3AtvB.transpose().deflatten());
+        PP.po(ans3AtvB.transpose());
 
         FloatMat ans1CtvB = GpuBlas.multVec(matC.transpose(), vecB, -1, 2);
-        PP.po(ans1CtvB.transpose().deflatten());
+        PP.po(ans1CtvB.transpose());
         
 		// **************************************
         PP.pSectionLine();
         PP.p("Copy");
         FloatMat ansCopy = GpuBlas.copy(matA);
-        PP.po(ansCopy.deflatten());
+        PP.po(ansCopy);
         
 		// **************************************
         PP.pSectionLine();
@@ -151,10 +151,16 @@ public class BlasTest
 		// **************************************
         PP.pSectionLine();
         PP.p("L2-Norm");
-        FloatMat vecNorm = new FloatMat(new float[] {1, 2, -3, 4});
-        PP.p(GpuBlas.norm(vecNorm));
+        FloatMat vecC = new FloatMat(new float[] {1, 2, -3, 4});
+        PP.p(GpuBlas.norm(vecC));
         
-        
+		// **************************************
+        PP.pSectionLine();
+        PP.p("L2-Norm");
+        FloatMat ansvBpvC = new FloatMat(4, 1);
+        // -5, -10, 0, 3
+        PP.p(GpuBlas.scaleAdd(vecB, ansvBpvC, 6).transpose());
+        PP.p(GpuBlas.scaleAdd(vecC, ansvBpvC, -1).transpose());
 
 		// Clean up
 		FloatMat[] mats = new FloatMat[] 
@@ -163,7 +169,7 @@ public class BlasTest
 				  vecA, vecB, ansAvA, ans3AtvB, ans1CtvB, 
 				  ansCopy,
 				  matM,
-				  vecNorm};
+				  vecC};
 		for (FloatMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();
