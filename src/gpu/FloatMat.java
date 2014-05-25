@@ -1,5 +1,6 @@
 package gpu;
 
+import gpu.ThrustStruct.FloatDevicePointer;
 import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
@@ -12,7 +13,9 @@ import static jcuda.jcublas.cublasOperation.*;
 public class FloatMat
 {
 	private float[] host = null;
-	private Pointer device = null;
+	private Pointer device = null; // jCuda pointer
+	private FloatDevicePointer thrustPointer = null; // Thrust pointer
+	
 	// This field records whether the matrix should be transposed or not
 	private int op = CUBLAS_OP_N; 
 	public int row;
@@ -81,6 +84,7 @@ public class FloatMat
 	{
 		this.host = other.host;
 		this.device = other.device;
+		this.thrustPointer = other.thrustPointer;
 		this.row = other.row;
 		this.col = other.col;
 		this.ldim = other.ldim;
@@ -287,5 +291,16 @@ public class FloatMat
 	public int toIndex(Coord c)
 	{
 		return c.j * row + c.i;
+	}
+	
+	// ******************** Interface to Thrust API ****************** /
+	/**
+	 * Get the thrust pointer
+	 */
+	public FloatDevicePointer getThrustPointer()
+	{
+		if (thrustPointer == null && device != null)
+			thrustPointer = new FloatDevicePointer(this.device);
+		return thrustPointer;
 	}
 }

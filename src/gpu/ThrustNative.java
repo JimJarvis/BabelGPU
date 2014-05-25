@@ -39,7 +39,7 @@ public class ThrustNative
     public static native void gpu_sqrt_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
 
 	/**
-	 * pow(a*x + b, p) in place, or with an output pointer
+	 * (a*x + b) ^p in place, or with an output pointer
 	 */
     public static native void gpu_pow_float(@ByVal FloatDevicePointer begin, int size, float p, float a, float b);
     public static native void gpu_pow_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float p, float a, float b);
@@ -101,8 +101,10 @@ public class ThrustNative
      */
     public static native @ByVal FloatDevicePointer offset_float(@ByVal FloatDevicePointer begin, int offset);
 
+    
+    // ******************** Babel specific methods ****************** /
     /**
-     * Babel specific method: I[y == j] - softmax(alpha_vec)
+     * I[y == j] - softmax(alpha_vec)
      */
     public static native void babel_id_minus_softmax(@ByVal FloatDevicePointer begin, int size, int id);
     
