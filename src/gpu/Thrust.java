@@ -93,7 +93,7 @@ public class Thrust
 	{
 		gpu_pow_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
 	}
-	public static void pow(FloatMat x, float p) {  pow(x, p, 1, 0); }
+	public static void pow(FloatMat x, float p) {  pow(x, p, 0, 0); }
 	public static void pow(FloatMat x, FloatMat out, float p) {  pow(x, out, p, 1, 0); }
 	
 	/**
@@ -107,8 +107,6 @@ public class Thrust
 	{
 		gpu__float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
-	public static void linear(FloatMat x) {  linear(x, 1, 0); }
-	public static void linear(FloatMat x, FloatMat out) {  linear(x, out, 1, 0); }
 	
 	public static float sum(FloatMat x)
 	{

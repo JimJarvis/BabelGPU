@@ -78,7 +78,7 @@ public class FloatMat
 	}
 	
 	/**
-	 * Copy ctor for clone()
+	 * Copy ctor
 	 */
 	private FloatMat(FloatMat other)
 	{
@@ -302,5 +302,120 @@ public class FloatMat
 		if (thrustPointer == null && device != null)
 			thrustPointer = new FloatDevicePointer(this.device);
 		return thrustPointer;
+	}
+	
+	/**
+	 * exp(a * x + b)
+	 */
+	public FloatMat exp(float a, float b)
+	{
+		Thrust.exp(this, a, b); return this;
+	}
+	public FloatMat exp()
+	{
+		Thrust.exp(this); return this;
+	}
+	
+	/**
+	 * log(a * x + b)
+	 */
+	public FloatMat log(float a, float b)
+	{
+		Thrust.log(this, a, b); return this;
+	}
+	public FloatMat log()
+	{
+		Thrust.log(this); return this;
+	}
+	
+	/**
+	 * cos(a * x + b)
+	 */
+	public FloatMat cos(float a, float b)
+	{
+		Thrust.cos(this, a, b); return this;
+	}
+	public FloatMat cos()
+	{
+		Thrust.cos(this); return this;
+	}
+	
+	/**
+	 * sin(a * x + b)
+	 */
+	public FloatMat sin(float a, float b)
+	{
+		Thrust.sin(this, a, b); return this;
+	}
+	public FloatMat sin()
+	{
+		Thrust.sin(this); return this;
+	}
+	
+	/**
+	 * sqrt(a * x + b)
+	 */
+	public FloatMat sqrt(float a, float b)
+	{
+		Thrust.sqrt(this, a, b); return this;
+	}
+	public FloatMat sqrt()
+	{
+		Thrust.sqrt(this); return this;
+	}
+	
+	/**
+	 * (a * x + b) ^p
+	 */
+	public FloatMat pow(float p, float a, float b)
+	{
+		Thrust.pow(this, p, a, b); return this;
+	}
+	public FloatMat pow(float p)
+	{
+		Thrust.pow(this, p); return this;
+	}
+	
+	/**
+	 * (a * x + b)
+	 */
+	public FloatMat linear(float a, float b)
+	{
+		Thrust.linear(this, a, b); return this;
+	}
+	
+	public float max()
+	{
+		return Thrust.max(this);
+	}
+
+	public float min()
+	{
+		return Thrust.min(this);
+	}
+
+	public float sum()
+	{
+		return Thrust.sum(this);
+	}
+
+	public float product()
+	{
+		return Thrust.product(this);
+	}
+	
+	public FloatMat sort()
+	{
+		Thrust.sort(this);	return this;
+	}
+	
+	public FloatMat fill(float val)
+	{
+		Thrust.fill(this, val);	return this;
+	}
+	
+	public FloatMat copyFrom(FloatMat other)
+	{
+		Thrust.copy(other, this);	return this;
 	}
 }
