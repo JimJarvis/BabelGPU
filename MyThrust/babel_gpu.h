@@ -1,3 +1,6 @@
+/*
+* Babel project specific GPU instructions
+*/
 #ifndef babel_gpu_h__
 #define babel_gpu_h__
 
@@ -12,25 +15,21 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cmath>
+#include "my_gpu.h"
 using namespace thrust;
+
+#include <cstdio>
 
 namespace MyGpu
 {
 // I [y==j] - softmax(alpha)
-struct babel_id_minus_softmax_functor
+inline void babel_id_minus_softmax(device_ptr<float> begin, device_ptr<float> end, int id)
 {
-	__host__ __device__ float operator()(const float& x) const
-	{
-		return log(x);
-	}
-};
-
-// I [y==j] - softmax(alpha)
-inline int babel_id_minus_softmax(device_ptr<float> begin, device_ptr<float> end, int id)
-{
-	//float mx = gpu_max_float(begin, end);
-	return 66;
-
+	float mx = gpu_max_float(begin, end);
+	gpu_exp_float(begin, end, 1, -mx);
+	float s = gpu_sum_float(begin, end);
+	gpu__float(begin, end, -1.0f / s, 0);
+	++ *(begin + id);  // when at id, x = 1 - x
 }
 }
 

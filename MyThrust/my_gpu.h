@@ -158,8 +158,14 @@ inline float gpu_max_float(device_ptr<float> begin, device_ptr<float> end)
 
 inline float gpu_sum_float(device_ptr<float> begin, device_ptr<float> end)
 {
-	reduce(begin, end, 0, thrust::plus<float>());
+	return reduce(begin, end, 0.0f, thrust::plus<float>());
 }
+
+inline float gpu_product_float(device_ptr<float> begin, device_ptr<float> end)
+{
+	return reduce(begin, end, 1.0f, thrust::multiplies<float>());
+}
+
 }
 
 #endif // try_h__
