@@ -1,10 +1,12 @@
 #!/bin/bash
 
-main="test/BlasTest"
+main="test/ThrustTest"
 #main="demo/JavacppDemo"
 
+cp *.h bin/gpu/
+
 cd bin
-java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" gpu/Thrust $main -properties windows-x86_64-cuda > stderr.log
+java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" gpu/Thrust gpu/ThrustStruct $main -properties windows-x86_64-cuda > stderr.log
 
 #java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" $main -properties windows-x86_64-cuda > stderr.log
 
