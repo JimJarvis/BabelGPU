@@ -227,5 +227,10 @@ namespace MyGpu
 		thrust::swap_ranges(begin, begin + size, out);
 	}
 
+	// Utility function for java
+	inline device_ptr<float> offset_float(device_ptr<float> begin, int offset)
+	{
+		return begin + offset;
+	}
 }
 #endif // try_h__

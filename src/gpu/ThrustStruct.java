@@ -34,7 +34,11 @@ public class ThrustStruct
         			}.a;
         		} 
         	}); 
-        } 
+        }
+        public FloatDevicePointer offset(int n)
+        {		
+        	return Thrust.offset_float(this, n);
+        }
         
         private native void allocate(FloatPointer ptr);
         public native FloatPointer get();
