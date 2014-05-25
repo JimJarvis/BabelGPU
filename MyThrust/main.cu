@@ -2,7 +2,7 @@
 #include "babel_gpu.h"
 #include <iostream>
 #define PI 3.14159265358979
-#define range &D[0],&D[D.size()]
+#define range &D[0],D.size()
 #define pr(stuff) std::cout << stuff << std::endl
 using namespace MyGpu;
 
@@ -86,8 +86,8 @@ void test_sort_copy_swap()
 	printf("Copying E\n");
 	gpu_copy_float(range, &E[0]);
 	printDevice(E);
-	gpu_fill_float(&E[0], &E[7], -666);
-	gpu_copy_partial_float(&D[0], &E[0], 2, 3, 4);
+	gpu_fill_float(&E[0], E.size(), -666);
+	gpu_copy_float(&D[2], 3, &E[4]);
 	printDevice(E);
 
 	printf("Swapping E\n");
@@ -126,5 +126,8 @@ void test_exp_out_pointer()
 
 void main()
 {
-
+	test_babel();
+	test_exp();
+	test_exp_out_pointer();
+	test_sort_copy_swap();
 }

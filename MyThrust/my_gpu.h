@@ -45,31 +45,31 @@ struct functor_##name##_float_3{ \
 };
 
 // Macro defines corresponding thrust::transform for various linear unary functors
-// gpu_exp_float(2 pointer) is in place transformation, while gpu_exp_float(3 pointer) writes to an output pointer.
+// gpu_exp_float(begin, size) is in place transformation, while gpu_exp_float(begin, size, out) writes to an output pointer.
 #define GEN_FLOAT_TRANS(name) \
 GEN_LINEAR_FLOAT_FUNCTOR(name); \
-inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, float a = 1, float b = 0) \
+inline void gpu_##name##_float(device_ptr<float> begin, int size, float a = 1, float b = 0) \
 { \
 	if (a == 1 && b == 0) \
-		transform(begin, end, begin, functor_##name##_float()); \
+		transform(begin, begin + size, begin, functor_##name##_float()); \
 	else if (a == 1) \
-		transform(begin, end, begin, functor_##name##_float_1(b)); \
+		transform(begin, begin + size, begin, functor_##name##_float_1(b)); \
 	else if (b == 0) \
-		transform(begin, end, begin, functor_##name##_float_2(a)); \
+		transform(begin, begin + size, begin, functor_##name##_float_2(a)); \
 	else \
-		transform(begin, end, begin, functor_##name##_float_3(a, b)); \
+		transform(begin, begin + size, begin, functor_##name##_float_3(a, b)); \
 } \
-inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, \
+inline void gpu_##name##_float(device_ptr<float> begin, int size, \
 	device_ptr<float> out, float a = 1, float b = 0) \
 { \
 if (a == 1 && b == 0) \
-	transform(begin, end, out, functor_##name##_float()); \
+	transform(begin, begin + size, out, functor_##name##_float()); \
 	else if (a == 1) \
-	transform(begin, end, out, functor_##name##_float_1(b)); \
+	transform(begin, begin + size, out, functor_##name##_float_1(b)); \
 	else if (b == 0) \
-	transform(begin, end, out, functor_##name##_float_2(a)); \
+	transform(begin, begin + size, out, functor_##name##_float_2(a)); \
 	else \
-	transform(begin, end, out, functor_##name##_float_3(a, b)); \
+	transform(begin, begin + size, out, functor_##name##_float_3(a, b)); \
 }
 
 
@@ -102,31 +102,31 @@ struct functor_##name##_float_3{ \
 };
 
 // Macro defines corresponding thrust::transform for various linear binary functors
-// gpu_pow_float(2 pointer) is in place transformation, while gpu_pow_float(3 pointer) writes to an output pointer.
+// gpu_pow_float(begin, size) is in place transformation, while gpu_pow_float(begin, size, out) writes to an output pointer.
 #define GEN_FLOAT_TRANS_2(name) \
 GEN_LINEAR_FLOAT_FUNCTOR_2(name); \
-inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, float p, float a = 1, float b = 0) \
+inline void gpu_##name##_float(device_ptr<float> begin, int size, float p, float a = 1, float b = 0) \
 { \
 	if (a == 1 && b == 0) \
-		transform(begin, end, begin, functor_##name##_float(p)); \
+		transform(begin, begin + size, begin, functor_##name##_float(p)); \
 	else if (a == 1) \
-		transform(begin, end, begin, functor_##name##_float_1(p, b)); \
+		transform(begin, begin + size, begin, functor_##name##_float_1(p, b)); \
 	else if (b == 0) \
-		transform(begin, end, begin, functor_##name##_float_2(p, a)); \
+		transform(begin, begin + size, begin, functor_##name##_float_2(p, a)); \
 	else \
-		transform(begin, end, begin, functor_##name##_float_3(p, a, b)); \
+		transform(begin, begin + size, begin, functor_##name##_float_3(p, a, b)); \
 } \
-inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, \
+inline void gpu_##name##_float(device_ptr<float> begin, int size, \
 	device_ptr<float> out, float p, float a = 1, float b = 0) \
 { \
 if (a == 1 && b == 0) \
-	transform(begin, end, out, functor_##name##_float(p)); \
+	transform(begin, begin + size, out, functor_##name##_float(p)); \
 	else if (a == 1) \
-	transform(begin, end, out, functor_##name##_float_1(p, b)); \
+	transform(begin, begin + size, out, functor_##name##_float_1(p, b)); \
 	else if (b == 0) \
-	transform(begin, end, out, functor_##name##_float_2(p, a)); \
+	transform(begin, begin + size, out, functor_##name##_float_2(p, a)); \
 	else \
-	transform(begin, end, out, functor_##name##_float_3(p, a, b)); \
+	transform(begin, begin + size, out, functor_##name##_float_3(p, a, b)); \
 }
 
 namespace MyGpu
@@ -176,64 +176,55 @@ namespace MyGpu
 	GEN_FLOAT_TRANS(atanh);
 #endif
 
-	inline float gpu_max_float(device_ptr<float> begin, device_ptr<float> end)
+	inline float gpu_max_float(device_ptr<float> begin, int size)
 	{
-		device_ptr<float> m = max_element(begin, end);
+		device_ptr<float> m = max_element(begin, begin+size);
 		return *m;
 	}
 
-	inline float gpu_min_float(device_ptr<float> begin, device_ptr<float> end)
+	inline float gpu_min_float(device_ptr<float> begin, int size)
 	{
-		device_ptr<float> m = min_element(begin, end);
+		device_ptr<float> m = min_element(begin, begin+size);
 		return *m;
 	}
 
-	inline float gpu_sum_float(device_ptr<float> begin, device_ptr<float> end)
+	inline float gpu_sum_float(device_ptr<float> begin, int size)
 	{
-		return reduce(begin, end, 0.0f, thrust::plus<float>());
+		return reduce(begin, begin+size, 0.0f, thrust::plus<float>());
 	}
 
-	inline float gpu_product_float(device_ptr<float> begin, device_ptr<float> end)
+	inline float gpu_product_float(device_ptr<float> begin, int size)
 	{
-		return reduce(begin, end, 1.0f, thrust::multiplies<float>());
+		return reduce(begin, begin+size, 1.0f, thrust::multiplies<float>());
 	}
 
 	// dir = ascending: 1, descending -1
-	inline void gpu_sort_float(device_ptr<float> begin, device_ptr<float> end, int dir = 1)
+	inline void gpu_sort_float(device_ptr<float> begin, int size, int dir = 1)
 	{
 		if (dir > 0) // ascending sort
-			thrust::sort(begin, end);
+			thrust::sort(begin, begin+size);
 		else // descending sort
-			thrust::sort(begin, end, greater<float>());
+			thrust::sort(begin, begin+size, greater<float>());
 	}
 
 	// Copy the whole thing
-	inline void gpu_copy_float(device_ptr<float> begin_from, device_ptr<float> end_from, \
-							   device_ptr<float> begin_to)
+	inline void gpu_copy_float(device_ptr<float> begin, int size, \
+							   device_ptr<float> out)
 	{
-		thrust::copy(begin_from, end_from, begin_to);
-	}
-
-	// Partial copy
-	inline void gpu_copy_partial_float( \
-		device_ptr<float> begin_from, device_ptr<float> begin_to, \
-		int from_start, int from_size, int to_start)
-
-	{
-		thrust::copy_n(begin_from + from_start, from_size, begin_to + to_start);
+		thrust::copy(begin, begin+size, out);
 	}
 
 	// Fill the array with the same value
-	inline void gpu_fill_float(device_ptr<float> begin, device_ptr<float> end, int val)
+	inline void gpu_fill_float(device_ptr<float> begin, int size, int val)
 	{
-		thrust::fill(begin, end, val);
+		thrust::fill(begin, begin + size, val);
 	}
 
 	// Swap two arrays
-	inline void gpu_swap_float(device_ptr<float> begin_from, device_ptr<float> end_from, \
-							   device_ptr<float> begin_to)
+	inline void gpu_swap_float(device_ptr<float> begin, int size, \
+							   device_ptr<float> out)
 	{
-		thrust::swap_ranges(begin_from, end_from, begin_to);
+		thrust::swap_ranges(begin, begin + size, out);
 	}
 
 }

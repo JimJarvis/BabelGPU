@@ -20,12 +20,12 @@ using namespace thrust;
 namespace MyGpu
 {
 // I [y==j] - softmax(alpha)
-inline void babel_id_minus_softmax(device_ptr<float> begin, device_ptr<float> end, int id)
+inline void babel_id_minus_softmax(device_ptr<float> begin, int size, int id)
 {
-	float mx = gpu_max_float(begin, end);
-	gpu_exp_float(begin, end, 1, -mx);
-	float s = gpu_sum_float(begin, end);
-	gpu__float(begin, end, -1.0f / s, 0);
+	float mx = gpu_max_float(begin, size);
+	gpu_exp_float(begin, size, 1, -mx);
+	float s = gpu_sum_float(begin, size);
+	gpu__float(begin, size, -1.0f / s, 0);
 	++ *(begin + id);  // when at id, x = 1 - x
 }
 }
