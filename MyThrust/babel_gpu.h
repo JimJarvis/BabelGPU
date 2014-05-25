@@ -10,15 +10,12 @@
 #include <thrust/copy.h>
 #include <thrust/reduce.h>
 #include <thrust/functional.h>
-#include <thrust/extrema.h>
 #include <thrust/sort.h>
 #include <algorithm>
 #include <cstdlib>
 #include <cmath>
 #include "my_gpu.h"
 using namespace thrust;
-
-#include <cstdio>
 
 namespace MyGpu
 {

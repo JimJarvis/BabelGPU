@@ -105,73 +105,110 @@ inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, f
 
 namespace MyGpu
 {
-// Generate unary transform functions
-// Exp and logs
-GEN_FLOAT_TRANS(exp);
-GEN_FLOAT_TRANS(log);
-GEN_FLOAT_TRANS(log10);
-GEN_FLOAT_TRANS(sqrt);
+	// Generate unary transform functions
+	// Exp and logs
+	GEN_FLOAT_TRANS(exp);
+	GEN_FLOAT_TRANS(log);
+	GEN_FLOAT_TRANS(log10);
+	GEN_FLOAT_TRANS(sqrt);
 
-// Trigs
-GEN_FLOAT_TRANS(cos);
-GEN_FLOAT_TRANS(sin);
-GEN_FLOAT_TRANS(tan);
-GEN_FLOAT_TRANS(acos);
-GEN_FLOAT_TRANS(asin);
-GEN_FLOAT_TRANS(atan);
-GEN_FLOAT_TRANS(cosh);
-GEN_FLOAT_TRANS(sinh);
-GEN_FLOAT_TRANS(tanh);
+	// Trigs
+	GEN_FLOAT_TRANS(cos);
+	GEN_FLOAT_TRANS(sin);
+	GEN_FLOAT_TRANS(tan);
+	GEN_FLOAT_TRANS(acos);
+	GEN_FLOAT_TRANS(asin);
+	GEN_FLOAT_TRANS(atan);
+	GEN_FLOAT_TRANS(cosh);
+	GEN_FLOAT_TRANS(sinh);
+	GEN_FLOAT_TRANS(tanh);
 
-// Other
-GEN_FLOAT_TRANS(fabs); // abs()
-GEN_FLOAT_TRANS(floor);
-GEN_FLOAT_TRANS(ceil);
-GEN_FLOAT_TRANS(); // gpu__float(), for plain linear transformation
+	// Other
+	GEN_FLOAT_TRANS(fabs); // abs()
+	GEN_FLOAT_TRANS(floor);
+	GEN_FLOAT_TRANS(ceil);
+	GEN_FLOAT_TRANS(); // gpu__float(), for plain linear transformation
 
-// Generate binary transform functions
-GEN_FLOAT_TRANS_2(pow);
-GEN_FLOAT_TRANS_2(fmod);
+	// Generate binary transform functions
+	GEN_FLOAT_TRANS_2(pow);
+	GEN_FLOAT_TRANS_2(fmod);
 
-// MSVC doesn't yet fully support C++11, these only work on linux
+	// MSVC doesn't yet fully support C++11, these only work on linux
 #ifndef _WIN32
-GEN_FLOAT_TRANS(exp2);
-GEN_FLOAT_TRANS(expm1); // exp - 1
-GEN_FLOAT_TRANS(log1p); // ln + 1
-GEN_FLOAT_TRANS(log2);
-GEN_FLOAT_TRANS(cbrt); // cubic root
-GEN_FLOAT_TRANS(hypot); // hypotenus
-GEN_FLOAT_TRANS(erf); // error function
-GEN_FLOAT_TRANS(erfc); // complementary error function
-GEN_FLOAT_TRANS(tgamma); // gamma function
-GEN_FLOAT_TRANS(lgamma); // log-gamma function
-GEN_FLOAT_TRANS(acosh);
-GEN_FLOAT_TRANS(asinh);
-GEN_FLOAT_TRANS(atanh);
+	GEN_FLOAT_TRANS(exp2);
+	GEN_FLOAT_TRANS(expm1); // exp - 1
+	GEN_FLOAT_TRANS(log1p); // ln + 1
+	GEN_FLOAT_TRANS(log2);
+	GEN_FLOAT_TRANS(cbrt); // cubic root
+	GEN_FLOAT_TRANS(hypot); // hypotenus
+	GEN_FLOAT_TRANS(erf); // error function
+	GEN_FLOAT_TRANS(erfc); // complementary error function
+	GEN_FLOAT_TRANS(tgamma); // gamma function
+	GEN_FLOAT_TRANS(lgamma); // log-gamma function
+	GEN_FLOAT_TRANS(acosh);
+	GEN_FLOAT_TRANS(asinh);
+	GEN_FLOAT_TRANS(atanh);
 #endif
 
-inline float gpu_max_float(device_ptr<float> begin, device_ptr<float> end)
-{
-	device_ptr<float> m = max_element(begin, end);
-	return *m;
-}
+	inline float gpu_max_float(device_ptr<float> begin, device_ptr<float> end)
+	{
+		device_ptr<float> m = max_element(begin, end);
+		return *m;
+	}
 
-inline float gpu_min_float(device_ptr<float> begin, device_ptr<float> end)
-{
-	device_ptr<float> m = min_element(begin, end);
-	return *m;
-}
+	inline float gpu_min_float(device_ptr<float> begin, device_ptr<float> end)
+	{
+		device_ptr<float> m = min_element(begin, end);
+		return *m;
+	}
 
-inline float gpu_sum_float(device_ptr<float> begin, device_ptr<float> end)
-{
-	return reduce(begin, end, 0.0f, thrust::plus<float>());
-}
+	inline float gpu_sum_float(device_ptr<float> begin, device_ptr<float> end)
+	{
+		return reduce(begin, end, 0.0f, thrust::plus<float>());
+	}
 
-inline float gpu_product_float(device_ptr<float> begin, device_ptr<float> end)
-{
-	return reduce(begin, end, 1.0f, thrust::multiplies<float>());
-}
+	inline float gpu_product_float(device_ptr<float> begin, device_ptr<float> end)
+	{
+		return reduce(begin, end, 1.0f, thrust::multiplies<float>());
+	}
+
+	// dir = ascending: 1, descending -1
+	inline void gpu_sort_float(device_ptr<float> begin, device_ptr<float> end, int dir = 1)
+	{
+		if (dir > 0) // ascending sort
+			thrust::sort(begin, end);
+		else // descending sort
+			thrust::sort(begin, end, greater<float>());
+	}
+
+	// Copy the whole thing
+	inline void gpu_copy_float(device_ptr<float> begin_from, device_ptr<float> end_from, \
+							   device_ptr<float> begin_to)
+	{
+		thrust::copy(begin_from, end_from, begin_to);
+	}
+
+	// Partial copy
+	inline void gpu_copy_partial_float( \
+		device_ptr<float> begin_from, device_ptr<float> begin_to, \
+		int from_start, int from_size, int to_start)
+
+	{
+		thrust::copy_n(begin_from + from_start, from_size, begin_to + to_start);
+	}
+
+	// Fill the array with the same value
+	inline void gpu_fill_float(device_ptr<float> begin, device_ptr<float> end, int val)
+	{
+		thrust::fill(begin, end, val);
+	}
+
+	// Swap two arrays
+	inline void gpu_swap_float(device_ptr<float> begin_from, device_ptr<float> end_from, \
+							   device_ptr<float> begin_to)
+	{
+		thrust::swap_ranges(begin_from, end_from, begin_to);
+	}
 
 }
-
 #endif // try_h__

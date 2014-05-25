@@ -61,7 +61,7 @@ void test_exp()
 	D = F; gpu_sqrt_float(range, 0.7, 4); printDevice(D);
 }
 
-void main()
+void test_babel()
 {
 	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
 	device_vector<float> D = getD(x, 7);
@@ -70,6 +70,31 @@ void main()
 
 	babel_id_minus_softmax(range, 3);
 	printDevice(D);
+}
 
-	//test_exp();
+void main()
+{
+	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
+	device_vector<float> D = getD(x, 7);
+	gpu_sort_float(range);
+	printDevice(D);
+
+	D = getD(x, 7);
+	gpu_sort_float(range, -1);
+	printDevice(D);
+
+	device_vector<float> E(7, -666);
+	printf("Copying E\n");
+	gpu_copy_float(range, &E[0]);
+	printDevice(E);
+	thrust::fill(&E[0], &E[7], -666);
+	gpu_copy_partial_float(&D[0], &E[0], 2, 3, 4);
+	printDevice(E);
+
+	printf("Swapping E\n");
+	float y[4] = { 4, 3, 2, 1 };
+	D = getD(y, 4);
+	gpu_swap_float(range, &E[0]);
+	printDevice(D);
+	printDevice(E);
 }
