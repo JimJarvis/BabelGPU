@@ -25,6 +25,11 @@ public class FloatMat
 	public int ldim; 
 	
 	/**
+	 * Default ctor
+	 */
+	public FloatMat() {	}
+	
+	/**
 	 * Ctor from host data
 	 */
 	public FloatMat(float[] host, int row, int col)
@@ -78,16 +83,12 @@ public class FloatMat
 	}
 	
 	/**
-	 * Copy ctor
+	 * Instantiate a new empty FloatMat with the same size
+	 * NOTE: doesn't copy any data. Only the same row/col
 	 */
-	private FloatMat(FloatMat other)
+	public FloatMat(FloatMat other)
 	{
-		this.host = other.host;
-		this.device = other.device;
-		this.thrustPointer = other.thrustPointer;
-		this.row = other.row;
-		this.col = other.col;
-		this.ldim = other.ldim;
+		this(other.row, other.col);
 	}
 	
 	// Ctor helper
@@ -98,6 +99,20 @@ public class FloatMat
 		this.ldim = row;
 	}
 	
+	// Shallow copy create new instance
+	private FloatMat shallowCopy()
+	{
+		FloatMat mat = new FloatMat();
+		mat.row = this.row;
+		mat.col = this.col;
+		mat.ldim = this.ldim;
+		mat.op = this.op;
+		mat.device = this.device;
+		mat.host = this.host;
+		mat.thrustPointer = this.thrustPointer;
+		
+		return mat;
+	}
 	
 	/**
 	 * Transpose the matrix and return a new one
@@ -106,12 +121,12 @@ public class FloatMat
 	 */
 	public FloatMat transpose()
 	{
-		FloatMat mat = new FloatMat(this);
-		mat.op = (op != CUBLAS_OP_N) ? 
-				CUBLAS_OP_N : CUBLAS_OP_T;
 		// Swap row and col dimension
+		FloatMat mat = this.shallowCopy();
 		mat.row = this.col;
 		mat.col = this.row;
+		mat.op = (op != CUBLAS_OP_N) ? 
+				CUBLAS_OP_N : CUBLAS_OP_T;
 		return mat;
 	}
 	
@@ -201,6 +216,8 @@ public class FloatMat
 	{
 		host = null;
 		cudaFree(device);
+		device = null;
+		thrustPointer = null;
 	}
 	
 	/**
@@ -299,8 +316,12 @@ public class FloatMat
 	 */
 	public FloatDevicePointer getThrustPointer()
 	{
-		if (thrustPointer == null && device != null)
+		if (thrustPointer == null)
+		{
+			if (device == null) // initialize device
+				this.getDevice();
 			thrustPointer = new FloatDevicePointer(this.device);
+		}
 		return thrustPointer;
 	}
 	

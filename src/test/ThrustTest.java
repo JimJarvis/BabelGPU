@@ -2,27 +2,34 @@ package test;
 
 import utils.PP;
 import gpu.*;
-import gpu.ThrustStruct.*;
 
 public class ThrustTest
 {
 
 	public static void main(String[] args)
 	{
-		float[] f = new float[] {4, 3, 2, 1, 10, -5};
-		FloatMat vec = new FloatMat(f);
-		FloatMat out = new FloatMat(6, 1);
-		FloatDevicePointer fp = new FloatDevicePointer(vec.getDevice());
-//		FloatDevicePointer fplast = new FloatDevicePointer(fp.get().position(vec.size()));
-		FloatDevicePointer fp1 = fp.offset(1);
+		float[] f = new float[] {25, 100, 16, 1024};
+		FloatMat O = new FloatMat(f);
 		
+		FloatMat a = new FloatMat(O);
+		a.fill(66);
+		PP.p(a);
 		
-		PP.p(vec.getHostFromDevice());
+		a.copyFrom(O); a.pow(0.5f); PP.p(a);
+		a.copyFrom(O); a.pow(0.5f, 0.7f, 0); PP.p(a);
+		a.copyFrom(O); a.pow(0.5f, 1, 4); PP.p(a);
+		a.copyFrom(O); a.pow(0.5f, .7f, 4); PP.p(a);
+
+		a.copyFrom(O); a.sqrt(); PP.p(a);
+		a.copyFrom(O); a.sqrt( 0.7f, 0); PP.p(a);
+		a.copyFrom(O); a.sqrt( 1, 4); PP.p(a);
+		a.copyFrom(O); a.sqrt( .7f, 4); PP.p(a);
 		
-		PP.p(ThrustNative.gpu_sum_float(fp1, vec.size() -1));
-		ThrustNative.gpu_exp_float(fp1, vec.size() - 1, 0.5f, 3);
-		PP.p(vec.getHostFromDevice());
-		
+		O.destroy(); a.destroy();
+
+		O = new FloatMat(new float[] {4.2f, 5.9f, -2.1f, -3.7f, 3.3f, 1.9f, -0.6f});
+		a = new FloatMat(O);
+		a.copyFrom(O); Thrust.babel_id_minus_softmax(a, 3); PP.p(a);
 	}
 
 }
