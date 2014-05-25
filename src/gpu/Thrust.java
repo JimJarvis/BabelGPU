@@ -1,9 +1,7 @@
 package gpu;
 
 import static gpu.ThrustNative.*;
-import gpu.ThrustStruct.FloatDevicePointer;
 
-import com.googlecode.javacpp.annotation.ByVal;
 
 /**
  * Wrapper around ThrustNative native methods.
@@ -17,155 +15,140 @@ public class Thrust
 	/**
 	 * exp(a * x + b)
 	 */
-	public static FloatMat exp(FloatMat x, float a, float b)
+	public static void exp(FloatMat x, float a, float b)
 	{
-		ThrustNative.gpu_exp_float(x.getThrustPointer(), x.size(), a, b);
-		return x;
+		gpu_exp_float(x.getThrustPointer(), x.size(), a, b);
 	}
-	public static FloatMat exp(FloatMat x,  FloatMat out, float a, float b)
+	public static void exp(FloatMat x,  FloatMat out, float a, float b)
 	{
-		ThrustNative.gpu_exp_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
-		return out;
+		gpu_exp_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
-	public static FloatMat exp(FloatMat x) { return exp(x, 1, 0); }
-	public static FloatMat exp(FloatMat x, FloatMat out) { return exp(x, out, 1, 0); }
+	public static void exp(FloatMat x) {  exp(x, 1, 0); }
+	public static void exp(FloatMat x, FloatMat out) {  exp(x, out, 1, 0); }
 	
 	/**
 	 * ln(a * x + b)
 	 */
-	public static FloatMat log(FloatMat x, float a, float b)
+	public static void log(FloatMat x, float a, float b)
 	{
-		ThrustNative.gpu_log_float(x.getThrustPointer(), x.size(), a, b);
-		return x;
+		gpu_log_float(x.getThrustPointer(), x.size(), a, b);
 	}
-	public static FloatMat log(FloatMat x,  FloatMat out, float a, float b)
+	public static void log(FloatMat x,  FloatMat out, float a, float b)
 	{
-		ThrustNative.gpu_log_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
-		return out;
+		gpu_log_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
-	public static FloatMat log(FloatMat x) { return log(x, 1, 0); }
-	public static FloatMat log(FloatMat x, FloatMat out) { return log(x, out, 1, 0); }
+	public static void log(FloatMat x) {  log(x, 1, 0); }
+	public static void log(FloatMat x, FloatMat out) {  log(x, out, 1, 0); }
 	
 	/**
 	 * cos(a * x + b)
 	 */
-	public static FloatMat cos(FloatMat x, float a, float b)
+	public static void cos(FloatMat x, float a, float b)
 	{
-		ThrustNative.gpu_cos_float(x.getThrustPointer(), x.size(), a, b);
-		return x;
+		gpu_cos_float(x.getThrustPointer(), x.size(), a, b);
 	}
-	public static FloatMat cos(FloatMat x,  FloatMat out, float a, float b)
+	public static void cos(FloatMat x,  FloatMat out, float a, float b)
 	{
-		ThrustNative.gpu_cos_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
-		return out;
+		gpu_cos_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
-	public static FloatMat cos(FloatMat x) { return cos(x, 1, 0); }
-	public static FloatMat cos(FloatMat x, FloatMat out) { return cos(x, out, 1, 0); }
+	public static void cos(FloatMat x) {  cos(x, 1, 0); }
+	public static void cos(FloatMat x, FloatMat out) {  cos(x, out, 1, 0); }
 	
 	/**
 	 * sin(a * x + b)
 	 */
-	public static FloatMat sin(FloatMat x, float a, float b)
+	public static void sin(FloatMat x, float a, float b)
 	{
-		ThrustNative.gpu_sin_float(x.getThrustPointer(), x.size(), a, b);
-		return x;
+		gpu_sin_float(x.getThrustPointer(), x.size(), a, b);
 	}
-	public static FloatMat sin(FloatMat x,  FloatMat out, float a, float b)
+	public static void sin(FloatMat x,  FloatMat out, float a, float b)
 	{
-		ThrustNative.gpu_sin_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
-		return out;
+		gpu_sin_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
-	public static FloatMat sin(FloatMat x) { return sin(x, 1, 0); }
-	public static FloatMat sin(FloatMat x, FloatMat out) { return sin(x, out, 1, 0); }
+	public static void sin(FloatMat x) {  sin(x, 1, 0); }
+	public static void sin(FloatMat x, FloatMat out) {  sin(x, out, 1, 0); }
 	
 	/**
 	 * sqrt(a * x + b)
 	 */
-	public static FloatMat sqrt(FloatMat x, float a, float b)
+	public static void sqrt(FloatMat x, float a, float b)
 	{
-		ThrustNative.gpu_sqrt_float(x.getThrustPointer(), x.size(), a, b);
-		return x;
+		gpu_sqrt_float(x.getThrustPointer(), x.size(), a, b);
 	}
-	public static FloatMat sqrt(FloatMat x,  FloatMat out, float a, float b)
+	public static void sqrt(FloatMat x,  FloatMat out, float a, float b)
 	{
-		ThrustNative.gpu_sqrt_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
-		return out;
+		gpu_sqrt_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
-	public static FloatMat sqrt(FloatMat x) { return sqrt(x, 1, 0); }
-	public static FloatMat sqrt(FloatMat x, FloatMat out) { return sqrt(x, out, 1, 0); }
+	public static void sqrt(FloatMat x) {  sqrt(x, 1, 0); }
+	public static void sqrt(FloatMat x, FloatMat out) {  sqrt(x, out, 1, 0); }
 	
 	/**
 	 * (a * x + b) ^p
 	 */
-	public static FloatMat pow(FloatMat x, float p, float a, float b)
+	public static void pow(FloatMat x, float p, float a, float b)
 	{
-		ThrustNative.gpu_pow_float(x.getThrustPointer(), x.size(), p, a, b);
-		return x;
+		gpu_pow_float(x.getThrustPointer(), x.size(), p, a, b);
 	}
-	public static FloatMat pow(FloatMat x,  FloatMat out, float p, float a, float b)
+	public static void pow(FloatMat x,  FloatMat out, float p, float a, float b)
 	{
-		ThrustNative.gpu_pow_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
-		return out;
+		gpu_pow_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
 	}
-	public static FloatMat pow(FloatMat x, float p) { return pow(x, p, 1, 0); }
-	public static FloatMat pow(FloatMat x, FloatMat out, float p) { return pow(x, out, p, 1, 0); }
+	public static void pow(FloatMat x, float p) {  pow(x, p, 1, 0); }
+	public static void pow(FloatMat x, FloatMat out, float p) {  pow(x, out, p, 1, 0); }
 	
 	/**
 	 * (a * x + b)
 	 */
-	public static FloatMat linear(FloatMat x, float a, float b)
+	public static void linear(FloatMat x, float a, float b)
 	{
-		ThrustNative.gpu__float(x.getThrustPointer(), x.size(), a, b);
-		return x;
+		gpu__float(x.getThrustPointer(), x.size(), a, b);
 	}
-	public static FloatMat linear(FloatMat x,  FloatMat out, float a, float b)
+	public static void linear(FloatMat x,  FloatMat out, float a, float b)
 	{
-		ThrustNative.gpu__float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
-		return out;
+		gpu__float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
-	public static FloatMat linear(FloatMat x) { return linear(x, 1, 0); }
-	public static FloatMat linear(FloatMat x, FloatMat out) { return linear(x, out, 1, 0); }
+	public static void linear(FloatMat x) {  linear(x, 1, 0); }
+	public static void linear(FloatMat x, FloatMat out) {  linear(x, out, 1, 0); }
 	
 	public static float sum(FloatMat x)
 	{
-		return ThrustNative.gpu_sum_float(x.getThrustPointer(), x.size());
+		return gpu_sum_float(x.getThrustPointer(), x.size());
 	}
 	
 	public static float product(FloatMat x)
 	{
-		return ThrustNative.gpu_product_float(x.getThrustPointer(), x.size());
+		return gpu_product_float(x.getThrustPointer(), x.size());
 	}
 	
 	public static float max(FloatMat x)
 	{
-		return ThrustNative.gpu_max_float(x.getThrustPointer(), x.size());
+		return gpu_max_float(x.getThrustPointer(), x.size());
 	}
 	
 	public static float min(FloatMat x)
 	{
-		return ThrustNative.gpu_min_float(x.getThrustPointer(), x.size());
+		return gpu_min_float(x.getThrustPointer(), x.size());
 	}
 	
 	/**
 	 * Sort. dir = 1 for ascending, -1 for descending
 	 * Default: ascending
 	 */
-	public static FloatMat sort(FloatMat x, int dir)
+	public static void sort(FloatMat x, int dir)
 	{
-		ThrustNative.gpu_sort_float(x.getThrustPointer(), x.size(), dir);
-		return x;
+		gpu_sort_float(x.getThrustPointer(), x.size(), dir);
 	}
 	/**
 	 * Ascending sort
 	 */
-	public static FloatMat sort(FloatMat x) {	return sort(x, 1);	}
+	public static void sort(FloatMat x) {	 sort(x, 1);	}
 	
 	/**
 	 * Copy x to out
 	 */
 	public static void copy(FloatMat x, FloatMat out)
 	{
-		ThrustNative.gpu_copy_float(x.getThrustPointer(), x.size(), out.getThrustPointer());
+		gpu_copy_float(x.getThrustPointer(), x.size(), out.getThrustPointer());
 	}
 	
 	/**
@@ -173,16 +156,15 @@ public class Thrust
 	 */
 	public static void swap(FloatMat x, FloatMat y)
 	{
-		ThrustNative.gpu_swap_float(x.getThrustPointer(), x.size(), y.getThrustPointer());
+		gpu_swap_float(x.getThrustPointer(), x.size(), y.getThrustPointer());
 	}
 	
 	/**
 	 * Fill x with val
 	 */
-	public static FloatMat fill(FloatMat x, float val)
+	public static void fill(FloatMat x, float val)
 	{
-		ThrustNative.gpu_fill_float(x.getThrustPointer(), x.size(), val);
-		return x;
+		gpu_fill_float(x.getThrustPointer(), x.size(), val);
 	}
 	
 	 // ******************** Babel specific methods ****************** /
