@@ -32,7 +32,7 @@ public class ThrustTest
 		Thrust.gpu_exp_float(fp, fplast, 0.5f, 3);
 		PP.p(vec.getHostFromDevice());
 		
-		PP.p(Thrust.babel_id_minus_softmax(fp, fplast, 0));
+		PP.p(Thrust.babel_id_minus_softmax(fp, fplast, 0) + 10);
 	}
 
 }

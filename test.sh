@@ -6,7 +6,13 @@ main="test/ThrustTest"
 cp *.h bin/gpu/
 
 cd bin
+
+# an arbitrary command line arg tells the script to regenerate
+if [ ! -z "$1" ]; then
 java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" gpu/Thrust gpu/ThrustStruct $main -properties windows-x86_64-cuda > stderr.log
+else
+    cp -rf ../windows-x86_64 ./gpu
+fi
 
 #java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" $main -properties windows-x86_64-cuda > stderr.log
 
