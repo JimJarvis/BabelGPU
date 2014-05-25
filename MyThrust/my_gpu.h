@@ -45,6 +45,7 @@ struct functor_##name##_float_3{ \
 };
 
 // Macro defines corresponding thrust::transform for various linear unary functors
+// gpu_exp_float(2 pointer) is in place transformation, while gpu_exp_float(3 pointer) writes to an output pointer.
 #define GEN_FLOAT_TRANS(name) \
 GEN_LINEAR_FLOAT_FUNCTOR(name); \
 inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, float a = 1, float b = 0) \
@@ -57,6 +58,18 @@ inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, f
 		transform(begin, end, begin, functor_##name##_float_2(a)); \
 	else \
 		transform(begin, end, begin, functor_##name##_float_3(a, b)); \
+} \
+inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, \
+	device_ptr<float> out, float a = 1, float b = 0) \
+{ \
+if (a == 1 && b == 0) \
+	transform(begin, end, out, functor_##name##_float()); \
+	else if (a == 1) \
+	transform(begin, end, out, functor_##name##_float_1(b)); \
+	else if (b == 0) \
+	transform(begin, end, out, functor_##name##_float_2(a)); \
+	else \
+	transform(begin, end, out, functor_##name##_float_3(a, b)); \
 }
 
 
@@ -89,6 +102,7 @@ struct functor_##name##_float_3{ \
 };
 
 // Macro defines corresponding thrust::transform for various linear binary functors
+// gpu_pow_float(2 pointer) is in place transformation, while gpu_pow_float(3 pointer) writes to an output pointer.
 #define GEN_FLOAT_TRANS_2(name) \
 GEN_LINEAR_FLOAT_FUNCTOR_2(name); \
 inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, float p, float a = 1, float b = 0) \
@@ -101,6 +115,18 @@ inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, f
 		transform(begin, end, begin, functor_##name##_float_2(p, a)); \
 	else \
 		transform(begin, end, begin, functor_##name##_float_3(p, a, b)); \
+} \
+inline void gpu_##name##_float(device_ptr<float> begin, device_ptr<float> end, \
+	device_ptr<float> out, float p, float a = 1, float b = 0) \
+{ \
+if (a == 1 && b == 0) \
+	transform(begin, end, out, functor_##name##_float(p)); \
+	else if (a == 1) \
+	transform(begin, end, out, functor_##name##_float_1(p, b)); \
+	else if (b == 0) \
+	transform(begin, end, out, functor_##name##_float_2(p, a)); \
+	else \
+	transform(begin, end, out, functor_##name##_float_3(p, a, b)); \
 }
 
 namespace MyGpu

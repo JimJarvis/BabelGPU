@@ -14,12 +14,11 @@ void printDevice(device_vector<float> D)
 
 device_vector<float> getD(float A[], int len)
 {
-	host_vector<float> D(len);
-	for (int i = 0; i < len; ++i)
-		D[i] = A[i];
+	host_vector<float> D(A, A+len);
 	return D;
 }
 
+// gpu_exp_float() in place transformation
 void test_exp()
 {
 	host_vector<float> A(4);
@@ -72,7 +71,7 @@ void test_babel()
 	printDevice(D);
 }
 
-void main()
+void test_sort_copy_swap()
 {
 	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
 	device_vector<float> D = getD(x, 7);
@@ -87,14 +86,45 @@ void main()
 	printf("Copying E\n");
 	gpu_copy_float(range, &E[0]);
 	printDevice(E);
-	thrust::fill(&E[0], &E[7], -666);
+	gpu_fill_float(&E[0], &E[7], -666);
 	gpu_copy_partial_float(&D[0], &E[0], 2, 3, 4);
 	printDevice(E);
 
 	printf("Swapping E\n");
-	float y[4] = { 4, 3, 2, 1 };
+	float y[4] = { 400, 300, 200, 100 };
 	D = getD(y, 4);
 	gpu_swap_float(range, &E[0]);
 	printDevice(D);
 	printDevice(E);
+}
+
+// gpu_exp_float with output pointer
+void test_exp_out_pointer()
+{
+	host_vector<float> A(4);
+	A[0] = 3;
+	A[1] = -2;
+	A[2] = PI;
+	A[3] = -PI / 3;
+
+	device_vector<float> D = A;
+	device_vector<float> E = A;
+
+	gpu_cos_float(range, &E[0]);
+	printDevice(E);
+
+	printf("exp\n");
+	printf("x\n");
+	gpu_exp_float(range, &E[0], 1, 0); printDevice(E);
+	printf("0.5 * x\n");
+	gpu_exp_float(range, &E[0], 0.5, 0); printDevice(E);
+	printf("x + 3\n");
+	gpu_exp_float(range, &E[0], 1, 3); printDevice(E);
+	printf("0.5 * x + 3\n");
+	gpu_exp_float(range, &E[0], 0.5, 3); printDevice(E);
+}
+
+void main()
+{
+
 }
