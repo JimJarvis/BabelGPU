@@ -215,7 +215,7 @@ namespace MyGpu
 	}
 
 	// Fill the array with the same value
-	inline void gpu_fill_float(device_ptr<float> begin, int size, int val)
+	inline void gpu_fill_float(device_ptr<float> begin, int size, float val)
 	{
 		thrust::fill(begin, begin + size, val);
 	}

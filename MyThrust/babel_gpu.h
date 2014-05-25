@@ -19,7 +19,7 @@ using namespace thrust;
 
 namespace MyGpu
 {
-// I [y==j] - softmax(alpha)
+// I [y==j] - softmax(alpha_vec)
 inline void babel_id_minus_softmax(device_ptr<float> begin, int size, int id)
 {
 	float mx = gpu_max_float(begin, size);
