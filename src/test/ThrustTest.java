@@ -17,11 +17,10 @@ public class ThrustTest
 		FloatDevicePointer fp1 = fp.offset(1);
 		
 		
-		PP.p(vec.getHost());
 		PP.p(vec.getHostFromDevice());
 		
-		PP.p(Thrust.gpu_sum_float(fp1, vec.size() -1));
-		Thrust.gpu_exp_float(fp1, vec.size() - 1, 0.5f, 3);
+		PP.p(ThrustNative.gpu_sum_float(fp1, vec.size() -1));
+		ThrustNative.gpu_exp_float(fp1, vec.size() - 1, 0.5f, 3);
 		PP.p(vec.getHostFromDevice());
 		
 	}

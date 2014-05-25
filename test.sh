@@ -9,7 +9,7 @@ cd bin
 
 # an arbitrary command line arg tells the script to regenerate
 if [ ! -z "$1" ]; then
-java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" gpu/Thrust gpu/ThrustStruct $main -properties windows-x86_64-cuda > stderr.log
+java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" gpu/ThrustNative gpu/ThrustStruct $main -properties windows-x86_64-cuda > stderr.log
     
     rm -rf ../windows-x86_64
     cp -rf gpu/windows-x86_64 ../

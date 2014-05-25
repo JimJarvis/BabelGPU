@@ -188,10 +188,7 @@ public class FloatMat
 	/**
 	 * @return row * col
 	 */
-	public int size()
-	{
-		return row * col;
-	}
+	public int size() { return row * col; }
 	
 	/**
 	 * Free the device pointer
@@ -240,7 +237,8 @@ public class FloatMat
 	 */
 	public float[][] deflatten()
 	{
-		return deflatten(getHost(), this.row);
+		return deflatten(device == null ? 
+				getHost() : getHostFromDevice(), this.row);
 	}
 	
 	/**
