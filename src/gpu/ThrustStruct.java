@@ -4,20 +4,11 @@ import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
 
 @Platform(include={"<thrust/host_vector.h>", "<thrust/device_vector.h>", "<thrust/generate.h>", "<thrust/sort.h>",
-                   "<thrust/copy.h>", "<thrust/reduce.h>", "<thrust/functional.h>", "<algorithm>", "<cstdlib>", "\"my_gpu.h\""})
+                   "<thrust/copy.h>", "<thrust/reduce.h>", "<thrust/functional.h>", "<algorithm>", "<cstdlib>"})
 @Namespace("thrust")
 public class ThrustStruct
 {
 	static { Loader.load(); }
-	
-	@Name("plus<float>")
-    public static class FloatPlus extends Pointer
-    {
-        static { Loader.load(); }
-        public FloatPlus() { allocate(); }
-        private native void allocate();
-        public native @Name("operator()") int call(int x, int y);
-    }    
 	
 	@Name("host_vector<float>")
     public static class FloatHostVector extends Pointer
@@ -77,9 +68,4 @@ public class ThrustStruct
         public native long size();
         public native void resize(long n);
     }
-    
-    
-    public static native void sort(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last);
-    public static native float reduce(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, float init, @ByVal FloatPlus binary_op);
-//    public static native FloatDevicePointer transform(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, @ByVal FloatDevicePointer out, @ByVal UnaryOp unaryOp);
 }

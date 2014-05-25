@@ -12,5 +12,5 @@ public class Thrust
 	
     public static native float gpu_max_float(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last);
     public static native void gpu_exp_float(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, float a, float b);
-    public static native int babel_id_minus_softmax(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, int id);
+    public static native void babel_id_minus_softmax(@ByVal FloatDevicePointer first, @ByVal FloatDevicePointer last, int id);
 }

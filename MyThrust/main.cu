@@ -65,6 +65,9 @@ void main()
 {
 	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
 	device_vector<float> D = getD(x, 7);
+	pr(gpu_product_float(range));
+	pr(gpu_min_float(range));
+
 	babel_id_minus_softmax(range, 3);
 	printDevice(D);
 

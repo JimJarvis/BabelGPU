@@ -156,6 +156,12 @@ inline float gpu_max_float(device_ptr<float> begin, device_ptr<float> end)
 	return *m;
 }
 
+inline float gpu_min_float(device_ptr<float> begin, device_ptr<float> end)
+{
+	device_ptr<float> m = min_element(begin, end);
+	return *m;
+}
+
 inline float gpu_sum_float(device_ptr<float> begin, device_ptr<float> end)
 {
 	return reduce(begin, end, 0.0f, thrust::plus<float>());
