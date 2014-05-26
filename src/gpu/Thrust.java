@@ -173,5 +173,10 @@ public class Thrust
 	{
 		ThrustNative.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
+	// version 2: more calculation, might be more numerically stable
+	public static void babel_id_minus_softmax_2(FloatMat x, int id)
+	{
+		ThrustNative.babel_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
+	}
 	
 }
