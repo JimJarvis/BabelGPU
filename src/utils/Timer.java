@@ -24,20 +24,33 @@ public class Timer
 
 	/**
 	 * Read from the timer start()
+	 * Optional event argument
 	 */
-	public void readFromStart()
+	public void readFromStart(String event)
 	{
 		long timel = System.currentTimeMillis();
-		System.out.format("[Timer] %.2f sec\n", ((double)(timel - timest))/1000);
+		timeFormat(event, timel - timest);
 	}
+	
+	public void readFromStart() {	readFromStart("Timer"); }
 
 	/**
 	 * Read from last read
+	 * Optional event argument
 	 */
-	public void readFromLast()
+	public void readFromLast(String event)
 	{
 		long now = System.currentTimeMillis();
-		System.out.format("[Timer] %.2f sec\n", ((double)(now - timel))/1000);
+		timeFormat(event, now - timel);
 		timel = now;
+	}
+	
+	public void readFromLast() {	readFromLast("Timer");	}
+	
+	// helper
+	private void timeFormat(String event, long delta)
+	{
+		System.out.format(
+				"[%s] %.2f sec\n", event, ((double)delta)/1000);
 	}
 }
