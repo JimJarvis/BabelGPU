@@ -96,7 +96,7 @@ public class PP
     		return C2str((Collection)A, "<>");
     	else if (A.getClass().isArray())  // all arrays
     		return arr2str(A);
-    	else if ((A instanceof Float || A instanceof Double)
+    	else if ((A.getClass() == float.class || A.getClass() == double.class)
     				&& doublePrec >= 0) // If -1, we don't use any specific precision
     		return String.format("%1$."+doublePrec+"f", (double) A);
     	else // call the most generic method

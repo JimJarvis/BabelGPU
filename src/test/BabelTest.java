@@ -8,6 +8,7 @@ import utils.*;
 
 public class BabelTest
 {
+	private static final float TOL = 1e-6f;
 
 	public static void main(String[] args)
 	{
@@ -16,11 +17,11 @@ public class BabelTest
 		timer.start();
 		
 		// Read in dummy data
-		CsvReader csv = new CsvReader("test_X.txt");
+		CsvReader csv = new CsvReader("input_X.txt");
 		FloatMat X = new FloatMat(csv.readFloatMat());
-		csv = new CsvReader("test_W.txt");
+		csv = new CsvReader("input_W.txt");
 		FloatMat W = new FloatMat(csv.readFloatMat());
-		csv = new CsvReader("test_Y.txt");
+		csv = new CsvReader("input_Y.txt");
 		int[] Y = csv.readIntVec(true);
 		timer.readFromLast("Read the database from CSV");
 		
@@ -33,8 +34,8 @@ public class BabelTest
 		/*
 		 * Dimensions
 		 */
-		csv = new CsvReader("test_dim.txt");
-		int[] dims = csv.readIntVec();
+		csv = new CsvReader("input_dim.txt");
+		int[] dims = csv.readIntVec(true);
 		final int SAMPLES = dims[0];
 		final int X_DIM = dims[1];
 		final int X_NEW_DIM = dims[2];
@@ -43,8 +44,10 @@ public class BabelTest
 		/*
 		 * Define a few learning constants
 		 */
-		final float LearningRate = 1.5f;
-		final float Lambda = 2f;
+		csv = new CsvReader("input_learn.txt");
+		float[] learns = csv.readFloatVec(true);
+		final float LearningRate = learns[0];
+		final float Lambda = learns[1];
 		
 		GpuBlas.init();
 		timer.readFromLast("cuBLAS init");
@@ -57,12 +60,13 @@ public class BabelTest
 		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1);
 		X1.copyFrom(X);
 		ThrustNative.gpu_fill_float(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
-//		X1.getHostFromDevice(); PP.p(X1);
+		
+//		X1.getHostFromDevice(); checkGold(X1.deflatten(), "X1");
 		
 		// Xnew: LABELS * SAMPLES
 		FloatMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
 		timer.readFromLast("Step 1");
-		
+
 		/*
 		 * Step2: Create Theta matrix and compute Theta * X_new
 		 */
@@ -86,13 +90,16 @@ public class BabelTest
 			// Theta += Lr * ( (Id-P) * Xnew_s' - Lambda/SAMPLES * Theta)
 			GpuBlas.mult(A, Xnew_s.transpose(), Theta, 
 					LearningRate, 1 - LearningRate * Lambda / SAMPLES);
-			
-			timer.readFromLast("Iteration " + s);
 		}
+		checkGold(Xnew.deflatten(), "Xnew");
+		checkGold(A.deflatten(), "A");
 
-		// DONE!
-		PP.p(Theta);
-		
+		/*
+		 * DONE!
+		 * Check results against Matlab
+		 */
+		checkGold(Theta.deflatten(), "Theta");
+
 		/*
 		 * Clean up and exit
 		 */
@@ -101,6 +108,29 @@ public class BabelTest
 		for (FloatMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();
+	}
+	
+	/**
+	 * Check the gold standard generated from Matlab
+	 */
+	private static void checkGold(float[][] Host, String goldFile)
+	{
+		CsvReader csv = new CsvReader("gold_" + goldFile + ".txt");
+		float[][] Gold = csv.readFloatMat();
+		
+		for (int i = 0; i < Gold.length; i ++)
+			for (int j = 0; j < Gold[0].length; j ++)
+			{
+				double gold = Gold[i][j];
+				double host = Host[i][j];
+				if (Math.abs(gold - host) > TOL)
+				{
+					PP.p(goldFile, "DIFF at", new FloatMat.Coord(i, j));
+					PP.p("Host =", host, "\nGold =", gold, '\n');
+					return;
+				}
+			}
+		PP.p("PASS! ");
 	}
 
 }
