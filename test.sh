@@ -1,9 +1,10 @@
 #!/bin/bash
 
-main="test/ThrustTest"
-#main="demo/JavacppDemo"
+#main="test/MiscTest"
+main="test/BabelTest"
 
 cp MyThrust/*.h bin/gpu/
+cp *.txt bin/
 
 cd bin
 

@@ -7,12 +7,14 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import gpu.FloatMat;
+import gpu.GpuBlas;
 import utils.PP;
 
 public class MiscTest
 {
 	public static void main(String[] args)
 	{
+		GpuBlas.init();
 		float A[] = new float[] {1, 2, 3, 4, 5, 6};
 		float B[][] = new float[][] {{1, 10},
 												{2, 20},
@@ -26,5 +28,14 @@ public class MiscTest
 		PP.p(m.toCoord(10));
 		PP.p(m.toIndex(3, 2));
 		
+		FloatMat b = new FloatMat(B);
+		FloatMat a = new FloatMat(A);
+		
+		FloatMat aa = a.createOffset(1, 4, 4);
+		PP.p(aa.row, aa.col);
+		PP.p(b.row, b.col);
+		PP.p(GpuBlas.mult(b.transpose(), aa));
+		
+		GpuBlas.destroy();
 	}
 }

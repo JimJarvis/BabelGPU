@@ -4,6 +4,7 @@ import gpu.ThrustStruct.FloatDevicePointer;
 import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
+import jcuda.Sizeof;
 import static jcuda.runtime.JCuda.*;
 import static jcuda.jcublas.cublasOperation.*;
 
@@ -202,6 +203,30 @@ public class FloatMat
 			host = GpuBlas.cublasToHostFloat(device, size());
 		
 		return host;
+	}
+	
+	/**
+	 * Get a device pointer (wrapped in a FloatMat) 
+	 * that starts from 'offset' and lasts 'size' floats.
+	 * The shape might need to be adjusted. 
+	 * Specify the number of rows, or leave it to be the current row dim.
+	 * host, thrustPointer and transpose flag will be cleared.
+	 */
+	public FloatMat createOffset(int offset, int size, int newRow)
+	{
+		FloatMat off = new FloatMat();
+		off.device = this.getDevice().withByteOffset(offset * Sizeof.FLOAT);
+		off.initDim(newRow, size/newRow);
+		return off;
+	}
+	
+	/**
+	 * Default version of createOffset.
+	 * Assume newRow to be the same as the current row dim. 
+	 */
+	public FloatMat createOffset(int offset, int size)
+	{
+		return createOffset(offset, size, this.row);
 	}
 	
 	/**
