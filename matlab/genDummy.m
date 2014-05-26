@@ -35,12 +35,8 @@ dlmwrite(loc('input_learn'), [learning_rate, lambda]);
 %%%% Testing with the training process
 % Augment with 1
 X1 = [X ones(samples, 1)];
-dlm(X1, 'gold_X1');
 
 %% Step 1
-WX = W * X1';
-dlm(WX, 'gold_WX');
-
 Xnew = cos(W * X1');
 
 dlm(Xnew, 'gold_Xnew');
