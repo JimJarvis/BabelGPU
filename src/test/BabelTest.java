@@ -57,14 +57,18 @@ public class BabelTest
 		 * W and b are combined. 
 		 */
 		// augment X with a column of 1
-		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1);
+		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1, false);
 		X1.copyFrom(X);
 		ThrustNative.gpu_fill_float(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
+		checkGold(X1, "X1");
 		
 //		X1.getHostFromDevice(); checkGold(X1.deflatten(), "X1");
 		
-		// Xnew: LABELS * SAMPLES
-		FloatMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
+		// Xnew: X_NEW_DIM * SAMPLES
+		FloatMat WX = GpuBlas.mult(W, X1.transpose());
+		checkGold(WX, "WX");
+		
+		FloatMat Xnew = WX.cos();
 		timer.readFromLast("Step 1");
 
 		/*
@@ -91,14 +95,14 @@ public class BabelTest
 			GpuBlas.mult(A, Xnew_s.transpose(), Theta, 
 					LearningRate, 1 - LearningRate * Lambda / SAMPLES);
 		}
-		checkGold(Xnew.deflatten(), "Xnew");
-		checkGold(A.deflatten(), "A");
+		checkGold(Xnew, "Xnew");
+		checkGold(A, "A");
 
 		/*
 		 * DONE!
 		 * Check results against Matlab
 		 */
-		checkGold(Theta.deflatten(), "Theta");
+		checkGold(Theta, "Theta");
 
 		/*
 		 * Clean up and exit
@@ -113,10 +117,11 @@ public class BabelTest
 	/**
 	 * Check the gold standard generated from Matlab
 	 */
-	private static void checkGold(float[][] Host, String goldFile)
+	private static void checkGold(FloatMat hostMat, String goldFile)
 	{
 		CsvReader csv = new CsvReader("gold_" + goldFile + ".txt");
 		float[][] Gold = csv.readFloatMat();
+		float[][] Host = hostMat.deflatten();
 		
 		for (int i = 0; i < Gold.length; i ++)
 			for (int j = 0; j < Gold[0].length; j ++)

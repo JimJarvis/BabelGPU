@@ -33,11 +33,17 @@ dlmwrite(loc('input_learn'), [learning_rate, lambda]);
 
 
 %%%% Testing with the training process
-% Augment with 0
+% Augment with 1
 X1 = [X ones(samples, 1)];
+dlm(X1, 'gold_X1');
 
 %% Step 1
+WX = W * X1';
+dlm(WX, 'gold_WX');
+
 Xnew = cos(W * X1');
+
+dlm(Xnew, 'gold_Xnew');
 
 %% Step 2
 Theta = zeros(labels, x_new_dim);
@@ -50,7 +56,6 @@ for s = 1:samples
     %% Step 3, update Theta
     Theta = Theta + learning_rate * (A * Xnew_s' - lambda/samples * Theta);
 end
-dlm(Xnew, 'gold_Xnew');
 dlm(A, 'gold_A');
 
 fprintf('Done!\n');
