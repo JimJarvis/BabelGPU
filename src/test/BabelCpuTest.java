@@ -8,7 +8,7 @@ import utils.*;
 
 public class BabelCpuTest
 {
-	private static final float TOL = 1e-6f;
+	private static final float TOL = 1e-1f;
 	
 	public static void main(String[] args)
 	{
@@ -62,8 +62,9 @@ public class BabelCpuTest
 		// Xnew: X_NEW_DIM * SAMPLES
 		FloatMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
 		float[][] jXnew = cos(mult(jW, transpose(jX1)));
-		PP.p("check Xnew"); checkGold(Xnew, jXnew);
-//		checkGold(jXnew, "Xnew");
+		PP.p("check Xnew"); 
+		checkGold(Xnew, jXnew);
+		checkGold(jXnew, "Xnew");
 
 		/*
 		 * Step2: Create Theta matrix and compute Theta * X_new
@@ -98,11 +99,13 @@ public class BabelCpuTest
 			
 			updateTheta(jTheta, - LearningRate * Lambda / SAMPLES, mult(jA, transpose(jXnew_s)), LearningRate);
 
-		PP.p("Iteration", s);
-		checkGold(A, jA);
-		checkGold(Theta, jTheta);
+//		PP.p("Iteration", s);
+//		checkGold(A, jA);
+//		checkGold(Theta, jTheta);
 		}
-//		checkGold(jA, "A");
+		PP.p("Check vector A");
+		checkGold(A, jA);
+		checkGold(jA, "A");
 
 		/*
 		 * DONE!
@@ -110,7 +113,7 @@ public class BabelCpuTest
 		 */
 		PP.p("Done. Check Theta:");
 		checkGold(Theta, jTheta);
-//		checkGold(jTheta, "Theta");
+		checkGold(jTheta, "Theta");
 
 		/*
 		 * Clean up and exit
@@ -137,8 +140,8 @@ public class BabelCpuTest
 				if (Math.abs(gold - host) > TOL)
 				{
 					PP.p("DIFF at", new FloatMat.Coord(i, j));
-					PP.p("Host =", host, "\nGold =", gold, '\n');
-					System.exit(0);
+					PP.p("GPU =", host, "\nCPU =", gold, '\n');
+					return;
 				}
 			}
 		PP.p("PASS! ");
@@ -160,7 +163,7 @@ public class BabelCpuTest
 				if (Math.abs(gold - host) > TOL)
 				{
 					PP.p(goldFile, "DIFF at", new FloatMat.Coord(i, j));
-					PP.p("CPU =", host, "\nGold =", gold, '\n');
+					PP.p("CPU =", host, "\nMatlab =", gold, '\n');
 					return;
 				}
 			}

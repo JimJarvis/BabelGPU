@@ -130,7 +130,7 @@ public class BabelTest
 				if (Math.abs(gold - host) > TOL)
 				{
 					PP.p(goldFile, "DIFF at", new FloatMat.Coord(i, j));
-					PP.p("Host =", host, "\nGold =", gold, '\n');
+					PP.p("GPU =", host, "\nMatlab =", gold, '\n');
 					return;
 				}
 			}
