@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#main="test/MiscTest"
 main="test/BabelTest"
+main="test/BabelCpuTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/

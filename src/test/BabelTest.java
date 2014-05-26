@@ -8,7 +8,7 @@ import utils.*;
 
 public class BabelTest
 {
-	private static final float TOL = 1e-2f;
+	private static final float TOL = 1e-4f;
 
 	public static void main(String[] args)
 	{
@@ -131,7 +131,7 @@ public class BabelTest
 				{
 					PP.p(goldFile, "DIFF at", new FloatMat.Coord(i, j));
 					PP.p("Host =", host, "\nGold =", gold, '\n');
-//					return;
+					return;
 				}
 			}
 		PP.p("PASS! ");
