@@ -4,7 +4,7 @@
 main="test/BabelTest"
 
 cp MyThrust/*.h bin/gpu/
-cp dummy/*.txt bin/
+cp matlab/*.txt bin/
 
 cd bin
 
