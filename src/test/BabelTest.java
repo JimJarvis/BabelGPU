@@ -12,11 +12,11 @@ public class BabelTest
 	public static void main(String[] args)
 	{
 		// Read in dummy data
-		CsvReader csv = new CsvReader("test_X.txt");
+		CsvReader csv = new CsvReader("dummy/test_X.txt");
 		FloatMat X = new FloatMat(csv.readFloatMat());
-		csv = new CsvReader("test_W.txt");
+		csv = new CsvReader("dummy/test_W.txt");
 		FloatMat W = new FloatMat(csv.readFloatMat());
-		csv = new CsvReader("test_Y.txt");
+		csv = new CsvReader("dummy/test_Y.txt");
 		FloatMat Y = new FloatMat(csv.readFloatMat());
 		
 		PP.p("X", X.row, X.col);
@@ -27,7 +27,7 @@ public class BabelTest
 		/*
 		 * Dimensions
 		 */
-		csv = new CsvReader("test_dim.txt");
+		csv = new CsvReader("dummy/test_dim.txt");
 		int[] dims = csv.readIntVec();
 		final int SAMPLES = dims[0];
 		final int X_DIM = dims[1];
