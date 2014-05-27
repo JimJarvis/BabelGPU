@@ -20,6 +20,7 @@ public class PP
     private static String mapSep = ",\n";
     private static String mapper = " => ";
     private static int doublePrec = -1;
+    private static boolean isScientific = false;
 
     /**
      * Set the separator for printing var args <br>
@@ -49,7 +50,17 @@ public class PP
      */
     public static void setDoublePrec(int doublePrec)	{	PP.doublePrec = doublePrec;	}
     public static void setDoublePrec()	{	PP.doublePrec = -1;	}
+    
+    /**
+     * Set whether to use scientific exponential notation for float/double
+     */
+    public static void setScientific(boolean isScientific) {	PP.isScientific = isScientific;	}
 
+    // Helper for float/double formatting
+    private static String getDoubleFormatter()
+    {
+    	return "%1$."+doublePrec+ (isScientific ? "e" : "f");
+    }
 
     /**
      * Pretty prints any recognized object types with new line <br>
@@ -96,9 +107,11 @@ public class PP
     		return C2str((Collection)A, "<>");
     	else if (A.getClass().isArray())  // all arrays
     		return arr2str(A);
-    	else if ((A.getClass() == float.class || A.getClass() == double.class)
+    	else if ((A.getClass() == float.class || A.getClass() == double.class
+    			|| A instanceof Float || A instanceof Double)
     				&& doublePrec >= 0) // If -1, we don't use any specific precision
-    		return String.format("%1$."+doublePrec+"f", (double) A);
+    		// can set whether or not to use scientific exponential notation display
+    		return String.format(getDoubleFormatter(), (double) A);
     	else // call the most generic method
     		return A.toString();
     }
@@ -142,7 +155,7 @@ public class PP
     				A instanceof Double[] || A instanceof Float[])
     				&& doublePrec >= 0)
     		for (int i = 0; i < Array.getLength(A); ++i)
-    			s += String.format("%1$."+doublePrec+"f", Array.get(A, i)) + sep;
+    			s += String.format(getDoubleFormatter(), Array.get(A, i)) + sep;
 
     	else if (A instanceof int[] || A instanceof byte[] ||
 			A instanceof long[] || A instanceof short[] ||
