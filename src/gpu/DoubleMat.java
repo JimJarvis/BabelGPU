@@ -1,6 +1,6 @@
 package gpu;
 
-import gpu.ThrustStruct.FloatDevicePointer;
+import gpu.ThrustStruct.*;
 import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
@@ -11,11 +11,11 @@ import static jcuda.jcublas.cublasOperation.*;
 /**
  * Struct around a matrix with row/col dimension info
  */
-public class FloatMat
+public class DoubleMat
 {
-	private float[] host = null;
+	private double[] host = null;
 	private Pointer device = null; // jCuda pointer
-	private FloatDevicePointer thrustPointer = null; // Thrust pointer
+	private DoubleDevicePointer thrustPointer = null; // Thrust pointer
 	
 	// This field records whether the matrix should be transposed or not
 	private int op = CUBLAS_OP_N; 
@@ -28,12 +28,12 @@ public class FloatMat
 	/**
 	 * Default ctor
 	 */
-	public FloatMat() {	}
+	public DoubleMat() {	}
 	
 	/**
 	 * Ctor from host data
 	 */
-	public FloatMat(float[] host, int row, int col)
+	public DoubleMat(double[] host, int row, int col)
 	{
 		this.host = host;
 		initDim(row, col);
@@ -42,7 +42,7 @@ public class FloatMat
 	/**
 	 * Ctor from 2D host data
 	 */
-	public FloatMat(float[][] host)
+	public DoubleMat(double[][] host)
 	{
 		this(flatten(host), host.length, host[0].length);
 	}
@@ -50,7 +50,7 @@ public class FloatMat
 	/**
 	 * Ctor for 1D vector (column vector)
 	 */
-	public FloatMat(float[] host)
+	public DoubleMat(double[] host)
 	{
 		this(host, host.length, 1);
 	}
@@ -58,7 +58,7 @@ public class FloatMat
 	/**
 	 * Ctor from device data
 	 */
-	public FloatMat(Pointer device, int row, int col)
+	public DoubleMat(Pointer device, int row, int col)
 	{
 		this.device = device;
 		initDim(row, col);
@@ -68,9 +68,9 @@ public class FloatMat
 	 * Ctor with dimensions
 	 * @param memsetToZero true to initialize the device data to 0. Default true. 
 	 */
-	public FloatMat(int row, int col, boolean memsetToZero)
+	public DoubleMat(int row, int col, boolean memsetToZero)
 	{
-		this.device = GpuUtil.createDeviceFloat(row * col, memsetToZero);
+		this.device = GpuUtil.createDeviceDouble(row * col, memsetToZero);
 		initDim(row, col);
 	}
 	
@@ -78,16 +78,16 @@ public class FloatMat
 	 * Ctor with dimensions
 	 * The device data will be initialized to all 0
 	 */
-	public FloatMat(int row, int col)
+	public DoubleMat(int row, int col)
 	{
 		this(row, col, true);
 	}
 	
 	/**
-	 * Instantiate a new empty FloatMat with the same size
+	 * Instantiate a new empty DoubleMat with the same size
 	 * NOTE: doesn't copy any data. Only the same row/col
 	 */
-	public FloatMat(FloatMat other)
+	public DoubleMat(DoubleMat other)
 	{
 		this(other.row, other.col);
 	}
@@ -101,9 +101,9 @@ public class FloatMat
 	}
 	
 	// Shallow copy create new instance
-	private FloatMat shallowCopy()
+	private DoubleMat shallowCopy()
 	{
-		FloatMat mat = new FloatMat();
+		DoubleMat mat = new DoubleMat();
 		mat.row = this.row;
 		mat.col = this.col;
 		mat.ldim = this.ldim;
@@ -120,10 +120,10 @@ public class FloatMat
 	 * Nothing in the real data actually changes, but only a flag
 	 * @return new instance
 	 */
-	public FloatMat transpose()
+	public DoubleMat transpose()
 	{
 		// Swap row and col dimension
-		FloatMat mat = this.shallowCopy();
+		DoubleMat mat = this.shallowCopy();
 		mat.row = this.col;
 		mat.col = this.row;
 		mat.op = (op != CUBLAS_OP_N) ? 
@@ -156,7 +156,7 @@ public class FloatMat
 	public Pointer getDevice()
 	{
 		if (device == null)
-			device = GpuBlas.hostToCublasFloat(host);
+			device = GpuBlas.hostToCublasDouble(host);
 		return device;
 	}
 	
@@ -171,10 +171,10 @@ public class FloatMat
 		if (device != null)
 		{
 			cudaFree(device);
-			GpuBlas.hostToCublasFloat(host, device);
+			GpuBlas.hostToCublasDouble(host, device);
 		}
 		else // device is null
-    		device = GpuBlas.hostToCublasFloat(host);
+    		device = GpuBlas.hostToCublasDouble(host);
 		return device;
 	}
 
@@ -182,10 +182,10 @@ public class FloatMat
 	 * Get the host pointer
 	 * If host is currently null, we copy device to CPU
 	 */
-	public float[] getHost()
+	public double[] getHost()
 	{
 		if (host == null)
-			host = GpuBlas.cublasToHostFloat(device, size());
+			host = GpuBlas.cublasToHostDouble(device, size());
 		return host;
 	}
 	
@@ -194,28 +194,28 @@ public class FloatMat
 	 * No matter whether 'host' field is null or not, we copy device to CPU
 	 * Syncs host w.r.t. device
 	 */
-	public float[] getHostFromDevice()
+	public double[] getHostFromDevice()
 	{
 		if (device == null) 	return null;
 		if (host != null)
-			GpuBlas.cublasToHostFloat(device, host);
+			GpuBlas.cublasToHostDouble(device, host);
 		else // host is null
-			host = GpuBlas.cublasToHostFloat(device, size());
+			host = GpuBlas.cublasToHostDouble(device, size());
 		
 		return host;
 	}
 	
 	/**
-	 * Get a device pointer (wrapped in a FloatMat) 
-	 * that starts from 'offset' and lasts 'size' floats.
+	 * Get a device pointer (wrapped in a DoubleMat) 
+	 * that starts from 'offset' and lasts 'size' doubles.
 	 * The shape might need to be adjusted. 
 	 * Specify the number of rows, or leave it to be the current row dim.
 	 * host, thrustPointer and transpose flag will be cleared.
 	 */
-	public FloatMat createOffset(int offset, int size, int newRow)
+	public DoubleMat createOffset(int offset, int size, int newRow)
 	{
-		FloatMat off = new FloatMat();
-		off.device = this.getDevice().withByteOffset(offset * Sizeof.FLOAT);
+		DoubleMat off = new DoubleMat();
+		off.device = this.getDevice().withByteOffset(offset * Sizeof.DOUBLE);
 		off.initDim(newRow, size/newRow);
 		return off;
 	}
@@ -224,7 +224,7 @@ public class FloatMat
 	 * Default version of createOffset.
 	 * Assume newRow to be the same as the current row dim. 
 	 */
-	public FloatMat createOffset(int offset, int size)
+	public DoubleMat createOffset(int offset, int size)
 	{
 		return createOffset(offset, size, this.row);
 	}
@@ -246,13 +246,13 @@ public class FloatMat
 	}
 	
 	/**
-	 * Utility: flatten a 2D float array to 1D, column major
+	 * Utility: flatten a 2D double array to 1D, column major
 	 */
-	public static float[] flatten(float[][] A)
+	public static double[] flatten(double[][] A)
 	{
 		int row = A.length;
 		int col = A[0].length;
-		float[] ans = new float[row * col];
+		double[] ans = new double[row * col];
 		int pt = 0;
 
 		for (int j = 0; j < col; j ++)
@@ -263,12 +263,12 @@ public class FloatMat
 	}
 	
 	/**
-	 * Utility: deflatten a 1D float to 2D matrix, column major
+	 * Utility: deflatten a 1D double to 2D matrix, column major
 	 */
-	public static float[][] deflatten(float[] A, int row)
+	public static double[][] deflatten(double[] A, int row)
 	{
 		int col = A.length / row;
-		float[][] ans = new float[row][col];
+		double[][] ans = new double[row][col];
 		int pt = 0;
 		
 		for (int j = 0; j < col; j ++)
@@ -279,16 +279,16 @@ public class FloatMat
 	}
 	
 	/**
-	 * Deflatten this to a 2D float array, column major
+	 * Deflatten this to a 2D double array, column major
 	 */
-	public float[][] deflatten()
+	public double[][] deflatten()
 	{
 		return deflatten(device == null ? 
 				getHost() : getHostFromDevice(), this.row);
 	}
 	
 	/**
-	 * @return its deflattened 2D float array representation
+	 * @return its deflattened 2D double array representation
 	 */
 	public String toString()
 	{
@@ -339,13 +339,13 @@ public class FloatMat
 	/**
 	 * Get the thrust pointer
 	 */
-	public FloatDevicePointer getThrustPointer()
+	public DoubleDevicePointer getThrustPointer()
 	{
 		if (thrustPointer == null)
 		{
 			if (device == null) // initialize device
 				this.getDevice();
-			thrustPointer = new FloatDevicePointer(this.device);
+			thrustPointer = new DoubleDevicePointer(this.device);
 		}
 		return thrustPointer;
 	}
@@ -353,11 +353,11 @@ public class FloatMat
 	/**
 	 * exp(a * x + b)
 	 */
-	public FloatMat exp(float a, float b)
+	public DoubleMat exp(double a, double b)
 	{
 		Thrust.exp(this, a, b); return this;
 	}
-	public FloatMat exp()
+	public DoubleMat exp()
 	{
 		Thrust.exp(this); return this;
 	}
@@ -365,11 +365,11 @@ public class FloatMat
 	/**
 	 * log(a * x + b)
 	 */
-	public FloatMat log(float a, float b)
+	public DoubleMat log(double a, double b)
 	{
 		Thrust.log(this, a, b); return this;
 	}
-	public FloatMat log()
+	public DoubleMat log()
 	{
 		Thrust.log(this); return this;
 	}
@@ -377,11 +377,11 @@ public class FloatMat
 	/**
 	 * cos(a * x + b)
 	 */
-	public FloatMat cos(float a, float b)
+	public DoubleMat cos(double a, double b)
 	{
 		Thrust.cos(this, a, b); return this;
 	}
-	public FloatMat cos()
+	public DoubleMat cos()
 	{
 		Thrust.cos(this); return this;
 	}
@@ -389,11 +389,11 @@ public class FloatMat
 	/**
 	 * sin(a * x + b)
 	 */
-	public FloatMat sin(float a, float b)
+	public DoubleMat sin(double a, double b)
 	{
 		Thrust.sin(this, a, b); return this;
 	}
-	public FloatMat sin()
+	public DoubleMat sin()
 	{
 		Thrust.sin(this); return this;
 	}
@@ -401,11 +401,11 @@ public class FloatMat
 	/**
 	 * sqrt(a * x + b)
 	 */
-	public FloatMat sqrt(float a, float b)
+	public DoubleMat sqrt(double a, double b)
 	{
 		Thrust.sqrt(this, a, b); return this;
 	}
-	public FloatMat sqrt()
+	public DoubleMat sqrt()
 	{
 		Thrust.sqrt(this); return this;
 	}
@@ -413,11 +413,11 @@ public class FloatMat
 	/**
 	 * abs(a * x + b)
 	 */
-	public FloatMat abs(float a, float b)
+	public DoubleMat abs(double a, double b)
 	{
 		Thrust.abs(this, a, b); return this;
 	}
-	public FloatMat abs()
+	public DoubleMat abs()
 	{
 		Thrust.abs(this); return this;
 	}
@@ -425,11 +425,11 @@ public class FloatMat
 	/**
 	 * (a * x + b) ^p
 	 */
-	public FloatMat pow(float p, float a, float b)
+	public DoubleMat pow(double p, double a, double b)
 	{
 		Thrust.pow(this, p, a, b); return this;
 	}
-	public FloatMat pow(float p)
+	public DoubleMat pow(double p)
 	{
 		Thrust.pow(this, p); return this;
 	}
@@ -437,42 +437,42 @@ public class FloatMat
 	/**
 	 * (a * x + b)
 	 */
-	public FloatMat linear(float a, float b)
+	public DoubleMat linear(double a, double b)
 	{
 		Thrust.linear(this, a, b); return this;
 	}
 	
-	public float max()
+	public double max()
 	{
 		return Thrust.max(this);
 	}
 
-	public float min()
+	public double min()
 	{
 		return Thrust.min(this);
 	}
 
-	public float sum()
+	public double sum()
 	{
 		return Thrust.sum(this);
 	}
 
-	public float product()
+	public double product()
 	{
 		return Thrust.product(this);
 	}
 	
-	public FloatMat sort()
+	public DoubleMat sort()
 	{
 		Thrust.sort(this);	return this;
 	}
 	
-	public FloatMat fill(float val)
+	public DoubleMat fill(double val)
 	{
 		Thrust.fill(this, val);	return this;
 	}
 	
-	public FloatMat copyFrom(FloatMat other)
+	public DoubleMat copyFrom(DoubleMat other)
 	{
 		Thrust.copy(other, this);	return this;
 	}

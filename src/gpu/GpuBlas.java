@@ -347,4 +347,317 @@ public class GpuBlas
 	{
 		cublasGetVector(host.length, FLOAT, device, 1, Pointer.to(host), 1);
 	}
+	
+	
+	//**************************************************/
+	//******************* DOUBLE *******************/
+	//**************************************************/
+	/**
+	 * Multiply two DoubleMat and add onto an existing DoubleMat.
+	 * The most complete method. All others overload from this.
+	 * C = alpha * A * B + beta * C;
+	 * @return input parameter C
+	 */
+	public static DoubleMat mult(DoubleMat A, DoubleMat B, DoubleMat C, double alpha, double beta)
+	{
+		Pointer pa = A.getDevice();
+		Pointer pb = B.getDevice();
+		Pointer pc = C.getDevice();
+		// m, n, k are named according to the online documentation
+		// http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm
+		int m = A.row;
+		int k = A.col;  // = B.row
+		int n = B.col;
+
+		cublasDgemm(handle, A.getOp(), B.getOp(), 
+				m, n, k, GpuUtil.toDoublePointer(alpha), 
+				pa, A.ldim, pb, B.ldim, 
+				GpuUtil.toDoublePointer(beta), pc, C.ldim);
+
+		return C;
+	}
+
+	/**
+	 * Multiply two DoubleMat and add onto an existing DoubleMat.
+	 * C = A * B;
+	 * @return input parameter C
+	 */
+	public static DoubleMat mult(DoubleMat A, DoubleMat B, DoubleMat C)
+	{
+		return mult(A, B, C, 1, 0);
+	}
+
+	/**
+	 * Multiply two DoubleMat
+	 * @return C = alpha * A *B
+	 */
+	public static DoubleMat mult(DoubleMat A, DoubleMat B, double alpha)
+	{
+		return mult(A, B, new DoubleMat(A.row, B.col), alpha, 0);
+	}
+
+	/**
+	 * Multiply two DoubleMat
+	 * @return C = A * B
+	 */
+	public static DoubleMat mult(DoubleMat A, DoubleMat B)
+	{	
+		return mult(A, B, 1);
+	}
+	
+	/**
+	 * Matrix multiplies vector and add onto an existing vector (col=1)
+	 * The most complete method. All others overload from this.
+	 * y = alpha * A * x + beta * y
+	 * @return input parameter y
+	 */
+	public static DoubleMat multVec(DoubleMat A, DoubleMat x, DoubleMat y, double alpha, double beta)
+	{
+		Pointer pa = A.getDevice();
+		Pointer px = x.getDevice();
+		Pointer py = y.getDevice();
+		// Here is an inconsistency in the API
+		// m and n are the original row/col dimension
+		int m = A.getOriginalRow();
+		int n = A.getOriginalCol();
+		
+		cublasDgemv(handle, A.getOp(),
+				m, n, 
+				GpuUtil.toDoublePointer(alpha), pa, A.ldim, 
+				px, 1, 
+				GpuUtil.toDoublePointer(beta), py, 1);
+
+		return y;
+	}
+	
+	/**
+	 * Matrix multiplies vector and add onto an existing vector (col=1)
+	 * y = A * x
+	 * @return input parameter y
+	 */
+	public static DoubleMat multVec(DoubleMat A, DoubleMat x, DoubleMat y)
+	{
+		return multVec(A, x, y, 1, 0);
+	}
+	
+	/**
+	 * Matrix multiplies vector
+	 * @return y = alpha * A * x + beta * y
+	 */
+	public static DoubleMat multVec(DoubleMat A, DoubleMat x, double alpha, double beta)
+	{
+		return multVec(A, x, new DoubleMat(A.row, 1), alpha, beta);
+	}
+	
+	/**
+	 * Matrix multiplies vector
+	 * @return y = A * x
+	 */
+	public static DoubleMat multVec(DoubleMat A, DoubleMat x)
+	{
+		return multVec(A, x, new DoubleMat(A.row, 1), 1, 0);
+	}
+	
+
+	/**
+	 * Add two DoubleMat.
+	 * The most complete method. All others overload from this. 
+	 * C = alpha * A + beta * B;
+	 * @return input parameter C
+	 */
+	public static DoubleMat add(DoubleMat A, DoubleMat B, DoubleMat C, double alpha, double beta)
+	{
+		Pointer pa = A.getDevice();
+		Pointer pb = B.getDevice();
+		Pointer pc = C.getDevice();
+		int m = A.row;
+		int n = A.col;
+
+		cublasDgeam(handle, A.getOp(), B.getOp(), 
+				m, n, 
+				GpuUtil.toDoublePointer(alpha), pa, A.ldim, 
+				GpuUtil.toDoublePointer(beta), pb, B.ldim, 
+				pc, C.ldim);
+
+		return C;
+	}
+
+	/**
+	 * Add two DoubleMat
+	 * C = A + B
+	 * @return input parameter C
+	 */
+	public static DoubleMat add(DoubleMat A, DoubleMat B, DoubleMat C)
+	{
+		return add(A, B, C, 1, 1);
+	}
+	
+	/**
+	 * Add two DoubleMat
+	 * @return C = alpha * A + beta * B
+	 */
+	public static DoubleMat add(DoubleMat A, DoubleMat B, double alpha, double beta)
+	{
+		return add(A, B, new DoubleMat(A.row, A.col, false), alpha, beta);
+	}
+	/**
+	 * Add two DoubleMat
+	 * @return C = A + B
+	 */
+	public static DoubleMat add(DoubleMat A, DoubleMat B)
+	{
+		return add(A, B, 1, 1);
+	}
+	
+	/**
+	 * Copies a matrix device data to another. They should have the same dim. 
+	 * @return input parameter 'to'
+	 */
+	public static DoubleMat copy(DoubleMat from, DoubleMat to)
+	{
+		cublasDcopy(handle, from.size(), 
+				from.getDevice(), 1, 
+				to.getDevice(), 1);
+		return to;
+	}
+	
+	/**
+	 * Copies a matrix device data to another. 
+	 * @return the new clone
+	 */
+	public static DoubleMat copy(DoubleMat from)
+	{
+		return copy(from, new DoubleMat(from.row, from.col, false));
+	}
+	
+	/**
+	 * @return the index of the maximum absolute value
+	 * NOTE: absolute value, no sign
+	 */
+	public static int maxAbsIndex(DoubleMat A)
+	{
+		int[] hostIdx = new int[1];
+		Pointer deviceIdx = Pointer.to(hostIdx);
+		cublasIdamax(handle, A.size(), A.getDevice(), 1, deviceIdx);
+		cudaFree(deviceIdx);
+		return hostIdx[0] - 1; // adjust to 0-based
+	}
+	
+	/**
+	 * @return the index of the minimum absolute value
+	 * NOTE: absolute value, no sign
+	 */
+	public static int minAbsIndex(DoubleMat A)
+	{
+		int[] idx = new int[1];
+		Pointer idxPtr = Pointer.to(idx);
+		cublasIdamin(handle, A.size(), A.getDevice(), 1, idxPtr);
+		return idx[0] - 1; // adjust to 0-based
+	}
+	
+	/**
+	 * @return L2-norm of a vector
+	 */
+	public static double norm(DoubleMat A)
+	{
+		double[] val = new double[1];
+		Pointer valPtr = Pointer.to(val);
+		cublasDnrm2(handle, A.size(), A.getDevice(), 1, valPtr);
+		return val[0];
+	}
+	
+	/**
+	 * Scale and add onto an existing matrix
+	 * y = alpha * x + y
+	 * @return input parameter y
+	 */
+	public static DoubleMat scaleAdd(DoubleMat x, DoubleMat y, double alpha)
+	{
+		cublasDaxpy(handle, x.size(), 
+				GpuUtil.toDoublePointer(alpha), 
+				x.getDevice(), 1, 
+				y.getDevice(), 1);
+		return y;
+	}
+	
+	/**
+	 * Scale and add onto an existing matrix
+	 * y += x
+	 * @return input parameter y
+	 */
+	public static DoubleMat scaleAdd(DoubleMat x, DoubleMat y)
+	{	
+		return scaleAdd(x, y, 1);
+	}
+	
+	/**
+	 * Scale and overwrite an existing matrix
+	 * x *= alpha
+	 * @return input parameter x
+	 */
+	public static DoubleMat scale(DoubleMat x, double alpha)
+	{
+		cublasDscal(handle, x.size(), 
+				GpuUtil.toDoublePointer(alpha), 
+				x.getDevice(), 1);
+		return x;
+	}
+	
+	/**
+	 * @return dot product of vectors x and y
+	 */
+	public static double dot(DoubleMat x, DoubleMat y)
+	{
+		double[] val = new double[1];
+		Pointer valPtr = Pointer.to(val);
+		cublasDdot(handle, x.size(), 
+				x.getDevice(), 1, 
+				y.getDevice(), 1, 
+				valPtr);
+		return val[0];
+	}
+
+
+	/**
+	 * Create and copy to Cublas device vector
+	 * @return new device pointer
+	 */
+	public static Pointer hostToCublasDouble(double[] host)
+	{
+		int n = host.length;
+		Pointer device = GpuUtil.createDeviceDouble(n);
+		cublasSetVector(n, DOUBLE, 
+				Pointer.to(host), 1, 
+				device, 1);
+		return device;
+	}
+	
+	/**
+	 * Create and copy to Cublas device vector
+	 */
+	public static void hostToCublasDouble(double[] host, Pointer device)
+	{
+		cublasSetVector(host.length, DOUBLE, 
+				Pointer.to(host), 1, 
+				device, 1);
+	}
+	
+	/**
+	 * Copy the device vector at Cublas back to host
+	 * @return new host array
+	 */
+	public static double[] cublasToHostDouble(Pointer device, int size)
+	{
+		double[] host = new double[size];
+		cublasGetVector(size, DOUBLE, device, 1, Pointer.to(host), 1);
+		return host;
+	}
+
+	/**
+	 * Copy the device vector at Cublas back to host
+	 */
+	public static void cublasToHostDouble(Pointer device, double[] host)
+	{
+		cublasGetVector(host.length, DOUBLE, device, 1, Pointer.to(host), 1);
+	}
 }

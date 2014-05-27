@@ -1,35 +1,34 @@
 package test;
 
-import gpu.FloatMat;
-import gpu.GpuBlas;
-import gpu.Thrust;
-import gpu.ThrustNative;
+import jcuda.jcurand.JCurand;
+import jcuda.runtime.JCuda;
+import gpu.*;
 import utils.*;
 
-public class BabelTest
+public class BabelGpuDoubleTest
 {
-	private static final float TOL = 1e-4f;
+	private static final double TOL = 1e-11;
+	private static final int ITER = 1000;
 
 	public static void main(String[] args)
 	{
+		JCuda.setExceptionsEnabled(true);
+        JCurand.setExceptionsEnabled(true);
+        
+        PP.p("Double GPU test");
+        
 		// Initialize timer
 		Timer timer = Timer.getInstance();
 		timer.start();
 		
 		// Read in dummy data
 		CsvReader csv = new CsvReader("input_X.txt");
-		FloatMat X = new FloatMat(csv.readFloatMat());
+		DoubleMat X = new DoubleMat(csv.readDoubleMat());
 		csv = new CsvReader("input_W.txt");
-		FloatMat W = new FloatMat(csv.readFloatMat());
+		DoubleMat W = new DoubleMat(csv.readDoubleMat());
 		csv = new CsvReader("input_Y.txt");
 		int[] Y = csv.readIntVec(true);
 		timer.readFromLast("Read the database from CSV");
-		
-		
-		PP.p("X", X.row, X.col);
-		PP.p("W", W.row, W.col);
-		PP.p("Y", Y.length);
-		PP.setDoublePrec(1);
 		
 		/*
 		 * Dimensions
@@ -45,9 +44,9 @@ public class BabelTest
 		 * Define a few learning constants
 		 */
 		csv = new CsvReader("input_learn.txt");
-		float[] learns = csv.readFloatVec(true);
-		final float LearningRate = learns[0];
-		final float Lambda = learns[1];
+		double[] learns = csv.readDoubleVec(true);
+		final double LearningRate = learns[0];
+		final double Lambda = learns[1];
 		
 		GpuBlas.init();
 		timer.readFromLast("cuBLAS init");
@@ -57,44 +56,46 @@ public class BabelTest
 		 * W and b are combined. 
 		 */
 		// augment X with a column of 1
-		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1, false);
+		DoubleMat X1 = new DoubleMat(SAMPLES, X_DIM + 1, false);
 		X1.copyFrom(X);
-		ThrustNative.gpu_fill_float(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
+		ThrustNative.gpu_fill_double(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
 		
 //		X1.getHostFromDevice(); checkGold(X1.deflatten(), "X1");
 		
-//		FloatMat WX = GpuBlas.mult(W, X1.transpose());
+//		DoubleMat WX = GpuBlas.mult(W, X1.transpose());
 		
 		// Xnew: X_NEW_DIM * SAMPLES
-		FloatMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
+//		checkGold(GpuBlas.mult(W, X1.transpose()), "WX");
+		
+		DoubleMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
 		timer.readFromLast("Step 1");
-		checkGold(Xnew, "Xnew");
+//		checkGold(Xnew, "Xnew");
 
 		/*
 		 * Step2: Create Theta matrix and compute Theta * X_new
 		 */
-		FloatMat Theta = new FloatMat(LABELS, X_NEW_DIM);
+		DoubleMat Theta = new DoubleMat(LABELS, X_NEW_DIM);
 
-		FloatMat A = new FloatMat(LABELS, 1, false);
+		DoubleMat A = new DoubleMat(LABELS, 1, false);
 		// Loop over samples column by column
-		for (int s = 0; s < SAMPLES; ++ s)
+		for (int s = 0; s < ITER; ++ s)
 		{
 			// Step2: extract a column
-			FloatMat Xnew_s = Xnew.createOffset(s * X_NEW_DIM, X_NEW_DIM);
+			DoubleMat Xnew_s = Xnew.createOffset(s * X_NEW_DIM, X_NEW_DIM);
 			// alpha_vector = Theta * Xnew_s, LABELS * 1
 			GpuBlas.mult(Theta, Xnew_s, A);
 			
 			/*
 			 * Step3: get Id[y==j] - P(yj | x, Theta)
 			 */
-			Thrust.babel_id_minus_softmax(A, Y[s]);
+			Thrust.babel_id_minus_softmax_double(A, Y[s]);
 			
 			// Step3: update Theta
 			// Theta += Lr * ( (Id-P) * Xnew_s' - Lambda/SAMPLES * Theta)
 			GpuBlas.mult(A, Xnew_s.transpose(), Theta, 
 					LearningRate, 1 - LearningRate * Lambda / SAMPLES);
 		}
-		checkGold(A, "A");
+//		checkGold(A, "A");
 
 		/*
 		 * DONE!
@@ -102,13 +103,15 @@ public class BabelTest
 		 */
 		PP.p("Done. Check Theta:");
 		checkGold(Theta, "Theta");
+		
+		PP.p("Theta abs avg:", Theta.abs().sum() / Theta.size());
 
 		/*
 		 * Clean up and exit
 		 */
-		FloatMat[] mats = new FloatMat[] 
-				{X, W, X1, Xnew};
-		for (FloatMat mat : mats)
+		DoubleMat[] mats = new DoubleMat[] 
+				{X, W, X1, Xnew, Theta};
+		for (DoubleMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();
 	}
@@ -116,25 +119,20 @@ public class BabelTest
 	/**
 	 * Check the gold standard generated from Matlab
 	 */
-	private static void checkGold(FloatMat hostMat, String goldFile)
+	private static void checkGold(DoubleMat gpu, String goldFile)
 	{
 		CsvReader csv = new CsvReader("gold_" + goldFile + ".txt");
-		float[][] Gold = csv.readFloatMat();
-		float[][] Host = hostMat.deflatten();
+		double[][] Gold = csv.readDoubleMat();
+		double[][] Host = gpu.deflatten();
 		
-		for (int i = 0; i < Gold.length; i ++)
-			for (int j = 0; j < Gold[0].length; j ++)
-			{
-				double gold = Gold[i][j];
-				double host = Host[i][j];
-				if (Math.abs(gold - host) > TOL)
-				{
-					PP.p(goldFile, "DIFF at", new FloatMat.Coord(i, j));
-					PP.p("GPU =", host, "\nMatlab =", gold, '\n');
-					return;
-				}
-			}
-		PP.p("PASS! ");
+		double diff = GpuUtil.matAvgDiff(Gold, Host);
+		PP.setDoublePrec(3);
+		PP.setScientific(true);
+		
+		if (GpuUtil.matAvgDiff(Gold, Host) < TOL)
+    		PP.p("PASS double GPU-Matlab: ", diff);
+		else
+			PP.p("FAIL double GPU-Matlab: ", diff);
 	}
 
 }

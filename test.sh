@@ -1,7 +1,9 @@
 #!/bin/bash
 
-main="test/BabelTest"
-main="test/BabelCpuTest"
+main="test/BabelGpuFloatTest"
+main="test/BabelCpuFloatTest"
+main="test/BabelGpuDoubleTest"
+main="test/BabelCpuDoubleTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/
@@ -10,7 +12,7 @@ cd bin
 
 # an arbitrary command line arg tells the script to regenerate
 if [ ! -z "$1" ]; then
-java -jar "E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" gpu/ThrustNative gpu/ThrustStruct $main -properties windows-x86_64-cuda > stderr.log
+java -jar "E:/Dropbox/Programming/Java/JarvisJava/BabelGPU/javacpp.jar" gpu/ThrustNative gpu/ThrustStruct -properties windows-x86_64-cuda #> stderr.log
     
     rm -rf ../windows-x86_64
     cp -rf gpu/windows-x86_64 ../

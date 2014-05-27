@@ -1,17 +1,17 @@
 package test;
 
-import gpu.FloatMat;
-import gpu.GpuBlas;
-import gpu.Thrust;
-import gpu.ThrustNative;
+import gpu.*;
 import utils.*;
 
-public class BabelCpuTest
+public class BabelCpuFloatTest
 {
-	private static final float TOL = 1e-1f;
+	private static final float TOL = 1e-5f;
+	private static final int ITER = 30;
 	
 	public static void main(String[] args)
 	{
+		PP.p("Float CPU test");
+		
 		// Read in dummy data
 		CsvReader csv = new CsvReader("input_X.txt");
 		float[][] jX = csv.readFloatMat();
@@ -22,12 +22,6 @@ public class BabelCpuTest
 		FloatMat W = new FloatMat(jW);
 		csv = new CsvReader("input_Y.txt");
 		int[] Y = csv.readIntVec(true);
-		
-		
-		PP.p("X", X.row, X.col);
-		PP.p("W", W.row, W.col);
-		PP.p("Y", Y.length);
-		PP.setDoublePrec(1);
 		
 		/*
 		 * Dimensions
@@ -62,9 +56,9 @@ public class BabelCpuTest
 		// Xnew: X_NEW_DIM * SAMPLES
 		FloatMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
 		float[][] jXnew = cos(mult(jW, transpose(jX1)));
-		PP.p("check Xnew"); 
-		checkGold(Xnew, jXnew);
-		checkGold(jXnew, "Xnew");
+//		PP.p("check Xnew"); 
+//		checkGold(Xnew, jXnew);
+//		checkGold(jXnew, "Xnew");
 
 		/*
 		 * Step2: Create Theta matrix and compute Theta * X_new
@@ -75,7 +69,7 @@ public class BabelCpuTest
 		FloatMat A = new FloatMat(LABELS, 1, false);
 		float[][] jA = new float[LABELS][1];
 		// Loop over samples column by column
-		for (int s = 0; s < SAMPLES; ++ s)
+		for (int s = 0; s < ITER; ++ s)
 		{
 			// Step2: extract a column
 			FloatMat Xnew_s = Xnew.createOffset(s * X_NEW_DIM, X_NEW_DIM);
@@ -89,7 +83,7 @@ public class BabelCpuTest
 			/*
 			 * Step3: get Id[y==j] - P(yj | x, Theta)
 			 */
-			Thrust.babel_id_minus_softmax(A, Y[s]);
+			Thrust.babel_id_minus_softmax_float(A, Y[s]);
 			jbabel_id_minus_softmax(jA, Y[s]);
 			
 			// Step3: update Theta
@@ -105,7 +99,7 @@ public class BabelCpuTest
 		}
 		PP.p("Check vector A");
 		checkGold(A, jA);
-		checkGold(jA, "A");
+//		checkGold(jA, "A");
 
 		/*
 		 * DONE!
@@ -128,23 +122,18 @@ public class BabelCpuTest
 	/**
 	 * Check the gold standard from plain Java
 	 */
-	private static void checkGold(FloatMat hostMat, float[][] Gold)
+	private static void checkGold(FloatMat gpu, float[][] cpu)
 	{
-		float[][] Host = hostMat.deflatten();
+		float[][] Host = gpu.deflatten();
 		
-		for (int i = 0; i < Gold.length; i ++)
-			for (int j = 0; j < Gold[0].length; j ++)
-			{
-				double gold = Gold[i][j];
-				double host = Host[i][j];
-				if (Math.abs(gold - host) > TOL)
-				{
-					PP.p("DIFF at", new FloatMat.Coord(i, j));
-					PP.p("GPU =", host, "\nCPU =", gold, '\n');
-					return;
-				}
-			}
-		PP.p("PASS! ");
+		double diff = GpuUtil.matAvgDiff(cpu, Host);
+		PP.setDoublePrec(3);
+		PP.setScientific(true);
+		
+		if (GpuUtil.matAvgDiff(cpu, Host) < TOL)
+    		PP.p("PASS float GPU-CPU: ", diff);
+		else
+			PP.p("FAIL float GPU-CPU: ", diff);
 	}
 	
 	/**
@@ -155,19 +144,14 @@ public class BabelCpuTest
 		CsvReader csv = new CsvReader("gold_" + goldFile + ".txt");
 		float[][] Gold = csv.readFloatMat();
 		
-		for (int i = 0; i < Gold.length; i ++)
-			for (int j = 0; j < Gold[0].length; j ++)
-			{
-				double gold = Gold[i][j];
-				double host = cpu[i][j];
-				if (Math.abs(gold - host) > TOL)
-				{
-					PP.p(goldFile, "DIFF at", new FloatMat.Coord(i, j));
-					PP.p("CPU =", host, "\nMatlab =", gold, '\n');
-					return;
-				}
-			}
-		PP.p("PASS! ");
+		double diff = GpuUtil.matAvgDiff(Gold, cpu);
+		PP.setDoublePrec(3);
+		PP.setScientific(true);
+		
+		if (GpuUtil.matAvgDiff(Gold, cpu) < TOL)
+    		PP.p("PASS float CPU-Matlab: ", diff);
+		else
+			PP.p("FAIL float CPU-Matlab: ", diff);
 	}
 
 	private static float[][] mult(float[][] a, float[][] b)
