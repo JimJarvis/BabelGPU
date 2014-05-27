@@ -32,8 +32,8 @@ public class MiscTest
 		FloatMat a = new FloatMat(A);
 		
 		FloatMat aa = a.createOffset(1, 4, 4);
-		PP.p(aa.row, aa.col);
-		PP.p(b.row, b.col);
+		PP.p(aa.numRows, aa.numCols);
+		PP.p(b.numRows, b.numCols);
 		PP.p(GpuBlas.mult(b.transpose(), aa));
 		
 		GpuBlas.destroy();

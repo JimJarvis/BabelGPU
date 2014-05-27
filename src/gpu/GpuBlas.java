@@ -52,9 +52,9 @@ public class GpuBlas
 		Pointer pc = C.getDevice();
 		// m, n, k are named according to the online documentation
 		// http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm
-		int m = A.row;
-		int k = A.col;  // = B.row
-		int n = B.col;
+		int m = A.numRows;
+		int k = A.numCols;  // = B.row
+		int n = B.numCols;
 
 		cublasSgemm(handle, A.getOp(), B.getOp(), 
 				m, n, k, GpuUtil.toFloatPointer(alpha), 
@@ -80,7 +80,7 @@ public class GpuBlas
 	 */
 	public static FloatMat mult(FloatMat A, FloatMat B, float alpha)
 	{
-		return mult(A, B, new FloatMat(A.row, B.col), alpha, 0);
+		return mult(A, B, new FloatMat(A.numRows, B.numCols), alpha, 0);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class GpuBlas
 	 */
 	public static FloatMat multVec(FloatMat A, FloatMat x, float alpha, float beta)
 	{
-		return multVec(A, x, new FloatMat(A.row, 1), alpha, beta);
+		return multVec(A, x, new FloatMat(A.numRows, 1), alpha, beta);
 	}
 	
 	/**
@@ -142,7 +142,7 @@ public class GpuBlas
 	 */
 	public static FloatMat multVec(FloatMat A, FloatMat x)
 	{
-		return multVec(A, x, new FloatMat(A.row, 1), 1, 0);
+		return multVec(A, x, new FloatMat(A.numRows, 1), 1, 0);
 	}
 	
 
@@ -157,8 +157,8 @@ public class GpuBlas
 		Pointer pa = A.getDevice();
 		Pointer pb = B.getDevice();
 		Pointer pc = C.getDevice();
-		int m = A.row;
-		int n = A.col;
+		int m = A.numRows;
+		int n = A.numCols;
 
 		cublasSgeam(handle, A.getOp(), B.getOp(), 
 				m, n, 
@@ -185,7 +185,7 @@ public class GpuBlas
 	 */
 	public static FloatMat add(FloatMat A, FloatMat B, float alpha, float beta)
 	{
-		return add(A, B, new FloatMat(A.row, A.col, false), alpha, beta);
+		return add(A, B, new FloatMat(A.numRows, A.numCols, false), alpha, beta);
 	}
 	/**
 	 * Add two FloatMat
@@ -214,7 +214,7 @@ public class GpuBlas
 	 */
 	public static FloatMat copy(FloatMat from)
 	{
-		return copy(from, new FloatMat(from.row, from.col, false));
+		return copy(from, new FloatMat(from.numRows, from.numCols, false));
 	}
 	
 	/**
@@ -312,7 +312,7 @@ public class GpuBlas
 	public static Pointer hostToCublasFloat(float[] host)
 	{
 		int n = host.length;
-		Pointer device = GpuUtil.createDeviceFloat(n);
+		Pointer device = GpuUtil.allocateDeviceFloat(n);
 		cublasSetVector(n, FLOAT, 
 				Pointer.to(host), 1, 
 				device, 1);

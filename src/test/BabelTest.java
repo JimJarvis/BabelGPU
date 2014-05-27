@@ -26,8 +26,8 @@ public class BabelTest
 		timer.readFromLast("Read the database from CSV");
 		
 		
-		PP.p("X", X.row, X.col);
-		PP.p("W", W.row, W.col);
+		PP.p("X", X.numRows, X.numCols);
+		PP.p("W", W.numRows, W.numCols);
 		PP.p("Y", Y.length);
 		PP.setDoublePrec(1);
 		
