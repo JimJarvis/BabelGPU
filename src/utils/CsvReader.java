@@ -48,6 +48,10 @@ public class CsvReader
 		catch (FileNotFoundException e)
 		{ System.err.println("File not found :" + fileName); }
 	}
+	
+	//**************************************************/
+	//******************* INTEGER *******************/
+	//**************************************************/
 
 	/**
 	 * Capable of resuming read
@@ -192,8 +196,46 @@ public class CsvReader
 	 * Default to false: read only one line at a time
 	 */
 	public int[] readIntVec()	{	return readIntVec(false);	}
+	
+	/**
+	 * Load an entire int matrix from a file
+	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
+	 */
+	public static int[][] readIntMat(String fileName)
+	{
+		if (fileExtension(fileName).equals("dat"))
+		{
+			return new Pickle<int[][]>().load(fileName);
+		}
+		else // "txt"
+		{
+			CsvReader csv = new CsvReader(fileName);
+			return csv.readIntMat();
+		}
+	}
 
 
+	/**
+	 * Load an entire int array from a file
+	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
+	 */
+	public static int[] readIntVec(String fileName)
+	{
+		if (fileExtension(fileName).equals("dat"))
+		{
+			return new Pickle<int[]>().load(fileName);
+		}
+		else // "txt"
+		{
+			CsvReader csv = new CsvReader(fileName);
+			return csv.readIntVec(true); // read all lines as one array
+		}
+	}
+
+	
+	//**************************************************/
+	//******************* FLOAT *******************/
+	//**************************************************/
 	/**
 	 * Capable of resuming read
 	 * @param row read a specified number of rows
@@ -336,8 +378,226 @@ public class CsvReader
 	 * Default to false: read only one line at a time
 	 */
 	public float[] readFloatVec()	{	return readFloatVec(false);	}
+	
+	/**
+	 * Load an entire float matrix from a file
+	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
+	 */
+	public static float[][] readFloatMat(String fileName)
+	{
+		if (fileExtension(fileName).equals("dat"))
+		{
+			return new Pickle<float[][]>().load(fileName);
+		}
+		else // "txt"
+		{
+			CsvReader csv = new CsvReader(fileName);
+			return csv.readFloatMat();
+		}
+	}
+
+	/**
+	 * Load an entire float array from a file
+	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
+	 */
+	public static float[] readFloatVec(String fileName)
+	{
+		if (fileExtension(fileName).equals("dat"))
+		{
+			return new Pickle<float[]>().load(fileName);
+		}
+		else // "txt"
+		{
+			CsvReader csv = new CsvReader(fileName);
+			return csv.readFloatVec(true); // read all lines as one array
+		}
+	}
+	
+	
+	//**************************************************/
+	//******************* DOUBLE *******************/
+	//**************************************************/
+	/**
+	 * Capable of resuming read
+	 * @param row read a specified number of rows
+	 * @param col read a specified number of columns
+	 * @return a double matrix from CSV file
+	 */
+	public double[][] readDoubleMat(int row, int col)
+	{
+		double[][] mat = new double[row][col];
+		String line;
+		Scanner scan = null;
+		int i = 0, j = 0;
+		try {
+			while (i < row && (line = reader.readLine()) != null)
+			{
+				if (line.trim().length() == 0)	continue;
+				scan = new Scanner(line);
+				scan.useDelimiter(delimiter);
+				while (j < col && scan.hasNextDouble())
+					mat[i][j++] = scan.nextDouble();
+				j = 0;
+				++ i;
+			}
+			if (scan == null)	return null; // no lines left
+			scan.close();
+			return mat;
+		}
+		catch (IOException e) {
+			e.printStackTrace(); return null;
+		}
+	}
+
+	/**
+	 * Read the whole CSV file. No need to specify rows/columns. <br>
+	 * The size of the first line determines the matrix width
+	 * @return an double matrix from CSV file
+	 */
+	public double[][] readDoubleMat()
+	{
+		ArrayList<String[]> rowBuffer = new ArrayList<>(512);
+		String line;
+		try {
+			while ((line = reader.readLine()) != null)
+			{
+				line = line.trim();
+				if (line.length() == 0)	continue;
+				rowBuffer.add(line.split(delimiter));
+			}
+
+			int iLen = rowBuffer.size();
+			if (iLen == 0)	return null;
+			int jLen = rowBuffer.get(0).length;
+			double[][] mat = new double[iLen][jLen];
+
+			for (int i = 0; i < iLen; i++)
+				for (int j = 0; j < jLen; j++)
+				{
+					String[] toks = rowBuffer.get(i);
+					mat[i][j] = (j < toks.length && toks[j].length() > 0) ? Double.parseDouble(toks[j]) : 0;
+				}
+
+			return mat;
+		}
+		catch (IOException e) {
+			e.printStackTrace(); return null;
+		}
+	}
+
+	/**
+	 * Capable of resuming reading
+	 * @return a double array (single-row-matrix)
+	 */
+	public double[] readDoubleVec(int col)
+	{
+		double[] array = new double[col];
+		try {
+			int i = 0;
+			while (i < col)
+			{
+				if (colScanner == null || !colScanner.hasNextDouble())
+				{
+					String line = reader.readLine();
+					if (line == null)
+					{
+						colScanner = null;
+						return i == 0 ? null : array; // if nothing read, return null
+					}
+					colScanner = new Scanner(line);
+					colScanner.useDelimiter(delimiter);
+				}
+				while (i < col && colScanner.hasNextDouble())
+					array[i++] = colScanner.nextDouble();
+			}
+
+			// not filled up yet, we proceed to the next row if there is any
+			return array;
+		}
+		catch (IOException e) {
+			e.printStackTrace(); return null;
+		}
+	}
+
+	/**
+	 * Read a one CSV file.
+	 * @param all true to read the whole CSV as one array. False to read one line at a time
+	 * @return an double array from CSV file
+	 */
+	public double[] readDoubleVec(boolean all)
+	{
+		ArrayList<String[]> rowBuffer = new ArrayList<>(64);
+		String line;
+		try {
+			int count = 0;
+			while ((line = reader.readLine()) != null)
+			{
+				line = line.trim();
+				if (line.length() == 0)	continue;
+				String[] toks = line.split(delimiter);
+				count += toks.length;
+				rowBuffer.add(toks);
+				if (!all) break; // read only one line at a time and return
+			}
+			if (rowBuffer.size() == 0)	return null;
+
+			double[] array = new double[count];
+
+			int pt = 0;
+			for (int i = 0; i < rowBuffer.size(); i++)
+				for (String s : rowBuffer.get(i))
+					array[pt++] = s.length() > 0 ? Double.parseDouble(s) : 0;
+
+					return array;
+		}
+		catch (IOException e) {
+			e.printStackTrace(); return null;
+		}
+	}
+
+	/**
+	 * Default to false: read only one line at a time
+	 */
+	public double[] readDoubleVec()	{	return readDoubleVec(false);	}
+	
+	/**
+	 * Load an entire double matrix from a file
+	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
+	 */
+	public static double[][] readDoubleMat(String fileName)
+	{
+		if (fileExtension(fileName).equals("dat"))
+		{
+			return new Pickle<double[][]>().load(fileName);
+		}
+		else // "txt"
+		{
+			CsvReader csv = new CsvReader(fileName);
+			return csv.readDoubleMat();
+		}
+	}
+
+	/**
+	 * Load an entire double array from a file
+	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
+	 */
+	public static double[] readDoubleVec(String fileName)
+	{
+		if (fileExtension(fileName).equals("dat"))
+		{
+			return new Pickle<double[]>().load(fileName);
+		}
+		else // "txt"
+		{
+			CsvReader csv = new CsvReader(fileName);
+			return csv.readDoubleVec(true); // read all lines as one array
+		}
+	}
 
 
+	//**************************************************/
+	//******************* STRING *******************/
+	//**************************************************/
 	/**
 	 * Capable of resuming read
 	 * @param row read a specified number of rows
@@ -482,76 +742,6 @@ public class CsvReader
 	 */
 	public String[] readStringVec()	{	return readStringVec(false);	}
 
-
-	/**
-	 * Load an entire int matrix from a file
-	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
-	 */
-	public static int[][] readIntMat(String fileName)
-	{
-		if (fileExtension(fileName).equals("dat"))
-		{
-			return new Pickle<int[][]>().load(fileName);
-		}
-		else // "txt"
-		{
-			CsvReader csv = new CsvReader(fileName);
-			return csv.readIntMat();
-		}
-	}
-
-
-	/**
-	 * Load an entire int array from a file
-	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
-	 */
-	public static int[] readIntVec(String fileName)
-	{
-		if (fileExtension(fileName).equals("dat"))
-		{
-			return new Pickle<int[]>().load(fileName);
-		}
-		else // "txt"
-		{
-			CsvReader csv = new CsvReader(fileName);
-			return csv.readIntVec(true); // read all lines as one array
-		}
-	}
-
-	/**
-	 * Load an entire float matrix from a file
-	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
-	 */
-	public static float[][] readFloatMat(String fileName)
-	{
-		if (fileExtension(fileName).equals("dat"))
-		{
-			return new Pickle<float[][]>().load(fileName);
-		}
-		else // "txt"
-		{
-			CsvReader csv = new CsvReader(fileName);
-			return csv.readFloatMat();
-		}
-	}
-
-	/**
-	 * Load an entire float array from a file
-	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
-	 */
-	public static float[] readFloatVec(String fileName)
-	{
-		if (fileExtension(fileName).equals("dat"))
-		{
-			return new Pickle<float[]>().load(fileName);
-		}
-		else // "txt"
-		{
-			CsvReader csv = new CsvReader(fileName);
-			return csv.readFloatVec(true); // read all lines as one array
-		}
-	}
-
 	/**
 	 * Load an entire string matrix from a file
 	 * @param fileName extension can be either "txt" (CSV file) or "dat" to load from binary java object file
@@ -586,6 +776,7 @@ public class CsvReader
 		}
 	}
 
+	// ******************** Utility ********************/
 	private static String fileExtension(String fileName)
 	{
 		// Extract the file extension
