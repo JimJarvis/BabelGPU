@@ -1,7 +1,8 @@
 #!/bin/bash
 
-main="test/BabelCpuDoubleTest"
-main="test/BabelCpuFloatTest"
+main="test/BabelDoubleTest"
+main="test/BabelFloatTest"
+main="test/BlasTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/

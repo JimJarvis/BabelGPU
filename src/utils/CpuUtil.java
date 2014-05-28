@@ -3,6 +3,28 @@ package utils;
 public class CpuUtil
 {
 	/**
+	 * Utility: deflatten a 1D float to 2D matrix
+	 * @param row row dimension
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static float[][] deflatten(float[] A, int row, boolean columnMajor)
+	{
+		int col = A.length / row;
+		float[][] ans = new float[row][col];
+		int pt = 0;
+		
+		if (columnMajor)
+    		for (int j = 0; j < col; j ++)
+    			for (int i = 0; i < row; i ++)
+    				ans[i][j] = A[pt ++];
+		else // row major
+			for (int i = 0; i < row; i ++)
+				for (int j = 0; j < col; j ++)
+					ans[i][j] = A[pt ++];
+		return ans;
+	}
+	
+	/**
 	 * Returns the average of absolute difference from 2 matrices
 	 */
 	public static float matAvgDiff(float[][] A, float[][] B)
@@ -89,6 +111,28 @@ public class CpuUtil
 	//**************************************************/
 	//******************* DOUBLE *******************/
 	//**************************************************/
+	/**
+	 * Utility: deflatten a 1D double to 2D matrix
+	 * @param row row dimension
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static double[][] deflatten(double[] A, int row, boolean columnMajor)
+	{
+		int col = A.length / row;
+		double[][] ans = new double[row][col];
+		int pt = 0;
+		
+		if (columnMajor)
+    		for (int j = 0; j < col; j ++)
+    			for (int i = 0; i < row; i ++)
+    				ans[i][j] = A[pt ++];
+		else // row major
+			for (int i = 0; i < row; i ++)
+				for (int j = 0; j < col; j ++)
+					ans[i][j] = A[pt ++];
+		return ans;
+	}
+	
 	/**
 	 * Returns the average of absolute difference from 2 matrices
 	 */

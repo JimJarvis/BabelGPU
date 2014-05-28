@@ -1,6 +1,7 @@
 package gpu;
 
 import gpu.ThrustStruct.*;
+import utils.CpuUtil;
 import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
@@ -267,15 +268,7 @@ public class DoubleMat
 	 */
 	public static double[][] deflatten(double[] A, int row)
 	{
-		int col = A.length / row;
-		double[][] ans = new double[row][col];
-		int pt = 0;
-		
-		for (int j = 0; j < col; j ++)
-			for (int i = 0; i < row; i ++)
-				ans[i][j] = A[pt ++];
-
-		return ans;
+		return CpuUtil.deflatten(A, row, true);
 	}
 	
 	/**
