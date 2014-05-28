@@ -1,5 +1,7 @@
 package gpu;
 
+import java.nio.FloatBuffer;
+
 import gpu.ThrustStruct.FloatDevicePointer;
 import utils.GpuUtil;
 import utils.PP;
@@ -13,6 +15,9 @@ import jcuda.jcublas.cublasOperation;
  */
 public class FloatMat
 {
+	// on the host side, the data can be stored as either a float[] or a FloatBuffer 
+	private float[] hostArray = null;
+	private FloatBuffer hostBuffer = null;
 	private Pointer hostPtr = null; // jCuda pointer
 	private Pointer devicePtr = null; // jCuda pointer
 	private FloatDevicePointer thrustPointer = null; // Thrust pointer
@@ -26,9 +31,138 @@ public class FloatMat
 	public int ldim; 
 	
 	
-	// used internally for shallow copies.
-	private FloatMat() { }
+	// used for shallow copies.
+	public FloatMat() { }
 
+	/**
+	 * Ctor from host and device data
+	 * In this constructor, both the hostPtr and the devicePtr are passed in.
+	 * The assumption is that memory has been allocated on the host and on the device already.
+	 */
+	public FloatMat(
+			Pointer devicePtr, Pointer hostPtr,  
+			float[] hostArray, FloatBuffer hostBuffer,
+			int numRows, int numCols) throws GpuException
+	{
+		this.devicePtr = devicePtr;
+		
+		if(hostPtr == null)
+		{
+			if(hostBuffer != null)
+			{
+				this.hostPtr = Pointer.toBuffer(hostBuffer);
+			}
+			else if(hostArray != null)
+			{
+				this.hostPtr = Pointer.to(hostArray);
+			}
+		}
+		else
+		{
+			this.hostPtr = hostPtr;
+		}
+		
+		this.hostArray = hostArray;
+		this.hostBuffer = hostBuffer;
+		this.initDim(numRows, numCols);
+	}
+	
+	/**
+	 * Ctor from host data
+	 * This constructor assumes the memory on the host has already been
+	 * allocated, and that the 'hostPtr' pointer to that memory is passed in. 
+	 * It allocates numRows * numCols * sizeOf.FLOAT memory on the device.
+	 * @param memsetToZero true to initialize the device data to 0.
+	 * @throws GpuException 
+	 */
+	public FloatMat(Pointer hostPtr, int numRows, int numCols, boolean memsetToZero) throws GpuException
+	{
+		this(
+				GpuUtil.allocateDeviceFloat(numRows * numCols, memsetToZero), 
+				hostPtr, 
+				null, // hostArray
+				null, // hostBuffer
+				numRows, 
+				numCols
+			);
+	}
+	
+	/**
+	 * Ctor from host data
+	 * This constructor assumes the memory on the host has already been
+	 * allocated as a FloatBuffer (which is passed in as parameter).
+	 * It allocates numRows * numCols * sizeOf.FLOAT memory on the device. 
+	 * @param memsetToZero true to initialize the device data to 0.
+	 * @throws GpuException 
+	 */
+	public FloatMat(FloatBuffer hostBuffer, int numRows, int numCols, boolean memsetToZero) throws GpuException
+	{
+		// TODO: should we use "Pointer.to" or "Pointer.toBuffer"
+		this(
+				GpuUtil.allocateDeviceFloat(numRows * numCols, memsetToZero), 
+				Pointer.toBuffer(hostBuffer), 
+				null, // hostArray
+				hostBuffer, // hostBuffer
+				numRows, 
+				numCols
+			);
+	}
+	
+	/**
+	 * Ctor from host data
+	 * This constructor assumes the memory on the host has already been
+	 * allocated as a 1D array (which is passed in as parameter).
+	 * It allocates numRows * numCols * sizeOf.FLOAT memory on the device. 
+	 * @param memsetToZero true to initialize the device data to 0.
+	 * @throws GpuException 
+	 */
+	public FloatMat(float[] hostArray, int numRows, int numCols, boolean memsetToZero) throws GpuException
+	{
+		this(
+				GpuUtil.allocateDeviceFloat(numRows * numCols, memsetToZero), 
+				Pointer.to(hostArray), 
+				hostArray, // hostArray
+				null, // hostBuffer
+				numRows, 
+				numCols
+			);
+	}
+	
+	/**
+	 * Ctor from 2D host data
+	 * This constructor assumes the memory on the host has already been
+	 * allocated as a 2D array (which is passed in as parameter).
+	 * It allocates numRows * numCols * sizeOf.FLOAT memory on the device. 
+	 * Note: the flatten method is very inefficient, and shouldn't be used.
+	 * @throws GpuException 
+	 */
+	public FloatMat(float[][] hostArray) throws GpuException
+	{
+		this(
+				GpuUtil.allocateDeviceFloat(hostArray.length * hostArray[0].length, false /*memsetToZero*/),
+				null, // hostPtr (will be set to point to flatten(hostArray) in the constructor
+				flatten(hostArray), // hostArray
+				null, // hostBuffer
+				hostArray.length, 
+				hostArray[0].length
+			);
+	}
+	
+	/**
+	 * Ctor for 1D host data (column vector)
+	 */
+	public FloatMat(float[] hostArray) throws GpuException
+	{
+		this(
+				GpuUtil.allocateDeviceFloat(hostArray.length, false /*memsetToZero*/), 
+				Pointer.to(hostArray), 
+				hostArray, // hostArray
+				null, // hostBuffer
+				hostArray.length, 
+				1 // numCols
+			);
+	}
+	
 	/**
 	 * Ctor with dimensions
 	 * This constructor doesn't set the hostPtr.
@@ -38,92 +172,41 @@ public class FloatMat
 	 * @param memsetToZero true to initialize the device data to 0. Default false. 
 	 * @throws GpuException 
 	 */
-	public FloatMat(int row, int col, boolean memsetToZero) throws GpuException
+	public FloatMat(int numRows, int numCols, boolean memsetToZero) throws GpuException
 	{
-		this.devicePtr = GpuUtil.allocateDeviceFloat(row * col, memsetToZero);
-		initDim(row, col);
-	}
-	
-	public FloatMat(Pointer hostPtr, Pointer devicePtr, int row, int col) throws GpuException
-	{
-		this.hostPtr = hostPtr;
-		this.devicePtr = devicePtr;
-		initDim(row, col);
-	}
-	
-	/**
-	 * Ctor from host data
-	 * This constructor assumes the memory on the device has already been
-	 * allocated, and that the 'device' Pointer to that memory is passed in. 
-	 * @throws GpuException 
-	 */
-	public FloatMat(Pointer hostPtr, int row, int col, boolean memsetToZero) throws GpuException
-	{
-		this.hostPtr = hostPtr;
-		this.devicePtr = GpuUtil.allocateDeviceFloat(row * col, memsetToZero);
-		initDim(row, col);
-	}
-	
-	/**
-	 * Ctor from host data
-	 * @param memsetToZero true to initialize the device data to 0. Default false. 
-	 * @throws GpuException 
-	 */
-	public FloatMat(float[] host, int row, int col, boolean memsetToZero) throws GpuException
-	{
-		this.hostPtr = Pointer.to(host);
-		this.devicePtr = GpuUtil.allocateDeviceFloat(row * col, memsetToZero);
-		initDim(row, col);
-	}
-	
-	/**
-	 * Ctor from host data
-	 * @throws GpuException 
-	 */
-	public FloatMat(float[] host, int row, int col) throws GpuException
-	{
-		this(host, row, col, false /*memSetToZero*/);
-	}
-	
-	/**
-	 * Ctor from 2D host data
-	 * Note: the flatten method is very inefficient, and shouldn't be used.
-	 * @throws GpuException 
-	 */
-	public FloatMat(float[][] host) throws GpuException
-	{
-		this(flatten(host), host.length, host[0].length);
-	}
-	
-	/**
-	 * Ctor for 1D host data (column vector)
-	 */
-	public FloatMat(float[] host) throws GpuException
-	{
-		this(host, host.length, 1);
-	}
-
-	// Ctor helper
-	private void initDim(int row, int col)
-	{
-		this.numRows = row;
-		this.numCols = col;
-		this.ldim = row;
+		this(
+				GpuUtil.allocateDeviceFloat(numRows * numCols, memsetToZero),
+				null, //hostPtr
+				null, // hostArray
+				null, // hostBuffer
+				numRows,
+				numCols
+			);
 	}
 	
 	// Shallow copy create new instance
 	private FloatMat shallowCopy()
 	{
 		FloatMat mat = new FloatMat();
+		mat.hostPtr = this.hostPtr;
+		mat.devicePtr = this.devicePtr;
+		mat.hostArray = this.hostArray;
+		mat.hostBuffer = this.hostBuffer;
+		mat.thrustPointer = this.thrustPointer;
 		mat.numRows = this.numRows;
 		mat.numCols = this.numCols;
 		mat.ldim = this.ldim;
 		mat.op = this.op;
-		mat.devicePtr = this.devicePtr;
-		mat.hostPtr = this.hostPtr;
-		mat.thrustPointer = this.thrustPointer;
 		
 		return mat;
+	}
+	
+	// Ctor helper
+	private void initDim(int row, int col)
+	{
+		this.numRows = row;
+		this.numCols = col;
+		this.ldim = row;
 	}
 	
 	/**
@@ -142,38 +225,49 @@ public class FloatMat
 		return mat;
 	}
 	
+	public Pointer getDevicePointer()
+	{
+		return this.devicePtr;
+	}
+	
+	public Pointer getHostPointer()
+	{
+		return this.hostPtr;
+	}
+	
+	public int getOp()
+	{
+		return this.op;
+	}
+	
 	public boolean isTransposed()
 	{
 		return this.op == cublasOperation.CUBLAS_OP_T;
 	}
 	
-	
-	public int getOp() 
-	{
-		return this.op;	
-	}
-	
 	/**
 	 * Invariant to transpose
 	 */
-	public int getOriginalRow()
+	public int getOriginalNumRows()
 	{
-		return this.op == cublasOperation.CUBLAS_OP_N ? this.numRows : this.numCols;
+		return (this.op == cublasOperation.CUBLAS_OP_N) ? this.numRows : this.numCols;
 	}
 
 	/**
 	 * Invariant to transpose
 	 */
-	public int getOriginalCol()
+	public int getOriginalNumCols()
 	{
-		return this.op == cublasOperation.CUBLAS_OP_N ? this.numCols : this.numRows;
+		return (this.op == cublasOperation.CUBLAS_OP_N) ? this.numCols : this.numRows;
 	}
 	
+	// HOST -> GPU
 	public void copyHostToDevice() throws GpuException
 	{
 		this.copyHostToDevice(this.size());
 	}
 	
+	// HOST -> GPU
 	public void copyHostToDevice(int numFloatsToCopy) throws GpuException
 	{
 		if(this.hostPtr == null)
@@ -188,11 +282,37 @@ public class FloatMat
 			);
 	}
 	
-	public void copyDeviceToHostArray(/*ref*/ float[] hostArray) throws GpuException
+	// GPU -> HOST
+	public float[] copyDeviceToHostAndReturnHostArray() throws GpuException
 	{
-		GpuUtil.deviceToHostFloat(this.devicePtr, /*ref*/ hostArray);
+		if(this.hostArray == null)
+		{
+			throw new GpuException("this.hostArray is null");
+		}
+		
+		this.copyDeviceToHost();
+		return this.hostArray;
+	}
+
+	// GPU -> HOST
+	public FloatBuffer copyDeviceToHostAndReturnHostBuffer() throws GpuException
+	{
+		if(this.hostBuffer == null)
+		{
+			throw new GpuException("this.hostBuffer is null");
+		}
+		
+		this.copyDeviceToHost();
+		return this.hostBuffer;
 	}
 	
+	// GPU -> HOST
+	public void copyDeviceToHost() throws GpuException
+	{
+		this.copyDeviceToHost(this.size());
+	}
+	
+	// GPU -> HOST
 	public void copyDeviceToHost(int numFloatsToCopy) throws GpuException
 	{
 		if(this.hostPtr == null)
@@ -203,14 +323,33 @@ public class FloatMat
 		GpuUtil.deviceToHostFloat(this.devicePtr, this.hostPtr, numFloatsToCopy);
 	}
 	
-	public Pointer getDevicePointer()
-	{
-		return this.devicePtr;
+	// GPU -> HOST
+	public void copyDeviceToHostArray(/*ref*/ float[] hostArray) throws GpuException
+	{		
+		GpuUtil.deviceToHostFloat(this.devicePtr, Pointer.to(hostArray), hostArray.length);
 	}
 	
-	public Pointer getHostPointer()
+	public float[] getHostArray()
 	{
-		return this.hostPtr;
+		return this.hostArray;
+	}
+	
+	public FloatBuffer getHostBuffer()
+	{
+		return this.hostBuffer;
+	}
+	
+	/**
+	 * Get a device pointer (wrapped in a FloatMat) 
+	 * that starts from 'offset' and lasts 'size' floats.
+	 * The shape might need to be adjusted. 
+	 * Specify the number of rows, or leave it to be the current row dim.
+	 * host, thrustPointer and transpose flag will be cleared.
+	 */
+	public void createOffset(/*ref*/ FloatMat offsetPtr, int offset, int size, int newNumRows)
+	{
+		offsetPtr.devicePtr = this.devicePtr.withByteOffset(offset * Sizeof.FLOAT);
+		offsetPtr.initDim(newNumRows, size/newNumRows);
 	}
 	
 	/**
@@ -223,7 +362,7 @@ public class FloatMat
 	public FloatMat createOffset(int offset, int size, int newRow)
 	{
 		FloatMat off = new FloatMat();
-		off.devicePtr = this.getDevicePointer().withByteOffset(offset * Sizeof.FLOAT);
+		off.devicePtr = this.devicePtr.withByteOffset(offset * Sizeof.FLOAT);
 		off.initDim(newRow, size/newRow);
 		return off;
 	}
@@ -238,7 +377,7 @@ public class FloatMat
 	}
 	
 	/**
-	 * @return row * col
+	 * @return numRows * numCols
 	 */
 	public int size() 
 	{ 
@@ -263,13 +402,13 @@ public class FloatMat
 	{
 		PP.out.println("The flatten method is super inefficient.  Don't use this in production code");
 		
-		int row = A.length;
-		int col = A[0].length;
-		float[] ans = new float[row * col];
+		int numRows = A.length;
+		int numCols = A[0].length;
+		float[] ans = new float[numRows * numCols];
 		int pt = 0;
 
-		for (int j = 0; j < col; j ++)
-			for (int i = 0; i < row; i ++)
+		for (int j = 0; j < numCols; j ++)
+			for (int i = 0; i < numRows; i ++)
 				ans[pt ++] = A[i][j];
 
 		return ans;
@@ -337,8 +476,8 @@ public class FloatMat
 	 */
 	public static class Coord
 	{
-		public int i; // row
-		public int j; // col
+		public int i; // numRows
+		public int j; // numCols
 		public Coord(int i, int j)
 		{
 			this.i = i; 
@@ -393,11 +532,11 @@ public class FloatMat
 	/**
 	 * exp(a * x + b)
 	 */
-	public FloatMat exp(float a, float b)
+	public FloatMat exp(float a, float b) throws GpuException
 	{
 		Thrust.exp(this, a, b); return this;
 	}
-	public FloatMat exp()
+	public FloatMat exp() throws GpuException
 	{
 		Thrust.exp(this); return this;
 	}
@@ -405,11 +544,11 @@ public class FloatMat
 	/**
 	 * log(a * x + b)
 	 */
-	public FloatMat log(float a, float b)
+	public FloatMat log(float a, float b) throws GpuException
 	{
 		Thrust.log(this, a, b); return this;
 	}
-	public FloatMat log()
+	public FloatMat log() throws GpuException
 	{
 		Thrust.log(this); return this;
 	}
@@ -417,11 +556,11 @@ public class FloatMat
 	/**
 	 * cos(a * x + b)
 	 */
-	public FloatMat cos(float a, float b)
+	public FloatMat cos(float a, float b) throws GpuException
 	{
 		Thrust.cos(this, a, b); return this;
 	}
-	public FloatMat cos()
+	public FloatMat cos() throws GpuException
 	{
 		Thrust.cos(this); return this;
 	}
@@ -429,11 +568,11 @@ public class FloatMat
 	/**
 	 * sin(a * x + b)
 	 */
-	public FloatMat sin(float a, float b)
+	public FloatMat sin(float a, float b) throws GpuException
 	{
 		Thrust.sin(this, a, b); return this;
 	}
-	public FloatMat sin()
+	public FloatMat sin() throws GpuException
 	{
 		Thrust.sin(this); return this;
 	}
@@ -441,11 +580,11 @@ public class FloatMat
 	/**
 	 * sqrt(a * x + b)
 	 */
-	public FloatMat sqrt(float a, float b)
+	public FloatMat sqrt(float a, float b) throws GpuException
 	{
 		Thrust.sqrt(this, a, b); return this;
 	}
-	public FloatMat sqrt()
+	public FloatMat sqrt() throws GpuException
 	{
 		Thrust.sqrt(this); return this;
 	}
@@ -453,11 +592,11 @@ public class FloatMat
 	/**
 	 * (a * x + b) ^p
 	 */
-	public FloatMat pow(float p, float a, float b)
+	public FloatMat pow(float p, float a, float b) throws GpuException
 	{
 		Thrust.pow(this, p, a, b); return this;
 	}
-	public FloatMat pow(float p)
+	public FloatMat pow(float p) throws GpuException
 	{
 		Thrust.pow(this, p); return this;
 	}
@@ -465,42 +604,42 @@ public class FloatMat
 	/**
 	 * (a * x + b)
 	 */
-	public FloatMat linear(float a, float b)
+	public FloatMat linear(float a, float b) throws GpuException
 	{
 		Thrust.linear(this, a, b); return this;
 	}
 	
-	public float max()
+	public float max() throws GpuException
 	{
 		return Thrust.max(this);
 	}
 
-	public float min()
+	public float min() throws GpuException
 	{
 		return Thrust.min(this);
 	}
 
-	public float sum()
+	public float sum() throws GpuException
 	{
 		return Thrust.sum(this);
 	}
 
-	public float product()
+	public float product() throws GpuException
 	{
 		return Thrust.product(this);
 	}
 	
-	public FloatMat sort()
+	public FloatMat sort() throws GpuException
 	{
 		Thrust.sort(this);	return this;
 	}
 	
-	public FloatMat fill(float val)
+	public FloatMat fill(float val) throws GpuException
 	{
 		Thrust.fill(this, val);	return this;
 	}
 	
-	public FloatMat copyFrom(FloatMat other)
+	public FloatMat copyFrom(FloatMat other) throws GpuException
 	{
 		Thrust.copy(other, this);	return this;
 	}
