@@ -8,11 +8,12 @@ import java.nio.IntBuffer;
 
 import gpu.FloatMat;
 import gpu.GpuBlas;
+import gpu.GpuException;
 import utils.PP;
 
 public class MiscTest
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws GpuException
 	{
 		GpuBlas.init();
 		float A[] = new float[] {1, 2, 3, 4, 5, 6};
@@ -24,7 +25,7 @@ public class MiscTest
 		PP.po(FloatMat.deflatten(A, 3));
 		PP.po(FloatMat.flatten(B));
 		
-		FloatMat m = new FloatMat(4, 3);
+		FloatMat m = new FloatMat(4, 3, true /*memsetToZero*/);
 		PP.p(m.toCoord(10));
 		PP.p(m.toIndex(3, 2));
 		

@@ -359,12 +359,11 @@ public class FloatMat
 	 * Specify the number of rows, or leave it to be the current row dim.
 	 * host, thrustPointer and transpose flag will be cleared.
 	 */
-	public FloatMat createOffset(int offset, int size, int newRow)
+	public FloatMat createOffset(int offset, int size, int newNumRows)
 	{
-		FloatMat off = new FloatMat();
-		off.devicePtr = this.devicePtr.withByteOffset(offset * Sizeof.FLOAT);
-		off.initDim(newRow, size/newRow);
-		return off;
+		FloatMat offsetPtr = new FloatMat();
+		this.createOffset(offsetPtr, offset, size, newNumRows);
+		return offsetPtr;
 	}
 	
 	/**
@@ -415,6 +414,22 @@ public class FloatMat
 	}
 	
 	/**
+	 * Utility: deflatten the 1D hostArray into a 2D array of the appropriate dimensions.
+	 * hostArray is assumed to be in column major format.
+	 */
+	public float[][] deflatten() throws BabelGpuException
+	{
+		if(this.hostArray == null)
+		{
+			throw new BabelGpuException("Can't flatten FloatMat without host array set");
+		}
+		
+		float[][] deflattenedHostArray = new float[this.numRows][this.numCols];
+		FloatMat.deflatten(this.hostArray, /*ref*/ deflattenedHostArray);
+		return deflattenedHostArray;
+	}
+	
+	/**
 	 * Utility: deflatten a 1D float to 2D matrix, column major
 	 */
 	public static void deflatten(
@@ -434,6 +449,17 @@ public class FloatMat
 			}
 		}
 	}
+	
+	/**
+	 * Utility: deflatten a 1D float to 2D matrix, column major
+	 */
+	public static float[][] deflatten(float[] A, int numRows)
+	{
+		float[][] deflattenedHostArray = new float[numRows][A.length/numRows];
+		FloatMat.deflatten(A, /*ref*/ deflattenedHostArray);
+		return deflattenedHostArray;
+	}
+	
 	
 	/**
 	 * Deflatten this to a 2D float array, column major

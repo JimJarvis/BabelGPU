@@ -1,7 +1,9 @@
 package test;
 
+import gpu.BabelGpuException;
 import gpu.FloatMat;
 import gpu.GpuBlas;
+import gpu.GpuException;
 import gpu.Thrust;
 import gpu.ThrustNative;
 import utils.*;
@@ -10,7 +12,7 @@ public class BabelTest
 {
 	private static final float TOL = 1e-6f;
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws BabelGpuException, GpuException
 	{
 		// Initialize timer
 		Timer timer = Timer.getInstance();
@@ -57,7 +59,7 @@ public class BabelTest
 		 * W and b are combined. 
 		 */
 		// augment X with a column of 1
-		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1);
+		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1, true /*memsetToZero*/);
 		X1.copyFrom(X);
 		ThrustNative.gpu_fill_float(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
 		
@@ -70,7 +72,7 @@ public class BabelTest
 		/*
 		 * Step2: Create Theta matrix and compute Theta * X_new
 		 */
-		FloatMat Theta = new FloatMat(LABELS, X_NEW_DIM);
+		FloatMat Theta = new FloatMat(LABELS, X_NEW_DIM, true /*memsetToZero*/);
 
 		FloatMat A = new FloatMat(LABELS, 1, false);
 		// Loop over samples column by column

@@ -19,7 +19,7 @@ public class GpuRand
 {
 	private curandGenerator generator;
 	private Pointer device;
-	private float[] host;
+	private float[] hostArray;
 	private int N; // size
 	private boolean automaticFree = true;
 	
@@ -46,7 +46,7 @@ public class GpuRand
 	private void init(int N)
 	{
 		this.N = N;
-		host = null;
+		hostArray = null;
 		if (automaticFree && device != null)
 			cudaFree(device);
 		device = new Pointer();
@@ -87,13 +87,16 @@ public class GpuRand
 	
 	/**
 	 * After genFloat
+	 * @throws GpuException 
 	 */
-	public float[] getHost()
+	public float[] getHostArray() throws GpuException
 	{
-		if (host != null)
-			return host;
+		if (hostArray != null)
+			return hostArray;
 		
-		return host = GpuUtil.deviceToHostFloat(device, N);
+		this.hostArray = new float[this.N];
+		GpuUtil.deviceToHostFloat(device, /*ref*/ this.hostArray);
+		return this.hostArray;
 	}
 	
 	/**

@@ -1,28 +1,15 @@
 package test;
 
-import static gpu.GpuBlas.*;
-import static jcuda.jcublas.JCublas2.*;
-import static jcuda.jcublas.cublasOperation.*;
-import static jcuda.jcurand.JCurand.*;
-import static jcuda.jcurand.curandRngType.*;
-import static jcuda.runtime.JCuda.*;
-import static jcuda.runtime.cudaMemcpyKind.*;
-import static jcuda.Sizeof.*;
 import gpu.FloatMat;
 import gpu.GpuBlas;
-import jcuda.Pointer;
-import jcuda.Sizeof;
-import jcuda.jcublas.cublasHandle;
+import gpu.GpuException;
 import jcuda.jcurand.JCurand;
-import jcuda.jcurand.curandGenerator;
 import jcuda.runtime.JCuda;
 import utils.*;
-import static utils.GpuUtil.*;
-import static gpu.FloatMat.*;
 
 public class BlasTest
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws GpuException
 	{
 		JCuda.setExceptionsEnabled(true);
 		JCurand.setExceptionsEnabled(true);
@@ -61,7 +48,7 @@ public class BlasTest
 		PP.po(ansAB);
 		
 		// 2 * A * B + (A*B)
-		FloatMat ans3AB = new FloatMat(m, n);
+		FloatMat ans3AB = new FloatMat(m, n, true /*memsetToZero*/);
 		GpuBlas.mult(matA, matB, ans3AB);
 		GpuBlas.mult(matA, matB, ans3AB, 2, 1);
 		PP.po(ans3AB);
@@ -71,12 +58,12 @@ public class BlasTest
 		PP.po(ansT);
 		ansT.destroy();
 
-		ansT = new FloatMat(m, m);
+		ansT = new FloatMat(m, m, true /*memsetToZero*/);
 		GpuBlas.mult(matA, matA.transpose(), ansT, 0.5f, 0);
 		PP.po(ansT);
 		ansT.destroy();
 		
-		ansT = new FloatMat(n, n);
+		ansT = new FloatMat(n, n, true /*memsetToZero*/);
 		GpuBlas.mult(matB.transpose(), matB, ansT, 1f, 0);
 		PP.po(ansT);
 		
@@ -116,7 +103,7 @@ public class BlasTest
         FloatMat ansAvA = GpuBlas.multVec(matA, vecA);
         PP.po(ansAvA.transpose());
         
-        FloatMat ans3AtvB = new FloatMat(2, 1);
+        FloatMat ans3AtvB = new FloatMat(2, 1, true /*memsetToZero*/);
         GpuBlas.multVec(matA.transpose(), vecB, ans3AtvB, 3, 100);
         PP.po(ans3AtvB.transpose());
 
@@ -157,7 +144,7 @@ public class BlasTest
 		// **************************************
         PP.pSectionLine();
         PP.p("Scale and Add");
-        FloatMat ansvBpvC = new FloatMat(4, 1);
+        FloatMat ansvBpvC = new FloatMat(4, 1, true /*memsetToZero*/);
         // -5, -10, 0, 3
         PP.p(GpuBlas.scaleAdd(vecB, ansvBpvC, 6).transpose());
         PP.p(GpuBlas.scaleAdd(vecC, ansvBpvC, -1).transpose());
