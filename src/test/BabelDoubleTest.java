@@ -1,19 +1,23 @@
 package test;
 
-import java.util.Arrays;
-
+import jcuda.jcurand.JCurand;
+import jcuda.runtime.JCuda;
 import gpu.*;
 import utils.*;
+import static utils.CpuUtil.*;
 
-public class BabelCpuDoubleTest
+public class BabelDoubleTest
 {
 	private static final double TOL = 1e-5f;
 	private static final int ITER = 10000;
 	
 	public static void main(String[] args)
 	{
-		PP.p("Double CPU test");
-		PP.setDoublePrec(3);
+		JCuda.setExceptionsEnabled(true);
+        JCurand.setExceptionsEnabled(true);
+        
+		PP.p("Double CPU-GPU-Matlab test");
+		PP.setPrecision(3);
 		
 		// Read in dummy data
 		CsvReader csv = new CsvReader("input_X.txt");
@@ -124,7 +128,7 @@ public class BabelCpuDoubleTest
 		 * Clean up and exit
 		 */
 		DoubleMat[] mats = new DoubleMat[] 
-				{X, W, X1, Xnew};
+				{X, W, X1, Xnew, Theta};
 		for (DoubleMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();
@@ -137,11 +141,11 @@ public class BabelCpuDoubleTest
 	{
 		double[][] Host = gpu.deflatten();
 		
-		double diff = GpuUtil.matAvgDiff(cpu, Host);
-		PP.setDoublePrec(3);
+		double diff = matAvgDiff(cpu, Host);
+		PP.setPrecision(3);
 		PP.setScientific(true);
 		
-		if (GpuUtil.matAvgDiff(cpu, Host) < TOL)
+		if (matAvgDiff(cpu, Host) < TOL)
     		PP.p("PASS double GPU-CPU: ", diff);
 		else
 			PP.p("FAIL double GPU-CPU: ", diff);
@@ -155,11 +159,11 @@ public class BabelCpuDoubleTest
 		CsvReader csv = new CsvReader("gold_" + goldFile + ".txt");
 		double[][] Gold = csv.readDoubleMat();
 		
-		double diff = GpuUtil.matAvgDiff(Gold, cpu);
-		PP.setDoublePrec(3);
+		double diff = matAvgDiff(Gold, cpu);
+		PP.setPrecision(3);
 		PP.setScientific(true);
 		
-		if (GpuUtil.matAvgDiff(Gold, cpu) < TOL)
+		if (matAvgDiff(Gold, cpu) < TOL)
     		PP.p("PASS double CPU-Matlab: ", diff);
 		else
 			PP.p("FAIL double CPU-Matlab: ", diff);
@@ -174,55 +178,16 @@ public class BabelCpuDoubleTest
 		double[][] Gold = csv.readDoubleMat();
 		double[][] Host = gpu.deflatten();
 		
-		double diff = GpuUtil.matAvgDiff(Gold, Host);
-		PP.setDoublePrec(3);
+		double diff = matAvgDiff(Gold, Host);
+		PP.setPrecision(3);
 		PP.setScientific(true);
 		
-		if (GpuUtil.matAvgDiff(Gold, Host) < TOL)
+		if (matAvgDiff(Gold, Host) < TOL)
     		PP.p("PASS double GPU-Matlab: ", diff);
 		else
 			PP.p("FAIL double GPU-Matlab: ", diff);
 	}
 
-	private static double[][] mult(double[][] a, double[][] b)
-	{
-		double[][] c = new double[a.length][b[0].length];
-		for(int i=0;i<a.length;i++){
-	        for(int j=0;j<b[0].length;j++){
-	            for(int k=0;k<b.length;k++){
-	            c[i][j]+= a[i][k] * b[k][j];
-	            }
-	        }
-	    }
-		return c;
-	}
-	
-	private static double[][] addCol1(double[][] a)
-	{
-		int r = a.length;
-		int c = a[0].length;
-		double[][] b = new double[r][c+1];
-		for (int i = 0; i < r; i++)
-			for (int j = 0; j < c; j++)
-				b[i][j] = a[i][j];
-
-		for (int i = 0; i < r; i++)
-			b[i][c] = 1;
-		
-		return b;
-	}
-	
-	private static double[][] transpose(double[][] a)
-	{
-		int r = a.length;
-		int c = a[0].length;
-		double[][] t = new double[c][r];
-		for (int i = 0; i < r; i++)
-			for (int j = 0; j < c; j++)
-				t[j][i] = a[i][j];
-		return t;
-	}
-	
 	private static void updateTheta(double[][] theta, double alpha, double[][] b, double beta)
 	{
 		int r = theta.length;
@@ -231,36 +196,6 @@ public class BabelCpuDoubleTest
 		for (int i = 0; i < r; i++)
 			for (int j = 0; j < c; j++)
 				theta[i][j] += theta[i][j] * alpha + b[i][j] * beta;
-	}
-	
-	private static double[][] cos(double[][] a)
-	{
-		int r = a.length;
-		int c = a[0].length;
-		for (int i = 0; i < r; i++)
-			for (int j = 0; j < c; j++)
-				a[i][j] = (double) Math.cos(a[i][j]);
-		return a;
-	}
-	
-	private static double[][] getCol(double[][] a, int c)
-	{
-		int r = a.length;
-		double[][] col = new double[r][1];
-		for (int i = 0; i < r; i++)
-			col[i][0] = a[i][c];
-		return col;
-	}
-	
-	private static double sum(double[][] a)
-	{
-		double s = 0;
-		int r = a.length;
-		int c = a[0].length;
-		for (int i = 0; i < r; i++)
-			for (int j = 0; j < c; j++)
-				s += a[i][j];
-		return s;
 	}
 	
 	private static void jbabel_id_minus_softmax(double[][] a, int id)

@@ -49,21 +49,6 @@ public class GpuUtil
 		return createDeviceFloat(n, false);
 	}
 	
-	/**
-	 * Returns the average of absolute difference from 2 matrices
-	 */
-	public static float matAvgDiff(float[][] A, float[][] B)
-	{
-		float diff = 0;
-		int r = A.length;
-		int c = A[0].length;
-		for (int i = 0; i < r; i++)
-			for (int j = 0; j < c; j ++)
-				diff += Math.abs(A[i][j] - B[i][j]);
-		
-		return diff / (r * c);
-	}
-	
 
 	//**************************************************/
 	//******************* DOUBLE *******************/
@@ -108,20 +93,5 @@ public class GpuUtil
 	public static Pointer createDeviceDouble(int n)
 	{
 		return createDeviceDouble(n, false);
-	}
-	
-	/**
-	 * Returns the average of absolute difference from 2 matrices
-	 */
-	public static double matAvgDiff(double[][] A, double[][] B)
-	{
-		double diff = 0;
-		int r = A.length;
-		int c = A[0].length;
-		for (int i = 0; i < r; i++)
-			for (int j = 0; j < c; j ++)
-				diff += Math.abs(A[i][j] - B[i][j]);
-		
-		return diff / (r * c);
 	}
 }

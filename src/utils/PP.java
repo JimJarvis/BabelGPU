@@ -48,7 +48,7 @@ public class PP
      * Set the precision of float/double types <br>
      * Default: -1, uses the system default precision
      */
-    public static void setDoublePrec(int doublePrec)	{	PP.doublePrec = doublePrec;	}
+    public static void setPrecision(int doublePrec)	{	PP.doublePrec = doublePrec;	}
     public static void setDoublePrec()	{	PP.doublePrec = -1;	}
     
     /**
@@ -269,7 +269,7 @@ public class PP
     {
     	setSep(";\n\n");
     	setMapper(": ");
-    	setDoublePrec(3);
+    	setPrecision(3);
 
     	HashSet<ArrayList> hs = new HashSet<>();
 
@@ -311,7 +311,7 @@ public class PP
     	p("Debugging", hs, new int[] {-10, -23, -8}, 2031.6666666,
     			new double[] {Math.PI, Math.E, Math.log(5), Math.sin(1)},
     			hm, new String[][] {{"str00", "str01", "str03"}, {"str11", "str12"}, {"str21"}}, hm2);
-    	setDoublePrec(-1);
+    	setPrecision(-1);
     	p_("\nJoin:  ");
 		p(join(new float[] {89.2387428f, -14f, 3.2f, 10.0058f, 27f}, " * "));
     }

@@ -29,8 +29,8 @@ inline void babel_id_minus_softmax_##Ftype(device_ptr<Ftype> begin, int size, in
 	gpu__##Ftype(begin, size, -1.0 / s, 0); \
 	++ *(begin + id);  /* when at id, x = 1 - x */ \
 }
-	GEN_babel_id_minus_softmax(float);
-	GEN_babel_id_minus_softmax(double);
+GEN_babel_id_minus_softmax(float);
+GEN_babel_id_minus_softmax(double);
 
 
 // Second way to implement (id - softmax_float()), exactly the same numerical result. 
