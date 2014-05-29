@@ -47,15 +47,28 @@ public class GpuBlas
 	 */
 	public static FloatMat mult(FloatMat A, FloatMat B, FloatMat C, float alpha, float beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer pb = B.getDevice();
-		Pointer pc = C.getDevice();
-		// m, n, k are named according to the online documentation
-		// http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm
-		int m = A.row;
-		int k = A.col;  // = B.row
-		int n = B.col;
-
+		return GpuBlas.mult(A, B, C, alpha, beta, 
+				A.numRows, A.numCols, B.numCols
+			);
+	}
+	
+	// DIMENSIONS OF ARRAYS TO MULTIPLY
+	// A: m x k
+	// B: k x n
+	// C: m x n
+	// m, n, k are named according to the online documentation
+	// http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm
+	// Note that m,n,k might specify a sub-matrix of A, B, or C
+	// to use in this multiplication. (it is not necessarily true that
+	// m = A.numRows, k = A.numCols (or B.numRows), n = B.numCols)
+	public static FloatMat mult(
+			FloatMat A, FloatMat B, FloatMat C, float alpha, float beta,
+			int m, int k, int n)
+	{
+		Pointer pa = A.getDevicePointer();
+		Pointer pb = B.getDevicePointer();
+		Pointer pc = C.getDevicePointer();
+		
 		cublasSgemm(handle, A.getOp(), B.getOp(), 
 				m, n, k, GpuUtil.toFloatPointer(alpha), 
 				pa, A.ldim, pb, B.ldim, 
@@ -63,6 +76,7 @@ public class GpuBlas
 
 		return C;
 	}
+	
 
 	/**
 	 * Multiply two FloatMat and add onto an existing FloatMat.
@@ -71,25 +85,31 @@ public class GpuBlas
 	 */
 	public static FloatMat mult(FloatMat A, FloatMat B, FloatMat C)
 	{
-		return mult(A, B, C, 1, 0);
+		return GpuBlas.mult(A, B, C, 1, 0);
 	}
 
 	/**
 	 * Multiply two FloatMat
 	 * @return C = alpha * A *B
+	 * @throws GpuException 
 	 */
-	public static FloatMat mult(FloatMat A, FloatMat B, float alpha)
+	public static FloatMat mult(FloatMat A, FloatMat B, float alpha) throws GpuException
 	{
-		return mult(A, B, new FloatMat(A.row, B.col), alpha, 0);
+		return GpuBlas.mult(
+				A, B, 
+				new FloatMat(A.numRows, B.numCols, false /*memsetToZero*/), 
+				alpha, 0
+			);
 	}
 
 	/**
 	 * Multiply two FloatMat
 	 * @return C = A * B
+	 * @throws GpuException 
 	 */
-	public static FloatMat mult(FloatMat A, FloatMat B)
+	public static FloatMat mult(FloatMat A, FloatMat B) throws GpuException
 	{	
-		return mult(A, B, 1);
+		return GpuBlas.mult(A, B, 1);
 	}
 	
 	/**
@@ -100,13 +120,13 @@ public class GpuBlas
 	 */
 	public static FloatMat multVec(FloatMat A, FloatMat x, FloatMat y, float alpha, float beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer px = x.getDevice();
-		Pointer py = y.getDevice();
+		Pointer pa = A.getDevicePointer();
+		Pointer px = x.getDevicePointer();
+		Pointer py = y.getDevicePointer();
 		// Here is an inconsistency in the API
 		// m and n are the original row/col dimension
-		int m = A.getOriginalRow();
-		int n = A.getOriginalCol();
+		int m = A.getOriginalNumRows();
+		int n = A.getOriginalNumCols();
 		
 		cublasSgemv(handle, A.getOp(),
 				m, n, 
@@ -124,25 +144,35 @@ public class GpuBlas
 	 */
 	public static FloatMat multVec(FloatMat A, FloatMat x, FloatMat y)
 	{
-		return multVec(A, x, y, 1, 0);
+		return GpuBlas.multVec(A, x, y, 1, 0);
 	}
 	
 	/**
 	 * Matrix multiplies vector
 	 * @return y = alpha * A * x + beta * y
+	 * @throws GpuException 
 	 */
-	public static FloatMat multVec(FloatMat A, FloatMat x, float alpha, float beta)
+	public static FloatMat multVec(FloatMat A, FloatMat x, float alpha, float beta) throws GpuException
 	{
-		return multVec(A, x, new FloatMat(A.row, 1), alpha, beta);
+		return GpuBlas.multVec(
+				A, x, 
+				new FloatMat(A.numRows, 1, false /*memsetToZero*/), 
+				alpha, beta
+			);
 	}
 	
 	/**
 	 * Matrix multiplies vector
 	 * @return y = A * x
+	 * @throws GpuException 
 	 */
-	public static FloatMat multVec(FloatMat A, FloatMat x)
+	public static FloatMat multVec(FloatMat A, FloatMat x) throws GpuException
 	{
-		return multVec(A, x, new FloatMat(A.row, 1), 1, 0);
+		return GpuBlas.multVec(
+				A, x, 
+				new FloatMat(A.numRows, 1, false /*memsetToZero*/), 
+				1, 0
+			);
 	}
 	
 
@@ -154,11 +184,11 @@ public class GpuBlas
 	 */
 	public static FloatMat add(FloatMat A, FloatMat B, FloatMat C, float alpha, float beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer pb = B.getDevice();
-		Pointer pc = C.getDevice();
-		int m = A.row;
-		int n = A.col;
+		Pointer pa = A.getDevicePointer();
+		Pointer pb = B.getDevicePointer();
+		Pointer pc = C.getDevicePointer();
+		int m = A.numRows;
+		int n = A.numCols;
 
 		cublasSgeam(handle, A.getOp(), B.getOp(), 
 				m, n, 
@@ -176,24 +206,30 @@ public class GpuBlas
 	 */
 	public static FloatMat add(FloatMat A, FloatMat B, FloatMat C)
 	{
-		return add(A, B, C, 1, 1);
+		return GpuBlas.add(A, B, C, 1, 1);
 	}
 	
 	/**
 	 * Add two FloatMat
 	 * @return C = alpha * A + beta * B
+	 * @throws GpuException 
 	 */
-	public static FloatMat add(FloatMat A, FloatMat B, float alpha, float beta)
+	public static FloatMat add(FloatMat A, FloatMat B, float alpha, float beta) throws GpuException
 	{
-		return add(A, B, new FloatMat(A.row, A.col, false), alpha, beta);
+		return GpuBlas.add(
+				A, B, 
+				new FloatMat(A.numRows, A.numCols, false /*memsetToZero*/), 
+				alpha, beta
+			);
 	}
 	/**
 	 * Add two FloatMat
 	 * @return C = A + B
+	 * @throws GpuException 
 	 */
-	public static FloatMat add(FloatMat A, FloatMat B)
+	public static FloatMat add(FloatMat A, FloatMat B) throws GpuException
 	{
-		return add(A, B, 1, 1);
+		return GpuBlas.add(A, B, 1, 1);
 	}
 	
 	/**
@@ -203,18 +239,22 @@ public class GpuBlas
 	public static FloatMat copy(FloatMat from, FloatMat to)
 	{
 		cublasScopy(handle, from.size(), 
-				from.getDevice(), 1, 
-				to.getDevice(), 1);
+				from.getDevicePointer(), 1, 
+				to.getDevicePointer(), 1);
 		return to;
 	}
 	
 	/**
 	 * Copies a matrix device data to another. 
 	 * @return the new clone
+	 * @throws GpuException 
 	 */
-	public static FloatMat copy(FloatMat from)
+	public static FloatMat copy(FloatMat from) throws GpuException
 	{
-		return copy(from, new FloatMat(from.row, from.col, false));
+		return GpuBlas.copy(
+				from, 
+				new FloatMat(from.numRows, from.numCols, false /*memsetToZero*/)
+			);
 	}
 	
 	/**
@@ -225,7 +265,7 @@ public class GpuBlas
 	{
 		int[] hostIdx = new int[1];
 		Pointer deviceIdx = Pointer.to(hostIdx);
-		cublasIsamax(handle, A.size(), A.getDevice(), 1, deviceIdx);
+		cublasIsamax(handle, A.size(), A.getDevicePointer(), 1, deviceIdx);
 		cudaFree(deviceIdx);
 		return hostIdx[0] - 1; // adjust to 0-based
 	}
@@ -238,7 +278,7 @@ public class GpuBlas
 	{
 		int[] idx = new int[1];
 		Pointer idxPtr = Pointer.to(idx);
-		cublasIsamin(handle, A.size(), A.getDevice(), 1, idxPtr);
+		cublasIsamin(handle, A.size(), A.getDevicePointer(), 1, idxPtr);
 		return idx[0] - 1; // adjust to 0-based
 	}
 	
@@ -249,7 +289,7 @@ public class GpuBlas
 	{
 		float[] val = new float[1];
 		Pointer valPtr = Pointer.to(val);
-		cublasSnrm2(handle, A.size(), A.getDevice(), 1, valPtr);
+		cublasSnrm2(handle, A.size(), A.getDevicePointer(), 1, valPtr);
 		return val[0];
 	}
 	
@@ -262,8 +302,8 @@ public class GpuBlas
 	{
 		cublasSaxpy(handle, x.size(), 
 				GpuUtil.toFloatPointer(alpha), 
-				x.getDevice(), 1, 
-				y.getDevice(), 1);
+				x.getDevicePointer(), 1, 
+				y.getDevicePointer(), 1);
 		return y;
 	}
 	
@@ -286,7 +326,7 @@ public class GpuBlas
 	{
 		cublasSscal(handle, x.size(), 
 				GpuUtil.toFloatPointer(alpha), 
-				x.getDevice(), 1);
+				x.getDevicePointer(), 1);
 		return x;
 	}
 	
@@ -298,8 +338,8 @@ public class GpuBlas
 		float[] val = new float[1];
 		Pointer valPtr = Pointer.to(val);
 		cublasSdot(handle, x.size(), 
-				x.getDevice(), 1, 
-				y.getDevice(), 1, 
+				x.getDevicePointer(), 1, 
+				y.getDevicePointer(), 1, 
 				valPtr);
 		return val[0];
 	}
@@ -308,11 +348,12 @@ public class GpuBlas
 	/**
 	 * Create and copy to Cublas device vector
 	 * @return new device pointer
+	 * @throws GpuException 
 	 */
-	public static Pointer hostToCublasFloat(float[] host)
+	public static Pointer hostToCublasFloat(float[] host) throws GpuException
 	{
 		int n = host.length;
-		Pointer device = GpuUtil.createDeviceFloat(n);
+		Pointer device = GpuUtil.allocateDeviceFloat(n);
 		cublasSetVector(n, FLOAT, 
 				Pointer.to(host), 1, 
 				device, 1);
