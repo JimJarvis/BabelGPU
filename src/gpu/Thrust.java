@@ -2,6 +2,9 @@ package gpu;
 
 import static gpu.ThrustNative.*;
 
+import com.googlecode.javacpp.IntPointer;
+import com.googlecode.javacpp.Loader;
+
 
 /**
  * Wrapper around ThrustNative native methods.
@@ -12,6 +15,8 @@ import static gpu.ThrustNative.*;
  */
 public class Thrust
 {
+	static { Loader.load(); }
+
 	/**
 	 * exp(a * x + b)
 	 */
@@ -235,5 +240,25 @@ public class Thrust
 	{
 		ThrustNative.babel_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
 	}
+	
+	/**
+	 * Minibatch: I[y == j] - softmax(alpha_vec)
+	 * @throws GpuException 
+	 */
+	public static void babel_batch_id_minus_softmax_float(FloatMat x, IntPointer labels) throws GpuException
+	{
+		ThrustNative.babel_batch_id_minus_softmax_float(x.getThrustPointer(), x.numRows, x.numCols, labels);
+	}
+	// helper
+	public static IntPointer copy_host_to_device(int[] labels)
+	{
+		return ThrustNative.copy_host_to_device(new IntPointer(labels), labels.length);
+	}
+	public static void gpu_free(IntPointer device)
+	{
+		ThrustNative.gpu_free(device);
+	}
+	
+
 	
 }
