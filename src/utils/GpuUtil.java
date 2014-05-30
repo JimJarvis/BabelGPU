@@ -3,11 +3,38 @@ package utils;
 import static jcuda.runtime.JCuda.*;
 import static jcuda.runtime.cudaMemcpyKind.*;
 import static jcuda.Sizeof.*;
-import jcuda.Pointer;
+import jcuda.*;
+import jcuda.jcublas.*;
+import jcuda.jcurand.JCurand;
 import jcuda.runtime.JCuda;
 
 public class GpuUtil
 {
+	//******************* COMMON *******************/
+	/**
+	 * Wait until all threads are finished
+	 */
+	public static void synchronize()
+	{
+		cudaDeviceSynchronize();
+	}
+	
+	/**
+	 * Enable detailed exceptions
+	 */
+	public static void enableExceptions()
+	{
+		JCuda.setExceptionsEnabled(true);
+		JCurand.setExceptionsEnabled(true);
+		JCublas.setExceptionsEnabled(true);
+		JCublas2.setExceptionsEnabled(true);
+	}
+	
+	
+	
+	//**************************************************/
+	//******************* FLOAT *******************/
+	//**************************************************/
 	/**
 	 * cudaMemcpy from device pointer to host float array
 	 */
@@ -49,13 +76,7 @@ public class GpuUtil
 	{
 		return allocDeviceFloat(n, false);
 	}
-	
-	//******************* COMMON *******************/
-	public static void synchronize()
-	{
-		JCuda.cudaDeviceSynchronize();
-	}
-	
+
 
 	//**************************************************/
 	//******************* DOUBLE *******************/

@@ -1,7 +1,5 @@
 package test;
 
-import jcuda.jcurand.JCurand;
-import jcuda.runtime.JCuda;
 import gpu.*;
 import utils.*;
 import static utils.CpuUtil.*;
@@ -13,8 +11,7 @@ public class BabelDoubleTest
 	
 	public static void main(String[] args)
 	{
-		JCuda.setExceptionsEnabled(true);
-        JCurand.setExceptionsEnabled(true);
+		GpuUtil.enableExceptions();
         
 		PP.p("Double CPU-GPU-Matlab test");
 		PP.setPrecision(3);
