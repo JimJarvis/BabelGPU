@@ -1,10 +1,8 @@
 package gpu;
 
 import gpu.ThrustStruct.FloatDevicePointer;
-import utils.CpuUtil;
 import utils.CpuUtil.Coord;
-import utils.GpuUtil;
-import utils.PP;
+import utils.*;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import static jcuda.runtime.JCuda.*;

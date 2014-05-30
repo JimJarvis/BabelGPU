@@ -201,11 +201,26 @@ void test_sort_copy_swap_double()
 	printD(E);
 }
 
+void test_batch()
+{
+	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
+	device_vector<float> D = getDf(x, 12);
+	int labels[4] = { 0, 3, 2, 1 };
+	device_vector<int> L = host_vector<int>(labels, labels + 4);
+
+	device_ptr<float> dp = &D[0];
+
+	babel_batch_id_minus_softmax_float(&D[0], 4, 3, thrust::raw_pointer_cast( &L[0]));
+
+	printD(D);
+}
+
 void main()
 {
-	test_babel();
-	test_exp_double();
-	test_sort_copy_swap_double();
+	test_batch();
+	//test_babel();
+	//test_exp_double();
+	//test_sort_copy_swap_double();
 	//test_exp();
 	//test_exp_out_pointer();
 	//test_sort_copy_swap();

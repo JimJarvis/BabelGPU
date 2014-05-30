@@ -1,11 +1,5 @@
 package test;
 
-import jcuda.Pointer;
-
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-
 import gpu.FloatMat;
 import gpu.GpuBlas;
 import utils.PP;
@@ -31,5 +25,6 @@ public class MiscTest
 		FloatMat b = new FloatMat(B);
 		FloatMat a = new FloatMat(A);
 		GpuBlas.destroy();
+		
 	}
 }

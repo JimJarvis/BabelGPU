@@ -30,6 +30,13 @@ public class GpuUtil
 		JCublas2.setExceptionsEnabled(true);
 	}
 	
+	/**
+	 * Show device details
+	 */
+	public static void gpuInfo()
+	{
+		//TODO
+	}
 	
 	
 	//**************************************************/
