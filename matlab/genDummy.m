@@ -11,7 +11,7 @@ labels = 50;
 % ITER = 100;
 
 %% Learning constants
-learning_rate = 1.5;
+learning_rate = 0.01;
 lambda = 2;
 
 % X needs to be transposed to add a column of 1

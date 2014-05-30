@@ -1,8 +1,8 @@
 #!/bin/bash
 
 main="test/BabelDoubleTest"
-main="test/BabelFloatTest"
 main="test/MinibatchTest"
+main="test/BabelFloatTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/
@@ -13,10 +13,10 @@ cd bin
 if [ ! -z "$1" ]; then
 java -jar "E:/Dropbox/Programming/Java/JarvisJava/BabelGPU/javacpp.jar" gpu/ThrustNative gpu/ThrustStruct -properties windows-x86_64-cuda #> stderr.log
     
-    rm -rf ../windows-x86_64
-    cp -rf gpu/windows-x86_64 ../
+    rm -rf ../native/windows-x86_64
+    cp -rf gpu/windows-x86_64 ../native/
 else
-    cp -rf ../windows-x86_64 ./gpu
+    cp -rf ../native/windows-x86_64 ./gpu
 fi
 
 echo ;echo
