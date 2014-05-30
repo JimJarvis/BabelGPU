@@ -170,22 +170,21 @@ namespace MyGpu
 	GEN_transf_2(pow);
 	GEN_transf_2(fmod);
 
-	// MSVC doesn't yet fully support C++11, these only work on linux
-#ifndef _WIN32
-	GEN_transf(exp2);
-	GEN_transf(expm1); // exp - 1
-	GEN_transf(log1p); // ln + 1
-	GEN_transf(log2);
-	GEN_transf(cbrt); // cubic root
-	GEN_transf(hypot); // hypotenus
-	GEN_transf(erf); // error function
-	GEN_transf(erfc); // complementary error function
-	GEN_transf(tgamma); // gamma function
-	GEN_transf(lgamma); // log-gamma function
-	GEN_transf(acosh);
-	GEN_transf(asinh);
-	GEN_transf(atanh);
-#endif
+//#ifndef _WIN32
+//	GEN_transf(exp2);
+//	GEN_transf(expm1); // exp - 1
+//	GEN_transf(log1p); // ln + 1
+//	GEN_transf(log2);
+//	GEN_transf(cbrt); // cubic root
+//	GEN_transf(hypot); // hypotenus
+//	GEN_transf(erf); // error function
+//	GEN_transf(erfc); // complementary error function
+//	GEN_transf(tgamma); // gamma function
+//	GEN_transf(lgamma); // log-gamma function
+//	GEN_transf(acosh);
+//	GEN_transf(asinh);
+//	GEN_transf(atanh);
+//#endif
 
 	// gpu_min|max_float|double
 #define GEN_minmax_ftype(name, Ftype) \

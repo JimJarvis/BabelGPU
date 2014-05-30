@@ -212,13 +212,34 @@ public class FloatMat
 	 * The shape might need to be adjusted. 
 	 * Specify the number of rows, or leave it to be the current row dim.
 	 * host, thrustPointer and transpose flag will be cleared.
+	 * @param offMat output parameter
+	 */
+	public FloatMat createOffset(FloatMat offMat, int offset, int size, int newRow)
+	{
+		offMat.device = this.getDevice().withByteOffset(offset * Sizeof.FLOAT);
+		offMat.initDim(newRow, size/newRow);
+		return offMat;
+	}
+	
+	/**
+	 * Get a device pointer (wrapped in a FloatMat) 
+	 * that starts from 'offset' and lasts 'size' floats.
+	 * The shape might need to be adjusted. 
+	 * Specify the number of rows, or leave it to be the current row dim.
+	 * host, thrustPointer and transpose flag will be cleared.
 	 */
 	public FloatMat createOffset(int offset, int size, int newRow)
 	{
-		FloatMat off = new FloatMat();
-		off.device = this.getDevice().withByteOffset(offset * Sizeof.FLOAT);
-		off.initDim(newRow, size/newRow);
-		return off;
+		return createOffset(new FloatMat(), offset, size, newRow);
+	}
+	
+	/**
+	 * Default version of createOffset.
+	 * Assume newRow to be the same as the current row dim. 
+	 */
+	public FloatMat createOffset(FloatMat offMat, int offset, int size)
+	{
+		return createOffset(offMat, offset, size, this.row);
 	}
 	
 	/**
