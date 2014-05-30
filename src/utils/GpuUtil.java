@@ -32,7 +32,7 @@ public class GpuUtil
 	 * Create a float array on device
 	 * @param memsetToZero true to initialize the memory to 0. Default false.
 	 */
-	public static Pointer createDeviceFloat(int n, boolean memsetToZero)
+	public static Pointer allocDeviceFloat(int n, boolean memsetToZero)
 	{
 		Pointer p = new Pointer();
 		cudaMalloc(p, n * FLOAT);
@@ -44,9 +44,9 @@ public class GpuUtil
 	/**
 	 * Default: memset = false
 	 */
-	public static Pointer createDeviceFloat(int n)
+	public static Pointer allocDeviceFloat(int n)
 	{
-		return createDeviceFloat(n, false);
+		return allocDeviceFloat(n, false);
 	}
 	
 
@@ -78,7 +78,7 @@ public class GpuUtil
 	 * Create a double array on device
 	 * @param memsetToZero true to initialize the memory to 0. Default false.
 	 */
-	public static Pointer createDeviceDouble(int n, boolean memsetToZero)
+	public static Pointer allocDeviceDouble(int n, boolean memsetToZero)
 	{
 		Pointer p = new Pointer();
 		cudaMalloc(p, n * DOUBLE);
@@ -90,8 +90,8 @@ public class GpuUtil
 	/**
 	 * Default: memset = false
 	 */
-	public static Pointer createDeviceDouble(int n)
+	public static Pointer allocDeviceDouble(int n)
 	{
-		return createDeviceDouble(n, false);
+		return allocDeviceDouble(n, false);
 	}
 }

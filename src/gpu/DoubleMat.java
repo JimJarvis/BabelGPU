@@ -71,7 +71,7 @@ public class DoubleMat
 	 */
 	public DoubleMat(int row, int col, boolean memsetToZero)
 	{
-		this.device = GpuUtil.createDeviceDouble(row * col, memsetToZero);
+		this.device = GpuUtil.allocDeviceDouble(row * col, memsetToZero);
 		initDim(row, col);
 	}
 	

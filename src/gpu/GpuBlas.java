@@ -312,7 +312,7 @@ public class GpuBlas
 	public static Pointer hostToCublasFloat(float[] host)
 	{
 		int n = host.length;
-		Pointer device = GpuUtil.createDeviceFloat(n);
+		Pointer device = GpuUtil.allocDeviceFloat(n);
 		cublasSetVector(n, FLOAT, 
 				Pointer.to(host), 1, 
 				device, 1);
@@ -625,7 +625,7 @@ public class GpuBlas
 	public static Pointer hostToCublasDouble(double[] host)
 	{
 		int n = host.length;
-		Pointer device = GpuUtil.createDeviceDouble(n);
+		Pointer device = GpuUtil.allocDeviceDouble(n);
 		cublasSetVector(n, DOUBLE, 
 				Pointer.to(host), 1, 
 				device, 1);

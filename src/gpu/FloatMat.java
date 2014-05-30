@@ -71,7 +71,7 @@ public class FloatMat
 	 */
 	public FloatMat(int row, int col, boolean memsetToZero)
 	{
-		this.device = GpuUtil.createDeviceFloat(row * col, memsetToZero);
+		this.device = GpuUtil.allocDeviceFloat(row * col, memsetToZero);
 		initDim(row, col);
 	}
 	
