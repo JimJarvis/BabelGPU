@@ -49,8 +49,7 @@ public class GpuRand
 		host = null;
 		if (automaticFree && device != null)
 			cudaFree(device);
-		device = new Pointer();
-		cudaMalloc(device, N * FLOAT);
+		device = GpuUtil.createDeviceFloat(N);
 	}
 	
 	/**
