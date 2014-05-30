@@ -419,9 +419,16 @@ public class FloatMat
 	 */
 	public float[][] deflatten() throws BabelGpuException
 	{
-		if(this.hostArray == null)
+		if(this.hostArray == null && this.hostBuffer == null)
 		{
-			throw new BabelGpuException("Can't flatten FloatMat without host array set");
+			throw new BabelGpuException("Can't deflatten FloatMat with no host data.  Please copy data to CPU before calling this");
+		}
+		
+		if(this.hostArray == null && this.hostBuffer != null)
+		{
+			this.hostArray = new float[this.size()];
+			this.hostBuffer.clear();
+			this.hostBuffer.get(this.hostArray);
 		}
 		
 		float[][] deflattenedHostArray = new float[this.numRows][this.numCols];

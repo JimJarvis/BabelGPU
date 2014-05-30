@@ -3,6 +3,7 @@ package gpu;
 import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
+import jcuda.Sizeof;
 import jcuda.jcublas.cublasHandle;
 import static jcuda.jcublas.cublasOperation.*;
 import static jcuda.Sizeof.*;
@@ -70,9 +71,12 @@ public class GpuBlas
 		Pointer pc = C.getDevicePointer();
 		
 		cublasSgemm(handle, A.getOp(), B.getOp(), 
-				m, n, k, GpuUtil.toFloatPointer(alpha), 
-				pa, A.ldim, pb, B.ldim, 
-				GpuUtil.toFloatPointer(beta), pc, C.ldim);
+				m, n, k, 
+				GpuUtil.toFloatPointer(alpha), 
+				pa, A.ldim, 
+				pb, B.ldim, 
+				GpuUtil.toFloatPointer(beta), 
+				pc, C.ldim);
 
 		return C;
 	}
@@ -358,6 +362,21 @@ public class GpuBlas
 				Pointer.to(host), 1, 
 				device, 1);
 		return device;
+	}
+	
+	
+	// Copies n elements from a vector x in CPU memory space to a vector y in GPU memory space. 
+	// Elements in both vectors are assumed to have a size of elemSize bytes. 
+	// Storage spacing between consecutive elements is incx for the source vector x and 
+	// incy for the destination vector y. In general, y points to an object, or part of an object,
+	// allocated via cublasAlloc(). Column major format for two-dimensional matrices is assumed 
+	// throughout CUBLAS. Therefore, if the increment for a vector is equal to 1, this access a 
+	// column vector while using an increment equal to the leading dimension of the respective
+	// matrix accesses a row vector.
+	public static void setFloatVectorDevice(
+			Pointer hostPtr, int incHost, Pointer devicePtr, int incDevice, int numElementsToCopy)
+	{
+		cublasSetVector(numElementsToCopy, Sizeof.FLOAT /*elemSize*/, hostPtr, incHost, devicePtr, incDevice);
 	}
 	
 	/**
