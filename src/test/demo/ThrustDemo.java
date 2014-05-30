@@ -1,4 +1,4 @@
-package demo;
+package test.demo;
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
 

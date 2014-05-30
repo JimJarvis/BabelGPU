@@ -1,4 +1,4 @@
-package demo;
+package test.demo;
 /*
  * JCublas - Java bindings for CUBLAS, the NVIDIA CUDA BLAS library,
  * to be used with JCuda <br />
