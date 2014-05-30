@@ -311,22 +311,20 @@ public class GpuBlas
 	 */
 	public static Pointer hostToCublasFloat(float[] host)
 	{
-		int n = host.length;
-		Pointer device = GpuUtil.allocDeviceFloat(n);
-		cublasSetVector(n, FLOAT, 
-				Pointer.to(host), 1, 
-				device, 1);
-		return device;
+		return hostToCublasFloat(host, 
+				GpuUtil.allocDeviceFloat(host.length));
 	}
 	
 	/**
 	 * Create and copy to Cublas device vector
+	 * @return output parameter 'device'
 	 */
-	public static void hostToCublasFloat(float[] host, Pointer device)
+	public static Pointer hostToCublasFloat(float[] host, Pointer device)
 	{
 		cublasSetVector(host.length, FLOAT, 
 				Pointer.to(host), 1, 
 				device, 1);
+		return device;
 	}
 	
 	/**
@@ -335,17 +333,17 @@ public class GpuBlas
 	 */
 	public static float[] cublasToHostFloat(Pointer device, int size)
 	{
-		float[] host = new float[size];
-		cublasGetVector(size, FLOAT, device, 1, Pointer.to(host), 1);
-		return host;
+		return cublasToHostFloat(device, new float[size]);
 	}
 
 	/**
 	 * Copy the device vector at Cublas back to host
+	 * @return output parameter 'host'
 	 */
-	public static void cublasToHostFloat(Pointer device, float[] host)
+	public static float[] cublasToHostFloat(Pointer device, float[] host)
 	{
 		cublasGetVector(host.length, FLOAT, device, 1, Pointer.to(host), 1);
+		return host;
 	}
 	
 	
@@ -624,22 +622,20 @@ public class GpuBlas
 	 */
 	public static Pointer hostToCublasDouble(double[] host)
 	{
-		int n = host.length;
-		Pointer device = GpuUtil.allocDeviceDouble(n);
-		cublasSetVector(n, DOUBLE, 
-				Pointer.to(host), 1, 
-				device, 1);
-		return device;
+		return hostToCublasDouble(host, 
+				GpuUtil.allocDeviceDouble(host.length));
 	}
 	
 	/**
 	 * Create and copy to Cublas device vector
+	 * @return output parameter 'device'
 	 */
-	public static void hostToCublasDouble(double[] host, Pointer device)
+	public static Pointer hostToCublasDouble(double[] host, Pointer device)
 	{
 		cublasSetVector(host.length, DOUBLE, 
 				Pointer.to(host), 1, 
 				device, 1);
+		return device;
 	}
 	
 	/**
@@ -648,16 +644,16 @@ public class GpuBlas
 	 */
 	public static double[] cublasToHostDouble(Pointer device, int size)
 	{
-		double[] host = new double[size];
-		cublasGetVector(size, DOUBLE, device, 1, Pointer.to(host), 1);
-		return host;
+		return cublasToHostDouble(device, new double[size]);
 	}
 
 	/**
 	 * Copy the device vector at Cublas back to host
+	 * @return output parameter 'host'
 	 */
-	public static void cublasToHostDouble(Pointer device, double[] host)
+	public static double[] cublasToHostDouble(Pointer device, double[] host)
 	{
 		cublasGetVector(host.length, DOUBLE, device, 1, Pointer.to(host), 1);
+		return host;
 	}
 }
