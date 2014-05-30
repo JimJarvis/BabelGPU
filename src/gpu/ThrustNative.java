@@ -106,9 +106,7 @@ public class ThrustNative
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-    public static native void babel_id_minus_softmax(@ByVal FloatDevicePointer begin, int size, int id);
-    // version 2: more calculation, might be more numerically stable
-    public static native void babel_id_minus_softmax_2(@ByVal FloatDevicePointer begin, int size, int id);
+    public static native void babel_id_minus_softmax_float(@ByVal FloatDevicePointer begin, int size, int id);
     
  // For minibatch
     public static native void babel_batch_id_minus_softmax_float(@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);

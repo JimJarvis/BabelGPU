@@ -231,14 +231,9 @@ public class Thrust
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-	public static void babel_id_minus_softmax(FloatMat x, int id) throws GpuException
+	public static void babel_id_minus_softmax_float(FloatMat x, int id) throws GpuException
 	{
-		ThrustNative.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
-	}
-	// version 2: more calculation, might be more numerically stable
-	public static void babel_id_minus_softmax_2(FloatMat x, int id) throws GpuException
-	{
-		ThrustNative.babel_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
+		ThrustNative.babel_id_minus_softmax_float(x.getThrustPointer(), x.size(), id);
 	}
 	
 	/**

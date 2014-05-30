@@ -86,7 +86,7 @@ public class BabelTest
 			/*
 			 * Step3: get Id[y==j] - P(yj | x, Theta)
 			 */
-			Thrust.babel_id_minus_softmax(A, Y[s]);
+			Thrust.babel_id_minus_softmax_float(A, Y[s]);
 			
 			// Step3: update Theta
 			// Theta += Lr * ( (Id-P) * Xnew_s' - Lambda/SAMPLES * Theta)
