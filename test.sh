@@ -2,6 +2,7 @@
 
 main="test/BabelDoubleTest"
 main="test/BabelFloatTest"
+main="test/RandTest"
 main="test/IterationTest"
 
 cp MyThrust/*.h bin/gpu/

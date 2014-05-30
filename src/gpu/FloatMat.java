@@ -66,6 +66,14 @@ public class FloatMat
 	}
 	
 	/**
+	 * Ctor from device data: 1D vector (column vector)
+	 */
+	public FloatMat(Pointer device, int len)
+	{
+		this(device, len, 1);
+	}
+	
+	/**
 	 * Ctor with dimensions
 	 * @param memsetToZero true to initialize the device data to 0. Default true. 
 	 */
@@ -262,8 +270,11 @@ public class FloatMat
 	public void destroy()
 	{
 		host = null;
-		cudaFree(device);
-		device = null;
+		if (device != null)
+		{
+    		cudaFree(device);
+    		device = null;
+		}
 		thrustPointer = null;
 	}
 	

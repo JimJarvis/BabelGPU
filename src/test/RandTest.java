@@ -1,5 +1,6 @@
 package test;
 
+import gpu.FloatMat;
 import gpu.GpuRand;
 import jcuda.Pointer;
 import jcuda.jcurand.JCurand;
@@ -25,27 +26,28 @@ public class RandTest
 		timer.readFromLast();
 		
 		PP.p("Normal");
-		rand.genNormalFloat(20, 0, 3);
+		FloatMat m = rand.genNormalFloat(20, 0, 3);
 		timer.readFromLast();
-		PP.p(rand.getHost());
+		PP.p(m);
 		timer.readFromLast();
+		m.destroy();
 		
 		PP.p("Uniform");
 		// If you explicitly obtain the pointer, you must
 		// manually free it
-		rand.genUniformFloat(20);
-		Pointer device = rand.getDevice();
+		m = rand.genUniformFloat(20);
 		timer.readFromLast();
-		PP.p(rand.getHost());
-		cudaFree(device);
+		PP.p(m);
 		timer.readFromLast();
+		m.destroy();
 		
 		PP.p("Normal 2^26 floats");
-		rand.genNormalFloat(1 << 27, 0, 3);
+		m = rand.genNormalFloat(1 << 27, 0, 3);
 		timer.readFromLast();
-		rand.getHost();
+		m.getHostFromDevice();
 		timer.readFromLast();
 		
+		m.destroy();
 		rand.destroy();
 	}
 

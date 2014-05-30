@@ -1,5 +1,6 @@
 package test;
 
+import utils.GpuUtil;
 import utils.Timer;
 import gpu.FloatMat;
 import gpu.GpuBlas;
@@ -17,14 +18,12 @@ public class IterationTest
 	private static void testRandMat(Timer timer, int r, int c, int c2)
 	{
 		GpuRand grand = new GpuRand(111);
-		grand.genUniformFloat(r * c);
-		FloatMat X = new FloatMat(grand.getDevice(), r, c);
-		grand.genUniformFloat(c * c2);
-		FloatMat W = new FloatMat(grand.getDevice(), c, c2);
+		FloatMat X = grand.genUniformFloat(r, c);
+		FloatMat W = grand.genUniformFloat(c, c2);
 		timer.readFromLast("Created random X and W");
 
 		GpuBlas.mult(X, W);
-		JCuda.cudaDeviceSynchronize();
+		GpuUtil.synchronize();
 		timer.readFromLast("X * W one shot");
 
 		// Iteration column by column
@@ -35,10 +34,12 @@ public class IterationTest
 			W.createOffset(coltmp, c*i, c);
 			GpuBlas.mult(X, coltmp, res);
 		}
-		JCuda.cudaDeviceSynchronize();
+		GpuUtil.synchronize();
 		timer.readFromLast("X * W column by column");
+		
 		X.destroy();
 		W.destroy();
+		grand.destroy();
 	}
 
 	public static void main(String[] args)

@@ -4,6 +4,7 @@ import static jcuda.runtime.JCuda.*;
 import static jcuda.runtime.cudaMemcpyKind.*;
 import static jcuda.Sizeof.*;
 import jcuda.Pointer;
+import jcuda.runtime.JCuda;
 
 public class GpuUtil
 {
@@ -47,6 +48,12 @@ public class GpuUtil
 	public static Pointer allocDeviceFloat(int n)
 	{
 		return allocDeviceFloat(n, false);
+	}
+	
+	//******************* COMMON *******************/
+	public static void synchronize()
+	{
+		JCuda.cudaDeviceSynchronize();
 	}
 	
 
