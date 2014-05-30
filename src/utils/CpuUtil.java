@@ -9,19 +9,63 @@ public class CpuUtil
 	 */
 	public static float[][] deflatten(float[] A, int row, boolean columnMajor)
 	{
-		int col = A.length / row;
-		float[][] ans = new float[row][col];
+		float[][] out = new float[row][A.length / row];
+		return deflatten(A, out, columnMajor);
+	}
+	
+	/**
+	 * Utility: deflatten a 1D float to 2D matrix
+	 * @param out output parameter
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static float[][] deflatten(float[] A, float[][] out, boolean columnMajor)
+	{
+		int row = out.length;
+		int col = out[0].length;
 		int pt = 0;
 		
 		if (columnMajor)
     		for (int j = 0; j < col; j ++)
     			for (int i = 0; i < row; i ++)
-    				ans[i][j] = A[pt ++];
+    				out[i][j] = A[pt ++];
 		else // row major
 			for (int i = 0; i < row; i ++)
 				for (int j = 0; j < col; j ++)
-					ans[i][j] = A[pt ++];
-		return ans;
+					out[i][j] = A[pt ++];
+		return out;
+	}
+	
+	/**
+	 * Utility: flatten a 2D float array to 1D
+	 * @param out output parameter
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static float[] flatten(float[][] A, float[] out, boolean columnMajor)
+	{
+		int row = A.length;
+		int col = A[0].length;
+		int pt = 0;
+
+		if (columnMajor)
+    		for (int j = 0; j < col; j ++)
+    			for (int i = 0; i < row; i ++)
+    				out[pt ++] = A[i][j];
+		else
+			for (int i = 0; i < row; i ++)
+				for (int j = 0; j < col; j ++)
+					out[pt ++] = A[i][j];
+
+		return out;
+	}
+	
+	/**
+	 * Utility: flatten a 2D float array to 1D
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static float[] flatten(float[][] A, boolean columnMajor)
+	{
+		float[] out = new float[A.length * A[0].length];
+		return flatten(A, out, columnMajor);
 	}
 	
 	/**
@@ -118,19 +162,63 @@ public class CpuUtil
 	 */
 	public static double[][] deflatten(double[] A, int row, boolean columnMajor)
 	{
-		int col = A.length / row;
-		double[][] ans = new double[row][col];
+		double[][] out = new double[row][A.length / row];
+		return deflatten(A, out, columnMajor);
+	}
+	
+	/**
+	 * Utility: deflatten a 1D double to 2D matrix
+	 * @param out output parameter
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static double[][] deflatten(double[] A, double[][] out, boolean columnMajor)
+	{
+		int row = out.length;
+		int col = out[0].length;
 		int pt = 0;
 		
 		if (columnMajor)
     		for (int j = 0; j < col; j ++)
     			for (int i = 0; i < row; i ++)
-    				ans[i][j] = A[pt ++];
+    				out[i][j] = A[pt ++];
 		else // row major
 			for (int i = 0; i < row; i ++)
 				for (int j = 0; j < col; j ++)
-					ans[i][j] = A[pt ++];
-		return ans;
+					out[i][j] = A[pt ++];
+		return out;
+	}
+	
+	/**
+	 * Utility: flatten a 2D double array to 1D
+	 * @param out output parameter
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static double[] flatten(double[][] A, double[] out, boolean columnMajor)
+	{
+		int row = A.length;
+		int col = A[0].length;
+		int pt = 0;
+
+		if (columnMajor)
+    		for (int j = 0; j < col; j ++)
+    			for (int i = 0; i < row; i ++)
+    				out[pt ++] = A[i][j];
+		else
+			for (int i = 0; i < row; i ++)
+				for (int j = 0; j < col; j ++)
+					out[pt ++] = A[i][j];
+
+		return out;
+	}
+	
+	/**
+	 * Utility: flatten a 2D double array to 1D
+	 * @param columnMajor true for column major, false for row major
+	 */
+	public static double[] flatten(double[][] A, boolean columnMajor)
+	{
+		double[] out = new double[A.length * A[0].length];
+		return flatten(A, out, columnMajor);
 	}
 	
 	/**

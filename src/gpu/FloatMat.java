@@ -272,16 +272,16 @@ public class FloatMat
 	 */
 	public static float[] flatten(float[][] A)
 	{
-		int row = A.length;
-		int col = A[0].length;
-		float[] ans = new float[row * col];
-		int pt = 0;
+		return CpuUtil.flatten(A, true);
+	}
 
-		for (int j = 0; j < col; j ++)
-			for (int i = 0; i < row; i ++)
-				ans[pt ++] = A[i][j];
-
-		return ans;
+	/**
+	 * Utility: flatten a 2D float array to 1D, column major
+	 * @param out output parameter
+	 */
+	public static float[] flatten(float[][] A, float[] out)
+	{
+		return CpuUtil.flatten(A, out, true);
 	}
 	
 	/**
@@ -290,6 +290,15 @@ public class FloatMat
 	public static float[][] deflatten(float[] A, int row)
 	{
 		return CpuUtil.deflatten(A, row, true);
+	}
+	
+	/**
+	 * Utility: deflatten a 1D float to 2D matrix, column major
+	 * @param out output parameter
+	 */
+	public static float[][] deflatten(float[] A, float[][] out)
+	{
+		return CpuUtil.deflatten(A, out, true);
 	}
 	
 	/**
