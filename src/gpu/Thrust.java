@@ -3,6 +3,7 @@ package gpu;
 import static gpu.ThrustNative.*;
 
 import com.googlecode.javacpp.IntPointer;
+import com.googlecode.javacpp.Loader;
 
 
 /**
@@ -14,6 +15,7 @@ import com.googlecode.javacpp.IntPointer;
  */
 public class Thrust
 {
+	static { Loader.load(); }
 	/**
 	 * exp(a * x + b)
 	 */

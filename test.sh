@@ -2,8 +2,7 @@
 
 main="test/BabelDoubleTest"
 main="test/BabelFloatTest"
-main="test/RandTest"
-main="test/IterationTest"
+main="test/MinibatchTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/
