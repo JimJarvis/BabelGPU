@@ -2,6 +2,49 @@ package utils;
 
 public class CpuUtil
 {
+	// ******************** COMMON ********************/
+	
+	/**
+	 * Inner class for 2D coordinate in the matrix
+	 */
+	public static class Coord
+	{
+		public int i; // row
+		public int j; // col
+		public Coord(int i, int j)
+		{
+			this.i = i; 
+			this.j = j;
+		}
+		public String toString() { return String.format("<%d, %d>", i, j); }
+	}
+	
+	/**
+	 * Transform an index to a coordinate (column major)
+	 */
+	public static Coord toCoord(int row, int idx)
+	{
+		return new Coord(idx%row, idx/row);
+	}
+	
+	/**
+	 * Transform a 2D coordinate to index (column major)
+	 */
+	public static int toIndex(int row, int i, int j)
+	{
+		return j * row + i;
+	}
+	/**
+	 * Transform a 2D coordinate to index (column major)
+	 */
+	public static int toIndex(int row, Coord c)
+	{
+		return c.j * row + c.i;
+	}
+	
+	//**************************************************/
+	//******************* FLOAT *******************/
+	//**************************************************/
 	/**
 	 * Utility: deflatten a 1D float to 2D matrix
 	 * @param row row dimension

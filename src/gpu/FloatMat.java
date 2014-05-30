@@ -2,6 +2,7 @@ package gpu;
 
 import gpu.ThrustStruct.FloatDevicePointer;
 import utils.CpuUtil;
+import utils.CpuUtil.Coord;
 import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
@@ -329,29 +330,12 @@ public class FloatMat
 		return PP.o2str(this.deflatten());
 	}
 
-	
-	/**
-	 * Inner class for 2D coordinate in the matrix
-	 */
-	public static class Coord
-	{
-		public int i; // row
-		public int j; // col
-		public Coord(int i, int j)
-		{
-			this.i = i; 
-			this.j = j;
-		}
-		
-		public String toString() { return String.format("<%d, %d>", i, j); }
-	}
-	
 	/**
 	 * Transform an index to a coordinate (column major)
 	 */
 	public Coord toCoord(int idx)
 	{
-		return new Coord(idx%row, idx/row);
+		return CpuUtil.toCoord(row, idx);
 	}
 	
 	/**
@@ -359,14 +343,14 @@ public class FloatMat
 	 */
 	public int toIndex(int i, int j)
 	{
-		return j * row + i;
+		return CpuUtil.toIndex(row, i, j);
 	}
 	/**
 	 * Transform a 2D coordinate to index (column major)
 	 */
 	public int toIndex(Coord c)
 	{
-		return c.j * row + c.i;
+		return CpuUtil.toIndex(row, c);
 	}
 	
 	// ******************** Interface to Thrust API ****************** /
