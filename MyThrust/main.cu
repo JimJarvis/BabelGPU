@@ -13,6 +13,19 @@ void printD(T D)
 		pr( "D[" << i << "] = " << D[i]);
 }
 
+// column major printing
+template<typename T>
+void printD(T D, int row)
+{
+	int col = D.size() / row;
+	for (int i = 0; i < row; i++)
+	{
+		for (int j = 0; j < col; j++)
+			std::cout << D[i + j * row] << '\t';
+		std::cout << std::endl;
+	}
+}
+
 
 device_vector<float> getDf(float A[], int len)
 {
@@ -201,6 +214,7 @@ void test_sort_copy_swap_double()
 	printD(E);
 }
 
+// babel mini-batch (I[] - softmax)
 void test_batch()
 {
 	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
@@ -215,8 +229,24 @@ void test_batch()
 	printD(D);
 }
 
+// Set a row/col to a specific value
+void test_set_row_col()
+{
+	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
+	device_vector<float> D = getDf(x, 12);
+	gpu_fill_col_float(&D[0], 4, 3, -2, 600);
+	gpu_fill_row_float(&D[0], 4, 3, -1, 100);
+	printD(D, 4);
+	D = getDf(x, 12);
+	gpu_fill_row_float(&D[0], 4, 3, 3, -100);
+	gpu_fill_col_float(&D[0], 4, 3, 2, -600);
+	printD(D, 4);
+}
+
+
 void main()
 {
+	test_set_row_col();
 	test_batch();
 	//test_babel();
 	//test_exp_double();

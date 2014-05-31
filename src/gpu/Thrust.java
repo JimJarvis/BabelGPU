@@ -1,6 +1,7 @@
 package gpu;
 
 import static gpu.ThrustNative.*;
+import gpu.ThrustStruct.FloatDevicePointer;
 
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
@@ -186,6 +187,24 @@ public class Thrust
 		gpu_fill_float(x.getThrustPointer(), x.size(), val);
 	}
 	
+	 /**
+     *  Set a specified row of a column-major matrix to be the same value
+     *  @param rowIdx like python, wrapped around: if negative, rowIdx = rowDim + rowIdx
+     */
+    public static void fill_row(FloatMat x, int rowIdx, float val)
+    {
+    	ThrustNative.gpu_fill_row_float(x.getThrustPointer(), x.row, x.col, rowIdx, val);
+    }
+    /**
+     *  Set a specified col of a  column-major matrix to be the same value
+     *  @param colIdx like python, wrapped around: if negative, colIdx = colDim + colIdx
+     */
+    public static void fill_col(FloatMat x, int colIdx, float val)
+    {
+    	ThrustNative.gpu_fill_col_float(x.getThrustPointer(), x.row, x.col, colIdx, val);
+    }
+	
+	
 	 // ******************** Babel specific methods ****************** /
     /**
      * I[y == j] - softmax(alpha_vec)
@@ -214,7 +233,13 @@ public class Thrust
 	}
 	// Add this identical method with ThrustNative to force recompilation
     public static native void gpu_free(@ByPtr IntPointer device);
-	
+    
+    // Set the last row of a matrix to 1
+    public static void set_last_row_one(FloatMat x)
+    {
+    	fill_row(x, -1, 1);
+    }
+   
 	
 	//**************************************************/
 	//******************* DOUBLE *******************/

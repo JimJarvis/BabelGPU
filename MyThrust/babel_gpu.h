@@ -59,11 +59,10 @@ inline void babel_id_minus_softmax_float_2(device_ptr<float> begin, int size, in
 }
 
 // mini-batch I [y==j] - softmax_float(alpha_vec)
-__forceinline__ __global__ 
+__global__ 
 void babel_batch_kernel(float *begin, int row, int col, int *labels)
 {
-	int idx = blockIdx.x * blockDim.x + threadIdx.x;
-	if (idx >= col) return; // out of bound
+	ThreadIndex1D(idx, col);
 
 	begin += idx * row; // beginning of a column
 
@@ -92,13 +91,7 @@ inline void babel_batch_id_minus_softmax_float(
 	device_ptr<float> begin, int row, int col, int *labels)
 {
 	dim3 gridDim, blockDim;
-	if (col > 1024) // we don't have enough threads on a single block
-	{
-		gridDim.x = col / 1024 + 1;
-		blockDim.x = 1024;
-	}
-	else
-		blockDim.x = col;
+	setKernelDim1D(col, gridDim, blockDim);
 
 	babel_batch_kernel<<<gridDim, blockDim>>>(
 		thrust::raw_pointer_cast(begin), row, col, labels);
@@ -118,7 +111,6 @@ inline void gpu_free(int *device)
 {
 	cudaFree(device);
 }
-
 }
 
 #endif // babel_gpu_h__

@@ -108,6 +108,15 @@ public class ThrustNative
      */
     public static native @ByVal FloatDevicePointer offset_float(@ByVal FloatDevicePointer begin, int offset);
 
+    /**
+     *  Set a specified row of a column-major matrix to be the same value
+     */
+    public static native void gpu_fill_row_float(@ByVal FloatDevicePointer begin, int row, int col, int rowIdx, float val);
+    /**
+     *  Set a specified col of a  column-major matrix to be the same value
+     */
+    public static native void gpu_fill_col_float(@ByVal FloatDevicePointer begin, int row, int col, int colIdx, float val);
+    
     
     // ******************** Babel specific methods ****************** /
     /**
@@ -122,6 +131,7 @@ public class ThrustNative
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
     public static native void gpu_free(@ByPtr IntPointer device);
+    
     
     //**************************************************/
 	//******************* DOUBLE *******************/

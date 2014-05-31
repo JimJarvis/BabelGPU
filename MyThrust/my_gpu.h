@@ -231,9 +231,9 @@ namespace MyGpu
 
 	// Fill the array with the same value
 	inline void gpu_fill_float(device_ptr<float> begin, int size, float val)
-	{ thrust::fill(begin, begin + size, val); }
+	{ thrust::fill_n(begin, size, val); }
 	inline void gpu_fill_double(device_ptr<double> begin, int size, double val)
-	{ thrust::fill(begin, begin + size, val); }
+	{ thrust::fill_n(begin, size, val); }
 
 	inline void gpu_copy_float(device_ptr<float> begin, int size, device_ptr<float> out)
 	{ thrust::copy(begin, begin + size, out); }
@@ -251,5 +251,56 @@ namespace MyGpu
 	{ return begin + offset; }
 	inline device_ptr<double> offset_double(device_ptr<double> begin, int offset)
 	{ return begin + offset; }
+
+	// Utility for setting blockDim and gridDim (1D). A block cannot have more than 1024 threads
+	// number of threads needed, 2 output params
+	inline void setKernelDim1D(int threads, dim3& gridDim, dim3& blockDim)
+	{
+		if (threads > 1024) // we don't have enough threads on a single block
+		{
+			gridDim.x = threads / 1024 + 1;
+			blockDim.x = 1024;
+		}
+		else
+			blockDim.x = threads;
+	}
+
+// Should be used inside kernel functions only
+#define ThreadIndex1D(idx, limit) \
+	int idx = blockIdx.x * blockDim.x + threadIdx.x; \
+	if (idx >= limit) return; // out of bound
+
+
+	// The specified col will be set to a specific value
+	// negative 'colIdx' means counting from the last col (-n => col - n)
+	inline void gpu_fill_col_float(device_ptr<float> begin, int row, int col, int colIdx, float val)
+	{
+		if (colIdx < 0)  colIdx += col;
+		thrust::fill_n(begin + row * colIdx, row, val);
+	}
+
+	// Change a specific row of a column major matrix to a specific value
+	// negative 'rowIdx' means counting from the last row (-n => row - n)
+	__global__
+	void gpu_fill_row_float_kernel(float *begin, int row, int col, int rowIdx, float val)
+	{
+			ThreadIndex1D(idx, col);
+
+			begin += row * idx + rowIdx; // end of a column
+			*begin = val; // set the value
+		}
+
+	// The specified row will be set to a specific value
+	// negative 'rowIdx' means counting from the last row (-n => row - n)
+	inline void gpu_fill_row_float(device_ptr<float> begin, int row, int col, int rowIdx, float val)
+	{
+		dim3 gridDim, blockDim;
+		setKernelDim1D(col, gridDim, blockDim);
+
+		if (rowIdx < 0) rowIdx += row;
+
+		gpu_fill_row_float_kernel<<<gridDim, blockDim>>>(
+			thrust::raw_pointer_cast(begin), row, col, rowIdx, val);
+	}
 }
 #endif // try_h__
