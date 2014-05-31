@@ -230,6 +230,23 @@ public class Thrust
 		gpu_fill_float(x.getThrustPointer(), x.size(), val);
 	}
 	
+	 /**
+     *  Set a specified row of a column-major matrix to be the same value
+     *  @param rowIdx like python, wrapped around: if negative, rowIdx = rowDim + rowIdx
+     */
+    public static void fill_row(FloatMat x, int rowIdx, float val) throws GpuException
+    {
+    	ThrustNative.gpu_fill_row_float(x.getThrustPointer(), x.numRows, x.numCols, rowIdx, val);
+    }
+    /**
+     *  Set a specified col of a  column-major matrix to be the same value
+     *  @param colIdx like python, wrapped around: if negative, colIdx = colDim + colIdx
+     */
+    public static void fill_col(FloatMat x, int colIdx, float val) throws GpuException
+    {
+    	ThrustNative.gpu_fill_col_float(x.getThrustPointer(), x.numRows, x.numCols, colIdx, val);
+    }
+	
 	 // ******************** Babel specific methods ****************** /
     /**
      * I[y == j] - softmax(alpha_vec)

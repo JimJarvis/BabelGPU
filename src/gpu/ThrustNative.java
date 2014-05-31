@@ -100,6 +100,15 @@ public class ThrustNative
      *  Utility: pointer += offset, advance the GPU pointer
      */
     public static native @ByVal FloatDevicePointer offset_float(@ByVal FloatDevicePointer begin, int offset);
+    
+    /**
+     *  Set a specified row of a column-major matrix to be the same value
+     */
+    public static native void gpu_fill_row_float(@ByVal FloatDevicePointer begin, int row, int col, int rowIdx, float val);
+    /**
+     *  Set a specified col of a  column-major matrix to be the same value
+     */
+    public static native void gpu_fill_col_float(@ByVal FloatDevicePointer begin, int row, int col, int colIdx, float val);
 
     
     // ******************** Babel specific methods ****************** /
