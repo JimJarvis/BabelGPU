@@ -2,6 +2,7 @@ package test;
 
 import gpu.FloatMat;
 import gpu.GpuBlas;
+import utils.GpuUtil;
 import utils.PP;
 
 public class MiscTest
@@ -26,5 +27,6 @@ public class MiscTest
 		FloatMat a = new FloatMat(A);
 		GpuBlas.destroy();
 		
+		PP.p( GpuUtil.getGpuInfo());
 	}
 }

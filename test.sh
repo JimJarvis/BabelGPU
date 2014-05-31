@@ -1,6 +1,5 @@
 #!/bin/bash
 
-main="test/BabelDoubleTest"
 main="test/BabelFloatTest"
 main="test/MinibatchTest"
 
