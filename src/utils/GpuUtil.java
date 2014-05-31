@@ -3,6 +3,8 @@ package utils;
 import static jcuda.runtime.JCuda.*;
 import static jcuda.runtime.cudaMemcpyKind.*;
 import static jcuda.Sizeof.*;
+import static utils.CpuUtil.matAvgDiff;
+import gpu.*;
 import jcuda.*;
 import jcuda.jcublas.*;
 import jcuda.jcurand.JCurand;
@@ -84,6 +86,24 @@ public class GpuUtil
 		return allocDeviceFloat(n, false);
 	}
 
+	/**
+	 * Check the gold standard generated from Matlab
+	 * Assume the goldFile has extension ".txt"
+	 * @param testName
+	 * @param tol tolerance of error
+	 */
+	public static void checkGold(FloatMat gpu, String goldFile, String testName, float tol)
+	{
+		CsvReader csv = new CsvReader(goldFile + ".txt");
+		float[][] Gold = csv.readFloatMat();
+		float[][] Host = gpu.deflatten();
+		
+		float diff = matAvgDiff(Gold, Host);
+		PP.setPrecision(3);
+		PP.setScientific(true);
+		
+		PP.p("["+testName+"]", diff < tol ? "PASS:" : "FAIL:", diff);
+	}
 
 	//**************************************************/
 	//******************* DOUBLE *******************/
@@ -128,5 +148,24 @@ public class GpuUtil
 	public static Pointer allocDeviceDouble(int n)
 	{
 		return allocDeviceDouble(n, false);
+	}
+	
+	/**
+	 * Check the gold standard generated from Matlab
+	 * Assume the goldFile has extension ".txt"
+	 * @param testName
+	 * @param tol tolerance of error
+	 */
+	public static void checkGold(DoubleMat gpu, String goldFile, String testName, double tol)
+	{
+		CsvReader csv = new CsvReader(goldFile + ".txt");
+		double[][] Gold = csv.readDoubleMat();
+		double[][] Host = gpu.deflatten();
+		
+		double diff = matAvgDiff(Gold, Host);
+		PP.setPrecision(3);
+		PP.setScientific(true);
+		
+		PP.p("["+testName+"]", diff < tol ? "PASS:" : "FAIL:", diff);
 	}
 }

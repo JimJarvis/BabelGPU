@@ -1,27 +1,41 @@
 package test;
 
-import utils.PP;
+import utils.*;
+import gpu.*;
 
-import com.googlecode.javacpp.IntPointer;
-import com.googlecode.javacpp.Loader;
-
-import gpu.FloatMat;
-import gpu.Thrust;
+import com.googlecode.javacpp.*;
 
 public class MinibatchTest
 {
+	private static final float TOL = 1e-5f;
+	
 	public static void main(String[] args)
 	{
-		FloatMat mat = new FloatMat(new float[] 
-				{ 4.2f, 5.9f, -2.1f, -3.7f, 3.3f, 1.9f, -0.6f, 2.5f, 1.7f, -0.2f, -0.9f, 0.4f}, 4, 3);
-		int labels[] = new int[] {0, 3, 2, 1};
+		GpuUtil.enableExceptions();
+		
+		PP.p("Mini-batch test");
+		PP.setPrecision(3);
+		
+		/*
+		 * Dimensions
+		 */
+		CsvReader csv = new CsvReader("input_dim.txt");
+		int[] dims = csv.readIntVec(true);
+		final int ROW = dims[0];
+		final int COL = dims[1];
+		
+		// Read in dummy data
+		csv = new CsvReader("input_X.txt");
+		FloatMat X = new FloatMat(csv.readFloatVec(true), ROW, COL);
+		csv = new CsvReader("input_Y.txt");
+		int[] labels = csv.readIntVec(true);
 		
 		IntPointer labelsDevice = Thrust.copy_host_to_device(labels);
-		Thrust.babel_batch_id_minus_softmax_float(mat, labelsDevice);
+		Thrust.babel_batch_id_minus_softmax_float(X, labelsDevice);
+		
+		GpuUtil.checkGold(X, "gold_MB", "Mini-batch", TOL);
 		
 		Thrust.gpu_free(labelsDevice);
-		
-		PP.p(mat);
 	}
 
 }

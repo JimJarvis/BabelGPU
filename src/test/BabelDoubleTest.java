@@ -16,8 +16,18 @@ public class BabelDoubleTest
 		PP.p("Double CPU-GPU-Matlab test");
 		PP.setPrecision(3);
 		
+		/*
+		 * Dimensions
+		 */
+		CsvReader csv = new CsvReader("input_dim.txt");
+		int[] dims = csv.readIntVec(true);
+		final int SAMPLES = dims[0];
+		final int X_DIM = dims[1];
+		final int X_NEW_DIM = dims[2];
+		final int LABELS = dims[3];
+		
 		// Read in dummy data
-		CsvReader csv = new CsvReader("input_X.txt");
+		csv = new CsvReader("input_X.txt");
 		double[][] jX = csv.readDoubleMat();
 		DoubleMat X = new DoubleMat(jX);
 		csv = new CsvReader("input_W.txt");
@@ -26,16 +36,6 @@ public class BabelDoubleTest
 		DoubleMat W = new DoubleMat(jW);
 		csv = new CsvReader("input_Y.txt");
 		int[] Y = csv.readIntVec(true);
-		
-		/*
-		 * Dimensions
-		 */
-		csv = new CsvReader("input_dim.txt");
-		int[] dims = csv.readIntVec(true);
-		final int SAMPLES = dims[0];
-		final int X_DIM = dims[1];
-		final int X_NEW_DIM = dims[2];
-		final int LABELS = dims[3];
 		
 		/*
 		 * Define a few learning constants
@@ -171,18 +171,7 @@ public class BabelDoubleTest
 	 */
 	private static void checkGold(DoubleMat gpu, String goldFile)
 	{
-		CsvReader csv = new CsvReader("gold_" + goldFile + ".txt");
-		double[][] Gold = csv.readDoubleMat();
-		double[][] Host = gpu.deflatten();
-		
-		double diff = matAvgDiff(Gold, Host);
-		PP.setPrecision(3);
-		PP.setScientific(true);
-		
-		if (matAvgDiff(Gold, Host) < TOL)
-    		PP.p("PASS double GPU-Matlab: ", diff);
-		else
-			PP.p("FAIL double GPU-Matlab: ", diff);
+		GpuUtil.checkGold(gpu, "gold_" + goldFile, "GPU-Matlab", TOL);
 	}
 
 	private static void updateTheta(double[][] theta, double alpha, double[][] b, double beta)
