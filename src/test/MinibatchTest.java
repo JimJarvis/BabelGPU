@@ -3,13 +3,13 @@ package test;
 import utils.PP;
 
 import com.googlecode.javacpp.IntPointer;
+import com.googlecode.javacpp.Loader;
 
 import gpu.FloatMat;
 import gpu.Thrust;
 
 public class MinibatchTest
 {
-
 	public static void main(String[] args)
 	{
 		FloatMat mat = new FloatMat(new float[] 
