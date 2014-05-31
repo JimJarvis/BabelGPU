@@ -4,6 +4,7 @@ import static gpu.ThrustNative.*;
 
 import com.googlecode.javacpp.IntPointer;
 import com.googlecode.javacpp.Loader;
+import com.googlecode.javacpp.annotation.*;
 
 
 /**
@@ -13,6 +14,8 @@ import com.googlecode.javacpp.Loader;
  * exp(x, out): x immutable and store the result in out. Return the output parameter
  * a * x + b, default a = 1 and b = 0
  */
+@Platform(include={"\"my_gpu.h\"", "\"babel_gpu.h\""})
+@Namespace("MyGpu")
 public class Thrust
 {
 	static { Loader.load(); }
@@ -249,11 +252,7 @@ public class Thrust
 	{
 		return ThrustNative.copy_host_to_device(new IntPointer(labels), labels.length);
 	}
-	public static void gpu_free(IntPointer device)
-	{
-		ThrustNative.gpu_free(device);
-	}
-	
-
+	// force javacpp recompilation
+	public static native void gpu_free(@ByPtr IntPointer device);
 	
 }
