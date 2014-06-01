@@ -22,29 +22,38 @@ using namespace thrust;
 
 namespace MyGpu
 {
-// I [y==j] - softmax(alpha_vec)
-// and simply softmax()
 #define GEN_babel_softmax(Ftype) \
-inline void babel_id_minus_softmax_##Ftype(device_ptr<Ftype> begin, int size, int id) \
+	/* I [y==j] - softmax(alpha_vec) */ \
+inline void babel_id_minus_softmax_##Ftype(device_ptr<Ftype> begin, int size, int label) \
 { \
 	Ftype mx = gpu_max_##Ftype(begin, size); \
 	gpu_exp_##Ftype(begin, size, 1, -mx); \
 	Ftype s = gpu_sum_##Ftype(begin, size); \
 	gpu__##Ftype(begin, size, -1.0 / s, 0); \
-	++ *(begin + id);  /* when at id, x = 1 - x */ \
+	++ *(begin + label);  /* when at id, x = 1 - x */ \
 } \
+	/* softmax(alpha_vec) */ \
 inline void babel_softmax_##Ftype(device_ptr<Ftype> begin, int size) \
 { \
 	Ftype mx = gpu_max_##Ftype(begin, size); \
 	gpu_exp_##Ftype(begin, size, 1, -mx); \
 	Ftype s = gpu_sum_##Ftype(begin, size); \
 	gpu__##Ftype(begin, size, 1.0 / s, 0); \
+} \
+	/* softmax(alpha_vec) at only the correct label. 'out' is a 1 float device_ptr */ \
+inline void babel_softmax_##Ftype(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> out) \
+{ \
+	Ftype mx = gpu_max_##Ftype(begin, size); \
+	Ftype expSum = thrust::transform_reduce(begin, begin + size, \
+		functor_exp_##Ftype##_1(-mx), 0.0, thrust::plus<Ftype>()); \
+	out[0] = exp(begin[label] - mx) / expSum; \
 }
+
 GEN_babel_softmax(float);
 GEN_babel_softmax(double);
 
 
-// Second way to implement (id - softmax_float()), exactly the same numerical result. 
+///// Second way to implement (id - softmax_float()), exactly the same numerical result. 
 struct functor_id_minus_softmax_float_2
 {
 	const float b;
@@ -66,7 +75,7 @@ inline void babel_id_minus_softmax_float_2(device_ptr<float> begin, int size, in
 	++ *(begin + id);  // when at id, x = 1 - x
 }
 
-// mini-batch I [y==j] - softmax_float(alpha_vec)
+///// mini-batch I [y==j] - softmax_float(alpha_vec)
 __global__ 
 void babel_batch_id_minus_softmax_kernel(float *begin, int row, int col, int *labels)
 {
@@ -99,10 +108,9 @@ inline void babel_batch_id_minus_softmax_float(
 {
 	if (col == 1) // use the thrust version
 	{
-		int *label = (int *) malloc(sizeof(int));
-		cudaMemcpy(label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-		babel_id_minus_softmax_float(begin, row, *label);
-		free(label);
+		int label;
+		cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
+		babel_id_minus_softmax_float(begin, row, label);
 	}
 	else // real batch
 	{
@@ -114,7 +122,7 @@ inline void babel_batch_id_minus_softmax_float(
 	}
 }
 
-// mini-batch softmax_float(alpha_vec)
+///// mini-batch softmax_float(alpha_vec)
 __global__
 void babel_batch_softmax_kernel(float *begin, int row, int col)
 {
@@ -139,7 +147,7 @@ void babel_batch_softmax_kernel(float *begin, int row, int col)
 		begin[i] /= sum;
 }
 
-// Computes the mini-batch softmax probability distribution
+// Computes the mini-batch softmax probability distribution for the full matrix
 inline void babel_batch_softmax_float(
 	device_ptr<float> begin, int row, int col)
 {
@@ -154,6 +162,53 @@ inline void babel_batch_softmax_float(
 
 		babel_batch_softmax_kernel<<<gridDim, blockDim >>>(
 			thrust::raw_pointer_cast(begin), row, col);
+	}
+}
+
+///// mini-batch softmax_float(alpha_vec) that writes to 'out' only the probability at the correct label
+__global__
+void babel_batch_softmax_kernel(float *begin, int row, int col, float *out, int *labels)
+{
+	ThreadIndex1D(idx, col);
+
+	begin += idx * row; // beginning of a column
+
+	// find max
+	float mx = -1e20;
+	for (int i = 0; i < row; i++)
+	if (begin[i] > mx) mx = begin[i];
+	// subtract max from each and do exp
+	// also compute sum of these exp
+	float sum = 0;
+	float numerator, tmp;
+	int label = labels[idx];
+	for (int i = 0; i < row; i++)
+	{
+		tmp = exp(begin[i] - mx);
+		if (i == label) numerator = tmp;
+		sum += tmp;
+	}
+	out[idx] = numerator / sum;
+}
+
+// Computes the mini-batch softmax probability distribution for the full matrix
+// writes to 'out' only the probability at the correct label
+inline void babel_batch_softmax_float(
+	device_ptr<float> begin, int row, int col, device_ptr<float> out, int *labels)
+{
+	if (col == 1) // use the thrust version
+	{
+		int label;
+		cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
+		babel_softmax_float(begin, row, label, out);
+	}
+	else // real batch
+	{
+		dim3 gridDim, blockDim;
+		setKernelDim1D(col, gridDim, blockDim);
+
+		babel_batch_softmax_kernel << <gridDim, blockDim >> >(
+			thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), labels);
 	}
 }
 

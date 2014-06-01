@@ -239,10 +239,11 @@ void test_id_minus_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	lp = offset(lp, 2);
 
-	babel_batch_id_minus_softmax_float(&D[0], 4, 3, lp);
+	babel_batch_id_minus_softmax_float(&D[0], 12, 1, lp);
 
 	printD(D, 4);
 }
+
 
 // babel mini-batch (softmax probability distr)
 void test_softmax_batch()
@@ -250,17 +251,26 @@ void test_softmax_batch()
 	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
 	device_vector<float> D = getDf(x, 12);
 
+	printf("Unlabeled softmax\n");
 	babel_batch_softmax_float(&D[0], 4, 3);
-
 	printD(D, 4);
+
+	printf("Labeled softmax\n");
+	int labels[4] = {0, 1, 2, 1 };
+	device_vector<int> L = host_vector<int>(labels, labels + 4);
+	int *lp = thrust::raw_pointer_cast(&L[0]);
+	D = getDf(x, 12);
+	device_vector<float> out(4);
+	babel_batch_softmax_float(&D[0], 3, 4, &out[0], lp);
+	printD(out, 1);
 }
 
 
 void main()
 {
+	//test_id_minus_softmax_batch();
 	test_softmax_batch();
 	//test_set_row_col();
-	//test_id_minus_softmax();
 	//test_exp_double();
 	//test_sort_copy_swap_double();
 	//test_exp();

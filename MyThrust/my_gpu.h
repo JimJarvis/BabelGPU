@@ -250,19 +250,27 @@ namespace MyGpu
 	inline device_ptr<float> offset_float(device_ptr<float> begin, int offset)
 	{ return begin + offset; }
 	inline device_ptr<double> offset_double(device_ptr<double> begin, int offset)
-	{ return begin + offset; }
+	{
+ return begin + offset; }
 
-// Deal with int, float, and double raw GPU pointers
+		// Deal with int, float, and double raw GPU pointers
 #define GEN_raw_pointer_func(Ftype) \
 	inline Ftype* offset(Ftype *begin, int offset) \
-	{ return begin + offset; } \
-	inline void gpu_free(Ftype *device) { cudaFree(device); } \
+		{ return begin + offset; } \
+	inline void free_device(Ftype *device) { cudaFree(device); } \
+	inline void free_host(Ftype *host) { free(host); } \
 	inline Ftype *copy_host_to_device(Ftype *host, int size) \
 	{ \
 		Ftype *device; size *= sizeof(Ftype); \
 		cudaMalloc((void **)&device, size); \
 		cudaMemcpy(device, host, size, cudaMemcpyHostToDevice); \
 		return device; \
+	} \
+	inline Ftype *copy_device_to_host(Ftype *device, int size) \
+	{ \
+		Ftype *host = (Ftype *) malloc(size * sizeof(Ftype)); \
+		cudaMemcpy(host, device, size, cudaMemcpyHostToDevice); \
+		return host; \
 	}
 
 	GEN_raw_pointer_func(int);
