@@ -81,17 +81,6 @@ void test_exp()
 	D = F; gpu_sqrt_float(range, 0.7, 4); printD(D);
 }
 
-void test_babel()
-{
-	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
-	device_vector<float> D = getDf(x, 7);
-	pr(gpu_product_float(range));
-	pr(gpu_min_float(range));
-
-	babel_id_minus_softmax_float(range, 3);
-	printD(D);
-}
-
 void test_sort_copy_swap()
 {
 	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
@@ -144,7 +133,6 @@ void test_exp_out_pointer()
 	printf("0.5 * x + 3\n");
 	gpu_exp_float(range, &E[0], 0.5, 3); printD(E);
 }
-
 
 void test_exp_double()
 {
@@ -214,21 +202,6 @@ void test_sort_copy_swap_double()
 	printD(E);
 }
 
-// babel mini-batch (I[] - softmax)
-void test_batch()
-{
-	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
-	device_vector<float> D = getDf(x, 12);
-	int labels[6] = {-100,-1000, 0, 3, 2, 1 };
-	device_vector<int> L = host_vector<int>(labels, labels + 6);
-	int *lp = thrust::raw_pointer_cast(&L[0]);
-	lp = offset(lp, 2);
-
-	babel_batch_id_minus_softmax_float(&D[0], 12, 1, lp);
-
-	printD(D, 4);
-}
-
 // Set a row/col to a specific value
 void test_set_row_col()
 {
@@ -244,11 +217,50 @@ void test_set_row_col()
 }
 
 
+// ****************** Babel specific tests ******************
+void test_id_minus_softmax()
+{
+	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
+	device_vector<float> D = getDf(x, 7);
+	pr(gpu_product_float(range));
+	pr(gpu_min_float(range));
+
+	babel_id_minus_softmax_float(range, 3);
+	printD(D);
+}
+
+// babel mini-batch (I[] - softmax)
+void test_id_minus_softmax_batch()
+{
+	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
+	device_vector<float> D = getDf(x, 12);
+	int labels[6] = {-100,-1000, 0, 3, 2, 1 };
+	device_vector<int> L = host_vector<int>(labels, labels + 6);
+	int *lp = thrust::raw_pointer_cast(&L[0]);
+	lp = offset(lp, 2);
+
+	babel_batch_id_minus_softmax_float(&D[0], 4, 3, lp);
+
+	printD(D, 4);
+}
+
+// babel mini-batch (softmax probability distr)
+void test_softmax_batch()
+{
+	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
+	device_vector<float> D = getDf(x, 12);
+
+	babel_batch_softmax_float(&D[0], 4, 3);
+
+	printD(D, 4);
+}
+
+
 void main()
 {
+	test_softmax_batch();
 	//test_set_row_col();
-	test_batch();
-	//test_babel();
+	//test_id_minus_softmax();
 	//test_exp_double();
 	//test_sort_copy_swap_double();
 	//test_exp();
