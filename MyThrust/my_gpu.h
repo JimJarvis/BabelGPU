@@ -254,6 +254,10 @@ namespace MyGpu
 	inline int * offset(int *begin, int offset)
 	{ return begin + offset; }
 
+	inline void gpu_free(int *device) { cudaFree(device); }
+	inline void gpu_free(float *device) { cudaFree(device); }
+	inline void gpu_free(double *device) { cudaFree(device); }
+
 	// Utility for setting blockDim and gridDim (1D). A block cannot have more than 1024 threads
 	// number of threads needed, 2 output params
 	inline void setKernelDim1D(int threads, dim3& gridDim, dim3& blockDim)

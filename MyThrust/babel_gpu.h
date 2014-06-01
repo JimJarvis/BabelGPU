@@ -90,11 +90,21 @@ void babel_batch_kernel(float *begin, int row, int col, int *labels)
 inline void babel_batch_id_minus_softmax_float(
 	device_ptr<float> begin, int row, int col, int *labels)
 {
-	dim3 gridDim, blockDim;
-	setKernelDim1D(col, gridDim, blockDim);
+	if (col == 1) // use the thrust version
+	{
+		int *label = (int *) malloc(sizeof(int));
+		cudaMemcpy(label, labels, sizeof(int), cudaMemcpyDeviceToHost);
+		babel_id_minus_softmax_float(begin, row, *label);
+		free(label);
+	}
+	else // real batch
+	{
+		dim3 gridDim, blockDim;
+		setKernelDim1D(col, gridDim, blockDim);
 
-	babel_batch_kernel<<<gridDim, blockDim>>>(
-		thrust::raw_pointer_cast(begin), row, col, labels);
+		babel_batch_kernel<<<gridDim, blockDim>>>(
+			thrust::raw_pointer_cast(begin), row, col, labels);
+	}
 }
 
 // for babel_batch_id_minus_softmax_float: deal with JavaCpp int pointer
@@ -107,10 +117,7 @@ inline int *copy_host_to_device(int *host, int size)
 	return device;
 }
 
-inline void gpu_free(int *device)
-{
-	cudaFree(device);
-}
+
 }
 
 #endif // babel_gpu_h__

@@ -224,7 +224,8 @@ void test_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	lp = offset(lp, 2);
 
-	babel_batch_id_minus_softmax_float(&D[0], 4, 3, lp);
+	//babel_batch_id_minus_softmax_float(&D[0], 4, 3, lp);
+	babel_batch_id_minus_softmax_float(&D[0], 12, 1, lp);
 
 	printD(D, 4);
 }
