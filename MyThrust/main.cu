@@ -219,14 +219,14 @@ void test_batch()
 {
 	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
 	device_vector<float> D = getDf(x, 12);
-	int labels[4] = { 0, 3, 2, 1 };
-	device_vector<int> L = host_vector<int>(labels, labels + 4);
+	int labels[6] = {-100,-1000, 0, 3, 2, 1 };
+	device_vector<int> L = host_vector<int>(labels, labels + 6);
+	int *lp = thrust::raw_pointer_cast(&L[0]);
+	lp = offset(lp, 2);
 
-	device_ptr<float> dp = &D[0];
+	babel_batch_id_minus_softmax_float(&D[0], 4, 3, lp);
 
-	babel_batch_id_minus_softmax_float(&D[0], 4, 3, thrust::raw_pointer_cast( &L[0]));
-
-	printD(D);
+	printD(D, 4);
 }
 
 // Set a row/col to a specific value
@@ -246,7 +246,7 @@ void test_set_row_col()
 
 void main()
 {
-	test_set_row_col();
+	//test_set_row_col();
 	test_batch();
 	//test_babel();
 	//test_exp_double();

@@ -231,8 +231,9 @@ public class Thrust
 	{
 		return ThrustNative.copy_host_to_device(new IntPointer(labels), labels.length);
 	}
-	// Add this identical method with ThrustNative to force recompilation
-    public static native void gpu_free(@ByPtr IntPointer device);
+	// Add this native method (identical in ThrustNative) to force recompilation
+	public static native void gpu_free(@ByPtr IntPointer device);
+	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
     
     // Set the last row of a matrix to 1
     public static void set_last_row_one(FloatMat x)

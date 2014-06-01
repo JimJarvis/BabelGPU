@@ -131,6 +131,7 @@ public class ThrustNative
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
     public static native void gpu_free(@ByPtr IntPointer device);
+	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
     
     
     //**************************************************/

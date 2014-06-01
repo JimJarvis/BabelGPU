@@ -251,6 +251,8 @@ namespace MyGpu
 	{ return begin + offset; }
 	inline device_ptr<double> offset_double(device_ptr<double> begin, int offset)
 	{ return begin + offset; }
+	inline int * offset(int *begin, int offset)
+	{ return begin + offset; }
 
 	// Utility for setting blockDim and gridDim (1D). A block cannot have more than 1024 threads
 	// number of threads needed, 2 output params
@@ -284,11 +286,11 @@ namespace MyGpu
 	__global__
 	void gpu_fill_row_float_kernel(float *begin, int row, int col, int rowIdx, float val)
 	{
-			ThreadIndex1D(idx, col);
+		ThreadIndex1D(idx, col);
 
-			begin += row * idx + rowIdx; // end of a column
-			*begin = val; // set the value
-		}
+		begin += row * idx + rowIdx; // end of a column
+		*begin = val; // set the value
+	}
 
 	// The specified row will be set to a specific value
 	// negative 'rowIdx' means counting from the last row (-n => row - n)

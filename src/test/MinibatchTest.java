@@ -1,5 +1,7 @@
 package test;
 
+import java.util.Arrays;
+
 import utils.*;
 import gpu.*;
 
@@ -28,9 +30,15 @@ public class MinibatchTest
 		csv = new CsvReader("input_X.txt");
 		FloatMat X = new FloatMat(csv.readFloatVec(true), ROW, COL);
 		csv = new CsvReader("input_Y.txt");
-		int[] labels = csv.readIntVec(true);
+		int[] labelstmp = csv.readIntVec(true);
+        // add 3 garbages values at the beginning to test Thrust.offset()
+		int[] labels = new int[labelstmp.length + 3];  
+		labels[0] = -1000; labels[1] = -2000; labels[2] = -3000;
+		for (int i = 0; i < labelstmp.length; i ++)
+			labels[i + 3] = labelstmp[i];
 		
 		IntPointer labelsDevice = Thrust.copy_host_to_device(labels);
+		labelsDevice = Thrust.offset(labelsDevice, 3);
 		Thrust.babel_batch_id_minus_softmax_float(X, labelsDevice);
 		
 		GpuUtil.checkGold(X, "gold_MB", "Mini-batch", TOL);
