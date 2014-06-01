@@ -271,5 +271,5 @@ public class Thrust
 	}
 	// force javacpp recompilation
 	public static native void gpu_free(@ByPtr IntPointer device);
-	
+	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);	
 }
