@@ -107,15 +107,6 @@ inline void babel_batch_id_minus_softmax_float(
 	}
 }
 
-// for babel_batch_id_minus_softmax_float: deal with JavaCpp int pointer
-inline int *copy_host_to_device(int *host, int size)
-{
-	int *device;
-	size *= sizeof(int);
-	cudaMalloc((void **)&device, size);
-	cudaMemcpy(device, host, size, cudaMemcpyHostToDevice);
-	return device;
-}
 
 
 }

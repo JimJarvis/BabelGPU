@@ -251,12 +251,24 @@ namespace MyGpu
 	{ return begin + offset; }
 	inline device_ptr<double> offset_double(device_ptr<double> begin, int offset)
 	{ return begin + offset; }
-	inline int * offset(int *begin, int offset)
-	{ return begin + offset; }
 
-	inline void gpu_free(int *device) { cudaFree(device); }
-	inline void gpu_free(float *device) { cudaFree(device); }
-	inline void gpu_free(double *device) { cudaFree(device); }
+// Deal with int, float, and double raw GPU pointers
+#define GEN_raw_pointer_func(Ftype) \
+	inline Ftype* offset(Ftype *begin, int offset) \
+	{ return begin + offset; } \
+	inline void gpu_free(Ftype *device) { cudaFree(device); } \
+	inline Ftype *copy_host_to_device(Ftype *host, int size) \
+	{ \
+		Ftype *device; size *= sizeof(Ftype); \
+		cudaMalloc((void **)&device, size); \
+		cudaMemcpy(device, host, size, cudaMemcpyHostToDevice); \
+		return device; \
+	}
+
+	GEN_raw_pointer_func(int);
+	GEN_raw_pointer_func(float);
+	GEN_raw_pointer_func(double);
+
 
 	// Utility for setting blockDim and gridDim (1D). A block cannot have more than 1024 threads
 	// number of threads needed, 2 output params
