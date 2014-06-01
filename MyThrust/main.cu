@@ -263,6 +263,13 @@ void test_softmax_batch()
 	device_vector<float> out(4);
 	babel_batch_softmax_float(&D[0], 3, 4, &out[0], lp);
 	printD(out, 1);
+
+	const int SIZE = 1946;
+	float y[SIZE];
+	for (int i = 0; i < SIZE; y[i] = float(rand()) / RAND_MAX, i++);
+	D = getDf(y, SIZE);
+	babel_batch_softmax_float(&D[0], 2, SIZE/2);
+	//printD(D, 32);
 }
 
 

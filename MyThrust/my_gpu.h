@@ -287,14 +287,22 @@ namespace MyGpu
 			gridDim.x = threads / 1024 + 1;
 			blockDim.x = 1024;
 		}
-		else
-			blockDim.x = threads;
+		else // try to make block dim a multiple of 32 to conform with 'warp'
+		{
+			if (threads % 32 == 0) blockDim.x = threads;
+			else blockDim.x = (threads / 32 + 1) * 32;
+		}
 	}
 
 // Should be used inside kernel functions only
 #define ThreadIndex1D(idx, limit) \
 	int idx = blockIdx.x * blockDim.x + threadIdx.x; \
 	if (idx >= limit) return; // out of bound
+
+// because kernel<<<>>> doesn't return anything, we need another way to get the error code
+#define DebugKernel \
+	cudaDeviceSynchronize(); \
+	printf("Kernel launch: %s\n", cudaGetErrorString(cudaGetLastError()));
 
 
 	// The specified col will be set to a specific value

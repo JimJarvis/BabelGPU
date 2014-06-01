@@ -77,7 +77,8 @@ inline void babel_id_minus_softmax_float_2(device_ptr<float> begin, int size, in
 
 ///// mini-batch I [y==j] - softmax_float(alpha_vec)
 __global__ 
-void babel_batch_id_minus_softmax_kernel(float *begin, int row, int col, int *labels)
+void babel_batch_id_minus_softmax_kernel(
+		float *begin, int row, int col, int *labels)
 {
 	ThreadIndex1D(idx, col);
 
@@ -152,9 +153,7 @@ inline void babel_batch_softmax_float(
 	device_ptr<float> begin, int row, int col)
 {
 	if (col == 1) // use the thrust version
-	{
 		babel_softmax_float(begin, row);
-	}
 	else // real batch
 	{
 		dim3 gridDim, blockDim;
@@ -167,7 +166,8 @@ inline void babel_batch_softmax_float(
 
 ///// mini-batch softmax_float(alpha_vec) that writes to 'out' only the probability at the correct label
 __global__
-void babel_batch_softmax_kernel(float *begin, int row, int col, float *out, int *labels)
+void babel_batch_softmax_kernel(
+	float *begin, int row, int col, float *out, int *labels)
 {
 	ThreadIndex1D(idx, col);
 
