@@ -336,5 +336,11 @@ namespace MyGpu
 		gpu_fill_row_float_kernel<<<gridDim, blockDim>>>(
 			thrust::raw_pointer_cast(begin), row, col, rowIdx, val);
 	}
+
+
+	inline void test_array(int dudulu[], int size)
+	{
+		for (int i = 0; i < size; i++) dudulu[i] *= 3;
+	}
 }
 #endif // try_h__

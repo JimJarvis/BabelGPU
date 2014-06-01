@@ -130,9 +130,11 @@ public class ThrustNative
     public static native void babel_batch_id_minus_softmax_float(@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
-    public static native void gpu_free(@ByPtr IntPointer device);
+    public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
+    public static native void free_device(@ByPtr IntPointer device);
+    public static native void free_host(@ByPtr IntPointer host);
 	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
-    
+	
     
     //**************************************************/
 	//******************* DOUBLE *******************/

@@ -221,6 +221,7 @@ public class Thrust
 	
 	/**
 	 * Minibatch: I[y == j] - softmax(alpha_vec)
+	 * @param labels must be alread on GPU. Call copy_host_to_device().
 	 */
 	public static void babel_batch_id_minus_softmax_float(FloatMat x, IntPointer labels)
 	{
@@ -232,7 +233,10 @@ public class Thrust
 		return ThrustNative.copy_host_to_device(new IntPointer(labels), labels.length);
 	}
 	// Add this native method (identical in ThrustNative) to force recompilation
-	public static native void gpu_free(@ByPtr IntPointer device);
+    public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
+    public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
+    public static native void free_device(@ByPtr IntPointer device);
+    public static native void free_host(@ByPtr IntPointer host);
 	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
     
     // Set the last row of a matrix to 1

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 main="test/BabelFloatTest"
-main="test/MiscTest"
 main="test/MinibatchTest"
+main="test/MiscTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/

@@ -3,6 +3,7 @@ package test;
 import gpu.FloatMat;
 import gpu.GpuBlas;
 import gpu.Thrust;
+import gpu.ThrustNative;
 import utils.GpuUtil;
 import utils.PP;
 

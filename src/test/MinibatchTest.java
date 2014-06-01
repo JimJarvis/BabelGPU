@@ -43,7 +43,7 @@ public class MinibatchTest
 		
 		GpuUtil.checkGold(X, "gold_MB", "Mini-batch", TOL);
 		
-		Thrust.gpu_free(labelsDevice);
+		Thrust.free_device(labelsDevice);
 	}
 
 }
