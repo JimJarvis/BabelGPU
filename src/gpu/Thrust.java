@@ -253,7 +253,7 @@ public class Thrust
      */
 	public static void babel_id_minus_softmax_float(FloatMat x, int id) throws GpuException
 	{
-		ThrustNative.babel_id_minus_softmax_float(x.getThrustPointer(), x.size(), id);
+		ThrustNative.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
 	
 	/**
@@ -262,14 +262,71 @@ public class Thrust
 	 */
 	public static void babel_batch_id_minus_softmax_float(FloatMat x, IntPointer labels) throws GpuException
 	{
-		ThrustNative.babel_batch_id_minus_softmax_float(x.getThrustPointer(), x.numRows, x.numCols, labels);
+		ThrustNative.babel_batch_id_minus_softmax(x.getThrustPointer(), x.numRows, x.numCols, labels);
 	}
 	// helper
 	public static IntPointer copy_host_to_device(int[] labels)
 	{
 		return ThrustNative.copy_host_to_device(new IntPointer(labels), labels.length);
 	}
-	// force javacpp recompilation
-	public static native void gpu_free(@ByPtr IntPointer device);
-	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);	
+	
+	   // Set the last row of a matrix to 1
+    public static void set_last_row_one(FloatMat x) throws GpuException
+    {
+    	fill_row(x, -1, 1);
+    }
+    
+    /**
+     * Minibatch: softmax(alpha_vec)
+     * @throws GpuException 
+     */
+    public static void babel_batch_softmax(FloatMat x) throws GpuException
+    {
+    	ThrustNative.babel_batch_softmax(x.getThrustPointer(), x.numRows, x.numCols);
+    }
+
+    /**
+     * Minibatch: softmax(alpha_vec)
+     * @param out writes to 'out' with probability only at the correct label of a column
+	 * @param labels must be already on GPU. Call copy_host_to_device().
+     * @throws GpuException 
+     */
+    public static void babel_batch_softmax(FloatMat x, FloatMat out, IntPointer labels) throws GpuException
+    {
+    	ThrustNative.babel_batch_softmax(
+    			x.getThrustPointer(), x.numRows, x.numCols, out.getThrustPointer(), labels);
+    }
+    
+    /**
+     * Minibatch: get the labels where the maximum probability occurs
+     * @param reusedDevicePtr use malloc_device() once to malloc on GPU
+     * @param outLabels collects the maximum labels, 
+     * 				writing from 'offset', write number of labels == label of columns
+     * @throws GpuException 
+     */
+    public static void babel_best_label(
+    		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset) throws GpuException
+	{
+    	ThrustNative.babel_best_label(x.getThrustPointer(), x.numRows, x.numCols, reusedDevicePtr);
+    	ThrustNative.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.numCols);
+	}
+
+   
+    // A few duplicates from ThrustNative.java
+	// Force Thrust.java to generate code by JavaCpp
+    public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
+    /**
+     * Copy from device pointer directly to a host array, starting from 'offset'
+     */
+    public static native void copy_device_to_host(@ByPtr IntPointer device, @ByPtr int[] host, int offset, int size);
+    
+    public static native @ByPtr IntPointer malloc_device_int(int size, boolean memsetTo0);
+    /**
+     * @param memsetTo0 default false
+     */
+    public static IntPointer malloc_device_int(int size) {	return malloc_device_int(size, false); }
+    
+    public static native void free_device(@ByPtr IntPointer device);
+    public static native void free_host(@ByPtr IntPointer host);
+	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
 }
