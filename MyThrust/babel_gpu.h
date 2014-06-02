@@ -193,6 +193,7 @@ void babel_batch_softmax_kernel(
 
 // Computes the mini-batch softmax probability distribution for the full matrix
 // writes to 'out' only the probability at the correct label
+// int *labels is on GPU
 inline void babel_batch_softmax_float(
 	device_ptr<float> begin, int row, int col, device_ptr<float> out, int *labels)
 {
@@ -210,6 +211,39 @@ inline void babel_batch_softmax_float(
 		babel_batch_softmax_kernel << <gridDim, blockDim >> >(
 			thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), labels);
 	}
+}
+
+///// Fill 'outLabels' with the label corresponding to the maximum probability of a column
+__global__
+void babel_best_label_kernel(
+	float *begin, int row, int col, int *outLabels)
+{
+	ThreadIndex1D(idx, col);
+
+	begin += idx * row; // beginning of a column
+
+	// find max
+	float mx = -1e20;
+	int maxLabel = 0;
+	for (int i = 0; i < row; i++)
+		if (begin[i] > mx)
+		{
+			mx = begin[i];
+			maxLabel = i;
+		}
+	outLabels[idx] = maxLabel;
+}
+
+// Fill 'outLabels' with the label corresponding to the maximum probability of a column
+// outLabels is filled out on GPU
+inline void babel_best_label(
+	device_ptr<float> begin, int row, int col, int *outLabels)
+{
+	dim3 gridDim, blockDim;
+	setKernelDim1D(col, gridDim, blockDim);
+
+	babel_best_label_kernel<<<gridDim, blockDim>>>(
+		thrust::raw_pointer_cast(begin), row, col, outLabels);
 }
 
 }

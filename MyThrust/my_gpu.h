@@ -251,14 +251,23 @@ namespace MyGpu
 	{ return begin + offset; }
 	inline device_ptr<double> offset_double(device_ptr<double> begin, int offset)
 	{
- return begin + offset; }
+		return begin + offset;
+	}
 
-		// Deal with int, float, and double raw GPU pointers
+	// Deal with int, float, and double raw GPU pointers
 #define GEN_raw_pointer_func(Ftype) \
 	inline Ftype* offset(Ftype *begin, int offset) \
-		{ return begin + offset; } \
+	{ return begin + offset; } \
 	inline void free_device(Ftype *device) { cudaFree(device); } \
 	inline void free_host(Ftype *host) { free(host); } \
+	inline void malloc_device(Ftype *device, int size, bool memsetTo0) \
+	{  \
+		cudaMalloc((void **)&device, size * sizeof(Ftype)); \
+		if (memsetTo0) \
+			cudaMemset(device, 0, size * sizeof(Ftype)); \
+	} \
+	/* Overload memsetTo0 to false */\
+	inline void malloc_device(Ftype *device, int size) { malloc_device(device, size, false); } \
 	inline Ftype *copy_host_to_device(Ftype *host, int size) \
 	{ \
 		Ftype *device; size *= sizeof(Ftype); \
@@ -268,9 +277,15 @@ namespace MyGpu
 	} \
 	inline Ftype *copy_device_to_host(Ftype *device, int size) \
 	{ \
-		Ftype *host = (Ftype *) malloc(size * sizeof(Ftype)); \
-		cudaMemcpy(host, device, size, cudaMemcpyHostToDevice); \
+		size *= sizeof(Ftype); \
+		Ftype *host = (Ftype *)malloc(size); \
+		cudaMemcpy(host, device, size, cudaMemcpyDeviceToHost); \
 		return host; \
+	} \
+	/* Can be used to copy directly to a primitive array (JavaCpp @Ptr) */ \
+	inline void copy_device_to_host(Ftype *device, Ftype host[], int offset, int size) \
+	{ \
+		cudaMemcpy(host + offset, device, size * sizeof(Ftype), cudaMemcpyDeviceToHost); \
 	}
 
 	GEN_raw_pointer_func(int);
@@ -337,10 +352,5 @@ namespace MyGpu
 			thrust::raw_pointer_cast(begin), row, col, rowIdx, val);
 	}
 
-
-	inline void test_array(int dudulu[], int size)
-	{
-		for (int i = 0; i < size; i++) dudulu[i] *= 3;
-	}
 }
 #endif // try_h__

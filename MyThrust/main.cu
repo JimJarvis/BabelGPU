@@ -269,7 +269,12 @@ void test_softmax_batch()
 	for (int i = 0; i < SIZE; y[i] = float(rand()) / RAND_MAX, i++);
 	D = getDf(y, SIZE);
 	babel_batch_softmax_float(&D[0], 2, SIZE/2);
-	//printD(D, 32);
+
+	device_vector<int> outLabels(4);
+	float p[12] = {2, 5, 1, 3, -4, -2, 1, 0, 9, 3, -5, 6};
+	D = getDf(p, 12);
+	babel_best_label(&D[0], 4, 3, thrust::raw_pointer_cast(&outLabels[0]));
+	printD(outLabels, 1);
 }
 
 

@@ -1,5 +1,7 @@
 package test;
 
+import com.googlecode.javacpp.IntPointer;
+
 import gpu.FloatMat;
 import gpu.GpuBlas;
 import gpu.Thrust;
