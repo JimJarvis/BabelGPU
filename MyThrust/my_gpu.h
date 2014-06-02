@@ -247,12 +247,10 @@ namespace MyGpu
 	{ thrust::swap_ranges(begin, begin + size, out); }
 
 	// Utility function for java
-	inline device_ptr<float> offset_float(device_ptr<float> begin, int offset)
+	inline device_ptr<float> offset(device_ptr<float> begin, int offset)
 	{ return begin + offset; }
-	inline device_ptr<double> offset_double(device_ptr<double> begin, int offset)
-	{
-		return begin + offset;
-	}
+	inline device_ptr<double> offset(device_ptr<double> begin, int offset)
+	{ return begin + offset; }
 
 	// Deal with int, float, and double raw GPU pointers
 #define GEN_raw_pointer_func(Ftype) \
