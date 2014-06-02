@@ -138,7 +138,7 @@ public class ThrustNative
     // Only the probability at the correct label
     public static native void babel_batch_softmax(
     				@ByVal FloatDevicePointer begin, int row, int col, 
-    				@ByPtr FloatDevicePointer out, @ByPtr IntPointer labels);
+    				@ByVal FloatDevicePointer out, @ByPtr IntPointer labels);
 
     // The best labels
     public static native void babel_best_label(
@@ -150,7 +150,8 @@ public class ThrustNative
     // NOTE: @Ptr can directly map to java primitive array types!!!!
     public static native void copy_device_to_host(@ByPtr IntPointer device, @ByPtr int[] host, int offset, int size);
     
-    public static native void malloc_device(@ByPtr IntPointer device, int size, boolean memsetTo0);
+    public static native @ByPtr IntPointer malloc_device_int(int size, boolean memsetTo0);
+    public static native @ByPtr FloatPointer malloc_device_float(int size, boolean memsetTo0);
     public static native void free_device(@ByPtr IntPointer device);
     public static native void free_host(@ByPtr IntPointer host);
 	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);

@@ -260,13 +260,14 @@ public class Thrust
     /**
      * Minibatch: get the labels where the maximum probability occurs
      * @param reusedDevicePtr use malloc_device() once to malloc on GPU
-     * @param outLabels collects the maximum labels, writing from 'offset'
+     * @param outLabels collects the maximum labels, 
+     * 				writing from 'offset', write number of labels == label of columns
      */
     public static void babel_best_label(
-    		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset, int size)
+    		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset)
 	{
     	ThrustNative.babel_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
-    	ThrustNative.copy_device_to_host(reusedDevicePtr, outLabels, offset, size);
+    	ThrustNative.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.col);
 	}
 
    
@@ -278,11 +279,11 @@ public class Thrust
      */
     public static native void copy_device_to_host(@ByPtr IntPointer device, @ByPtr int[] host, int offset, int size);
     
-    public static native void malloc_device(@ByPtr IntPointer device, int size, boolean memsetTo0);
+    public static native @ByPtr IntPointer malloc_device_int(int size, boolean memsetTo0);
     /**
      * @param memsetTo0 default false
      */
-    public static void malloc_device(IntPointer device, int size) {	malloc_device(device, size, false); }
+    public static IntPointer malloc_device_int(int size) {	return malloc_device_int(size, false); }
     
     public static native void free_device(@ByPtr IntPointer device);
     public static native void free_host(@ByPtr IntPointer host);

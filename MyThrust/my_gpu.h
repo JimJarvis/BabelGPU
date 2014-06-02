@@ -260,11 +260,13 @@ namespace MyGpu
 	{ return begin + offset; } \
 	inline void free_device(Ftype *device) { cudaFree(device); } \
 	inline void free_host(Ftype *host) { free(host); } \
-	inline void malloc_device(Ftype *device, int size, bool memsetTo0) \
+	inline Ftype* malloc_device_##Ftype(int size, bool memsetTo0) \
 	{  \
+		Ftype *device; \
 		cudaMalloc((void **)&device, size * sizeof(Ftype)); \
 		if (memsetTo0) \
 			cudaMemset(device, 0, size * sizeof(Ftype)); \
+		return device; \
 	} \
 	inline Ftype *copy_host_to_device(Ftype *host, int size) \
 	{ \

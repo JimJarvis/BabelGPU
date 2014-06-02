@@ -12,6 +12,12 @@ void printD(T D)
 	for (int i = 0; i < D.size(); i++)
 		pr( "D[" << i << "] = " << D[i]);
 }
+template<typename T>
+void printH(T D, int size)
+{
+	for (int i = 0; i < size; i++)
+		pr("H[" << i << "] = " << D[i]);
+}
 
 // column major printing
 template<typename T>
@@ -273,8 +279,13 @@ void test_softmax_batch()
 	device_vector<int> outLabels(4);
 	float p[12] = {2, 5, 1, 3, -4, -2, 1, 0, 9, 3, -5, 6};
 	D = getDf(p, 12);
-	babel_best_label(&D[0], 4, 3, thrust::raw_pointer_cast(&outLabels[0]));
+	lp = thrust::raw_pointer_cast(&outLabels[0]);
+	babel_best_label(&D[0], 4, 3, lp);
 	printD(outLabels, 1);
+
+	int outLabelHost[10];
+	copy_device_to_host(lp, outLabelHost, 5, 3);
+	printH(outLabelHost, 10);
 }
 
 
