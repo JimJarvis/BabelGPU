@@ -37,7 +37,7 @@ public class ThrustStruct
         }
         public FloatDevicePointer offset(int n)
         {		
-        	return ThrustNative.offset_float(this, n);
+        	return ThrustNative.offset(this, n);
         }
         
         private native void allocate(FloatPointer ptr);

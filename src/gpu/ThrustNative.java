@@ -99,7 +99,7 @@ public class ThrustNative
     /**
      *  Utility: pointer += offset, advance the GPU pointer
      */
-    public static native @ByVal FloatDevicePointer offset_float(@ByVal FloatDevicePointer begin, int offset);
+    public static native @ByVal FloatDevicePointer offset(@ByVal FloatDevicePointer begin, int offset);
     
     /**
      *  Set a specified row of a column-major matrix to be the same value
