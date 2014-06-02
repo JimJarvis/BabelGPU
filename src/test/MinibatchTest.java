@@ -1,7 +1,5 @@
 package test;
 
-import java.util.Arrays;
-
 import utils.*;
 import gpu.*;
 
