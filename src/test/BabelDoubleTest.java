@@ -88,7 +88,7 @@ public class BabelDoubleTest
 			/*
 			 * Step3: get Id[y==j] - P(yj | x, Theta)
 			 */
-			Thrust.babel_id_minus_softmax_double(A, Y[s]);
+			Thrust.babel_id_minus_softmax(A, Y[s]);
 			jbabel_id_minus_softmax(jA, Y[s]);
 			
 			// Step3: update Theta

@@ -266,8 +266,6 @@ namespace MyGpu
 		if (memsetTo0) \
 			cudaMemset(device, 0, size * sizeof(Ftype)); \
 	} \
-	/* Overload memsetTo0 to false */\
-	inline void malloc_device(Ftype *device, int size) { malloc_device(device, size, false); } \
 	inline Ftype *copy_host_to_device(Ftype *host, int size) \
 	{ \
 		Ftype *device; size *= sizeof(Ftype); \

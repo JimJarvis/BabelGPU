@@ -111,26 +111,46 @@ public class ThrustNative
     /**
      *  Set a specified row of a column-major matrix to be the same value
      */
-    public static native void gpu_fill_row_float(@ByVal FloatDevicePointer begin, int row, int col, int rowIdx, float val);
+    public static native void gpu_fill_row_float(
+    		@ByVal FloatDevicePointer begin, int row, int col, int rowIdx, float val);
     /**
      *  Set a specified col of a  column-major matrix to be the same value
      */
-    public static native void gpu_fill_col_float(@ByVal FloatDevicePointer begin, int row, int col, int colIdx, float val);
+    public static native void gpu_fill_col_float(
+    		@ByVal FloatDevicePointer begin, int row, int col, int colIdx, float val);
     
     
     // ******************** Babel specific methods ****************** /
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-    public static native void babel_id_minus_softmax_float(@ByVal FloatDevicePointer begin, int size, int id);
+    public static native void babel_id_minus_softmax(@ByVal FloatDevicePointer begin, int size, int id);
     // version 2: more calculation, might be more numerically stable
-    public static native void babel_id_minus_softmax_float_2(@ByVal FloatDevicePointer begin, int size, int id);
+    public static native void babel_id_minus_softmax_2(@ByVal FloatDevicePointer begin, int size, int id);
     
     // For minibatch
-    public static native void babel_batch_id_minus_softmax_float(@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);
+    public static native void babel_batch_id_minus_softmax(
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);
+    
+    // To calculate softmax() only, no subtraction from id[]
+    public static native void babel_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col);
+
+    // Only the probability at the correct label
+    public static native void babel_batch_softmax(
+    				@ByVal FloatDevicePointer begin, int row, int col, 
+    				@ByPtr FloatDevicePointer out, @ByPtr IntPointer labels);
+
+    // The best labels
+    public static native void babel_best_label(
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer outLabels);
+    
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
     public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
+    // NOTE: @Ptr can directly map to java primitive array types!!!!
+    public static native void copy_device_to_host(@ByPtr IntPointer device, @ByPtr int[] host, int offset, int size);
+    
+    public static native void malloc_device(@ByPtr IntPointer device, int size, boolean memsetTo0);
     public static native void free_device(@ByPtr IntPointer device);
     public static native void free_host(@ByPtr IntPointer host);
 	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
@@ -238,5 +258,5 @@ public class ThrustNative
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-    public static native void babel_id_minus_softmax_double(@ByVal DoubleDevicePointer begin, int size, int id);
+    public static native void babel_id_minus_softmax(@ByVal DoubleDevicePointer begin, int size, int id);
 }

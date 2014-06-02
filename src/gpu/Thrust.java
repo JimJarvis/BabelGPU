@@ -209,42 +209,85 @@ public class Thrust
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-	public static void babel_id_minus_softmax_float(FloatMat x, int id)
+	public static void babel_id_minus_softmax(FloatMat x, int id)
 	{
-		ThrustNative.babel_id_minus_softmax_float(x.getThrustPointer(), x.size(), id);
+		ThrustNative.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
 	// version 2: more calculation, might be more numerically stable
-	public static void babel_id_minus_softmax_float_2(FloatMat x, int id)
+	public static void babel_id_minus_softmax_2(FloatMat x, int id)
 	{
-		ThrustNative.babel_id_minus_softmax_float_2(x.getThrustPointer(), x.size(), id);
+		ThrustNative.babel_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
 	}
 	
 	/**
 	 * Minibatch: I[y == j] - softmax(alpha_vec)
-	 * @param labels must be alread on GPU. Call copy_host_to_device().
+	 * @param labels must be already on GPU. Call copy_host_to_device().
 	 */
-	public static void babel_batch_id_minus_softmax_float(FloatMat x, IntPointer labels)
+	public static void babel_batch_id_minus_softmax(FloatMat x, IntPointer labels)
 	{
-		ThrustNative.babel_batch_id_minus_softmax_float(x.getThrustPointer(), x.row, x.col, labels);
+		ThrustNative.babel_batch_id_minus_softmax(x.getThrustPointer(), x.row, x.col, labels);
 	}
 	// helper
 	public static IntPointer copy_host_to_device(int[] labels)
 	{
 		return ThrustNative.copy_host_to_device(new IntPointer(labels), labels.length);
 	}
-	// Add this native method (identical in ThrustNative) to force recompilation
-    public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
-    public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
-    public static native void free_device(@ByPtr IntPointer device);
-    public static native void free_host(@ByPtr IntPointer host);
-	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
-    
     // Set the last row of a matrix to 1
     public static void set_last_row_one(FloatMat x)
     {
     	fill_row(x, -1, 1);
     }
+    
+    /**
+     * Minibatch: softmax(alpha_vec)
+     */
+    public static void babel_batch_softmax(FloatMat x)
+    {
+    	ThrustNative.babel_batch_softmax(x.getThrustPointer(), x.row, x.col);
+    }
+
+    /**
+     * Minibatch: softmax(alpha_vec)
+     * @param out writes to 'out' with probability only at the correct label of a column
+	 * @param labels must be already on GPU. Call copy_host_to_device().
+     */
+    public static void babel_batch_softmax(FloatMat x, FloatMat out, IntPointer labels)
+    {
+    	ThrustNative.babel_batch_softmax(
+    			x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), labels);
+    }
+    
+    /**
+     * Minibatch: get the labels where the maximum probability occurs
+     * @param reusedDevicePtr use malloc_device() once to malloc on GPU
+     * @param outLabels collects the maximum labels, writing from 'offset'
+     */
+    public static void babel_best_label(
+    		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset, int size)
+	{
+    	ThrustNative.babel_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
+    	ThrustNative.copy_device_to_host(reusedDevicePtr, outLabels, offset, size);
+	}
+
    
+    // A few duplicates from ThrustNative.java
+	// Force Thrust.java to generate code by JavaCpp
+    public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
+    /**
+     * Copy from device pointer directly to a host array, starting from 'offset'
+     */
+    public static native void copy_device_to_host(@ByPtr IntPointer device, @ByPtr int[] host, int offset, int size);
+    
+    public static native void malloc_device(@ByPtr IntPointer device, int size, boolean memsetTo0);
+    /**
+     * @param memsetTo0 default false
+     */
+    public static void malloc_device(IntPointer device, int size) {	malloc_device(device, size, false); }
+    
+    public static native void free_device(@ByPtr IntPointer device);
+    public static native void free_host(@ByPtr IntPointer host);
+	public static native @ByPtr IntPointer offset(@ByPtr IntPointer begin, int offset);
+    
 	
 	//**************************************************/
 	//******************* DOUBLE *******************/
@@ -420,9 +463,9 @@ public class Thrust
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-	public static void babel_id_minus_softmax_double(DoubleMat x, int id)
+	public static void babel_id_minus_softmax(DoubleMat x, int id)
 	{
-		ThrustNative.babel_id_minus_softmax_double(x.getThrustPointer(), x.size(), id);
+		ThrustNative.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
 	
 }

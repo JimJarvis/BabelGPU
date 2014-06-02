@@ -225,7 +225,7 @@ void test_id_minus_softmax()
 	pr(gpu_product_float(range));
 	pr(gpu_min_float(range));
 
-	babel_id_minus_softmax_float(range, 3);
+	babel_id_minus_softmax(range, 3);
 	printD(D);
 }
 
@@ -239,7 +239,7 @@ void test_id_minus_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	lp = offset(lp, 2);
 
-	babel_batch_id_minus_softmax_float(&D[0], 12, 1, lp);
+	babel_batch_id_minus_softmax(&D[0], 12, 1, lp);
 
 	printD(D, 4);
 }
@@ -252,7 +252,7 @@ void test_softmax_batch()
 	device_vector<float> D = getDf(x, 12);
 
 	printf("Unlabeled softmax\n");
-	babel_batch_softmax_float(&D[0], 4, 3);
+	babel_batch_softmax(&D[0], 4, 3);
 	printD(D, 4);
 
 	printf("Labeled softmax\n");
@@ -261,14 +261,14 @@ void test_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	D = getDf(x, 12);
 	device_vector<float> out(4);
-	babel_batch_softmax_float(&D[0], 3, 4, &out[0], lp);
+	babel_batch_softmax(&D[0], 3, 4, &out[0], lp);
 	printD(out, 1);
 
 	const int SIZE = 1946;
 	float y[SIZE];
 	for (int i = 0; i < SIZE; y[i] = float(rand()) / RAND_MAX, i++);
 	D = getDf(y, SIZE);
-	babel_batch_softmax_float(&D[0], 2, SIZE/2);
+	babel_batch_softmax(&D[0], 2, SIZE/2);
 
 	device_vector<int> outLabels(4);
 	float p[12] = {2, 5, 1, 3, -4, -2, 1, 0, 9, 3, -5, 6};
