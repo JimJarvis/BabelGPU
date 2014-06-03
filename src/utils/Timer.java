@@ -47,10 +47,17 @@ public class Timer
 	
 	public void readFromLast() {	readFromLast("Timer");	}
 	
+	/**
+	 * Set timing precision
+	 * default: 2 decimal places
+	 */
+	private static int prec = 2;
+	public static void setPrecision(int prec) {	Timer.prec = prec; }
+	
 	// helper
 	private void timeFormat(String event, long delta)
 	{
 		System.out.format(
-				"[%s] %.2f sec\n", event, ((double)delta)/1000);
+				"[%s] %." + Timer.prec + "f sec\n", event, ((double)delta)/1000);
 	}
 }

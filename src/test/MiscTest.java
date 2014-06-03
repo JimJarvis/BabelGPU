@@ -2,12 +2,8 @@ package test;
 
 import com.googlecode.javacpp.IntPointer;
 
-import gpu.FloatMat;
-import gpu.GpuBlas;
-import gpu.Thrust;
-import gpu.ThrustNative;
-import utils.GpuUtil;
-import utils.PP;
+import gpu.*;
+import utils.*;
 
 public class MiscTest
 {
@@ -45,5 +41,29 @@ public class MiscTest
 		GpuBlas.destroy();
 		
 //		PP.p( GpuUtil.getGpuInfo());
+		
+		GpuRand rand = new GpuRand(10);
+		FloatMat dumd = rand.genUniformFloat(10000000);
+		Timer timer = Timer.getInstance();
+		Timer.setPrecision(4);
+		timer.start();
+		float[] dumh = dumd.getHostFromDevice();
+		GpuUtil.synchronize();
+		timer.readFromLast("Copy to CPU");
+		dumd.destroy();
+		timer.start();
+		double[] dumh_ = new double[dumh.length];
+		for (int i = 0 ; i < dumh.length; i ++)
+			dumh_[i] = (double) dumh[i];
+		timer.readFromLast("Casting to double");
+		timer.start();
+		for (int i = 0 ; i < dumh.length; i ++)
+			dumh[i] = (float) dumh_[i];
+		timer.readFromLast("Casting to float");
+		FloatMat dumd_ = new FloatMat(dumh);
+		timer.start();
+		dumd_.getDeviceFromHost();
+		GpuUtil.synchronize();
+		timer.readFromLast("Copy to GPU");
 	}
 }
