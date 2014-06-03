@@ -4,7 +4,9 @@ import utils.GpuUtil;
 import utils.PP;
 import jcuda.Pointer;
 import jcuda.Sizeof;
+import jcuda.jcublas.JCublas2;
 import jcuda.jcublas.cublasHandle;
+import jcuda.runtime.JCuda;
 import static jcuda.jcublas.cublasOperation.*;
 import static jcuda.Sizeof.*;
 import static jcuda.jcublas.JCublas2.*;
@@ -23,6 +25,8 @@ public class GpuBlas
 	 */
 	public static void init()
 	{
+		JCuda.setExceptionsEnabled(true);
+		JCublas2.setExceptionsEnabled(true);
 		if (handle == null)
 		{
 			handle = new cublasHandle();
