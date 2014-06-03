@@ -311,7 +311,16 @@ public class Thrust
     	ThrustNative.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.numCols);
 	}
 
-   
+    /**
+     * @param x an array of softmax() of the correct labels
+     * @return sum of the log probability
+     * @throws GpuException 
+     */
+    public static float babel_log_prob(FloatMat x) throws GpuException
+    {
+    	return ThrustNative.babel_log_prob(x.getThrustPointer(), x.size());
+    }
+
     // A few duplicates from ThrustNative.java
 	// Force Thrust.java to generate code by JavaCpp
     public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
