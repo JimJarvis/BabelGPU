@@ -7,7 +7,7 @@ import com.googlecode.javacpp.*;
 
 public class SoftmaxTest
 {
-	private static final float TOL = 1e-5f;
+	private static final float TOL = 1e-9f;
 	
 	private static int ROW;
 	private static int COL;
@@ -45,6 +45,14 @@ public class SoftmaxTest
 		FloatMat maxProbs = new FloatMat(1, COL, false);
 		Thrust.babel_batch_softmax(X, maxProbs, labelsDevice);
 		GpuUtil.checkGold(maxProbs, "gold_softmax_labeled", "softmax(correct label)", TOL);
+		
+		// compute sum of log likelihood
+		float logProb = Thrust.babel_log_prob(maxProbs);
+		float goldLogProb = new CsvReader("gold_log_prob.txt").readFloatVec(true)[0];
+		
+		PP.p("[log likelihood] " + 
+				(Math.abs(goldLogProb - logProb) < TOL ? "PASS" : "FAIL"));
+		
 		X.destroy();	maxProbs.destroy();
 
 		/**

@@ -269,6 +269,15 @@ public class Thrust
     	ThrustNative.babel_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
     	ThrustNative.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.col);
 	}
+    
+    /**
+     * @param x an array of softmax() of the correct labels
+     * @return sum of the log probability
+     */
+    public static float babel_log_prob(FloatMat x)
+    {
+    	return ThrustNative.babel_log_prob(x.getThrustPointer(), x.size());
+    }
 
    
     // A few duplicates from ThrustNative.java

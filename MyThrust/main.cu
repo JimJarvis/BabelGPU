@@ -269,6 +269,8 @@ void test_softmax_batch()
 	device_vector<float> out(4);
 	babel_batch_softmax(&D[0], 3, 4, &out[0], lp);
 	printD(out, 1);
+	printf("Log likelihood sum: %f\n", 
+		   babel_log_prob(&out[0], out.size()));
 
 	const int SIZE = 1946;
 	float y[SIZE];

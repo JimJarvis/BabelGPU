@@ -26,6 +26,9 @@ dlm(res, 'gold_softmax');
 res = batch_softmax(X, row, col, Y);
 dlm(res, 'gold_softmax_labeled');
 
+% sum of log likelihood
+dlm(sum(log(res)), 'gold_log_prob');
+
 % The best labels from X
 [~, labelIdx] = max(reshape(X, row, col), [], 1);
 labelIdx = labelIdx - 1;

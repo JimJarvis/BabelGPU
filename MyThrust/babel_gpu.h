@@ -69,7 +69,7 @@ inline void babel_id_minus_softmax_2(device_ptr<float> begin, int size, int id)
 
 	float logsum = log(
 		thrust::transform_reduce(begin, begin + size,
-		functor_exp_float_1(-mx), 0.0f, thrust::plus<float>()));
+		functor_exp_float_1(-mx), 0.0, thrust::plus<float>()));
 
 	thrust::transform(begin, begin + size, begin, functor_id_minus_softmax_2(mx + logsum));
 	++ *(begin + id);  // when at id, x = 1 - x
@@ -244,6 +244,14 @@ inline void babel_best_label(
 
 	babel_best_label_kernel<<<gridDim, blockDim>>>(
 		thrust::raw_pointer_cast(begin), row, col, outLabels);
+}
+
+// Sum of log of correct label probability
+// input: a float array computed by softmax()
+inline float babel_log_prob(device_ptr<float> begin, int size)
+{
+	return thrust::transform_reduce(begin, begin + size,
+						 functor_log_float(), 0.0, thrust::plus<float>());
 }
 
 }
