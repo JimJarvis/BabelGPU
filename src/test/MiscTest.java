@@ -1,7 +1,5 @@
 package test;
 
-import com.googlecode.javacpp.IntPointer;
-
 import gpu.*;
 import utils.*;
 
