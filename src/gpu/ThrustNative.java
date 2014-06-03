@@ -135,6 +135,9 @@ public class ThrustNative
     public static native void babel_best_label(
     		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer outLabels);
     
+    // Sum of log probability from the correct label
+    public static native float babel_log_prob(@ByVal FloatDevicePointer begin, int size);
+    
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
     public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
