@@ -245,9 +245,17 @@ void test_id_minus_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	lp = offset(lp, 2);
 
-	babel_batch_id_minus_softmax(&D[0], 12, 1, lp);
-
+	babel_batch_id_minus_softmax(&D[0], 4, 3, lp);
 	printD(D, 4);
+
+	D = getDf(x, 12);
+	device_vector<float> outLogProb(3);
+	float sumLogProb =
+		babel_batch_id_minus_softmax_log_prob(
+			&D[0], 4, 3, &outLogProb[0], lp);
+	printD(D, 4);
+	printD(outLogProb, 1);
+	printf("Sum of log prob %f\n", sumLogProb);
 }
 
 
@@ -291,14 +299,16 @@ void test_softmax_batch()
 }
 
 
-void main()
+int main()
 {
-	//test_id_minus_softmax_batch();
-	test_softmax_batch();
+	test_id_minus_softmax_batch();
+	//test_softmax_batch();
 	//test_set_row_col();
 	//test_exp_double();
 	//test_sort_copy_swap_double();
 	//test_exp();
 	//test_exp_out_pointer();
 	//test_sort_copy_swap();
+
+	return 0;
 }

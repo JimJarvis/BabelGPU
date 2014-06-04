@@ -279,6 +279,17 @@ public class Thrust
     	return ThrustNative.babel_log_prob(x.getThrustPointer(), x.size());
     }
 
+    /**
+     * Combines babel_batch_id_minus_softmax with babel_log_prob
+     * @param outLogProb records log probability at the correct label of each column
+     * 			can be used as temporary storage.
+     */
+    public static float babel_batch_id_minus_softmax_log_prob(
+    		FloatMat x, FloatMat outLogProb, IntPointer labels)
+    {
+    	return ThrustNative.babel_batch_id_minus_softmax_log_prob(
+    			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
+    }
    
     // A few duplicates from ThrustNative.java
 	// Force Thrust.java to generate code by JavaCpp

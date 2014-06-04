@@ -75,19 +75,28 @@ inline void babel_id_minus_softmax_2(device_ptr<float> begin, int size, int id)
 	++ *(begin + id);  // when at id, x = 1 - x
 }
 
-///// mini-batch I [y==j] - softmax(alpha_vec)
-__global__ 
-void babel_batch_id_minus_softmax_kernel(
-		float *begin, int row, int col, int *labels)
+/**********************************************/
+/* Common device functions used in kernels  */
+/**********************************************/
+__inline__ __device__ 
+float max_kernel(float *begin, int size)
 {
-	ThreadIndex1D(idx, col);
+	// find max
+	float mx = -1e20;
+	for (int i = 0; i < size; i++)
+		if (begin[i] > mx) mx = begin[i];
+	return mx;
+}
 
+// Used in 2 other kernels
+// return the probability (before log()) at the correct label
+__inline__ __device__
+float id_minus_softmax_kernel(int idx, float *begin, int row, int col, int *labels)
+{
 	begin += idx * row; // beginning of a column
 
 	// find max
-	float mx = -1e20;
-	for (int i = 0; i < row; i++)
-		if (begin[i] > mx) mx = begin[i];
+	float mx = max_kernel(begin, row);
 	// subtract max from each and do exp
 	// also compute sum of these exp
 	float sum = 0;
@@ -101,7 +110,19 @@ void babel_batch_id_minus_softmax_kernel(
 		begin[i] /= -sum;
 
 	// Add 1 to the identity function
+	float probCorrect = -begin[labels[idx]];
 	++begin[labels[idx]];
+	return probCorrect;
+}
+
+///// mini-batch I [y==j] - softmax(alpha_vec)
+__global__
+void babel_batch_id_minus_softmax_kernel(
+		float *begin, int row, int col, int *labels)
+{
+	ThreadIndex1D(idx, col);
+
+	id_minus_softmax_kernel(idx, begin, row, col, labels);
 }
 
 inline void babel_batch_id_minus_softmax(
@@ -123,6 +144,32 @@ inline void babel_batch_id_minus_softmax(
 	}
 }
 
+///// id-softmax AND return the sum of log probability.
+// combine babel_batch_id_minus_softmax and babel_log_prob
+__global__
+void babel_batch_id_minus_softmax_log_prob_kernel(
+	float *begin, int row, int col, float *outLogProb, int *labels)
+{
+	ThreadIndex1D(idx, col);
+
+	outLogProb[idx] = log(
+		id_minus_softmax_kernel(idx, begin, row, col, labels));
+}
+
+// Computes the id - softmax() for each column, and return the sum of the log prob at the correct labels
+// writes the log probability at the correct labels to 'outLogProb'
+inline float babel_batch_id_minus_softmax_log_prob(
+	device_ptr<float> begin, int row, int col, device_ptr<float> outLogProb, int *labels)
+{
+	dim3 gridDim, blockDim;
+	setKernelDim1D(col, gridDim, blockDim);
+
+	babel_batch_id_minus_softmax_log_prob_kernel<<<gridDim, blockDim>>>(
+		thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outLogProb), labels);
+
+	return gpu_sum_float(outLogProb, col);
+}
+
 ///// mini-batch softmax(alpha_vec)
 __global__
 void babel_batch_softmax_kernel(float *begin, int row, int col)
@@ -132,9 +179,7 @@ void babel_batch_softmax_kernel(float *begin, int row, int col)
 	begin += idx * row; // beginning of a column
 
 	// find max
-	float mx = -1e20;
-	for (int i = 0; i < row; i++)
-	if (begin[i] > mx) mx = begin[i];
+	float mx = max_kernel(begin, row);
 	// subtract max from each and do exp
 	// also compute sum of these exp
 	float sum = 0;
@@ -174,9 +219,7 @@ void babel_batch_softmax_kernel(
 	begin += idx * row; // beginning of a column
 
 	// find max
-	float mx = -1e20;
-	for (int i = 0; i < row; i++)
-	if (begin[i] > mx) mx = begin[i];
+	float mx = max_kernel(begin, row);
 	// subtract max from each and do exp
 	// also compute sum of these exp
 	float sum = 0;
@@ -195,13 +238,13 @@ void babel_batch_softmax_kernel(
 // writes to 'out' only the probability at the correct label
 // int *labels is on GPU
 inline void babel_batch_softmax(
-	device_ptr<float> begin, int row, int col, device_ptr<float> out, int *labels)
+	device_ptr<float> begin, int row, int col, device_ptr<float> outProb, int *labels)
 {
 	if (col == 1) // use the thrust version
 	{
 		int label;
 		cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-		babel_softmax(begin, row, label, out);
+		babel_softmax(begin, row, label, outProb);
 	}
 	else // real batch
 	{
@@ -209,7 +252,7 @@ inline void babel_batch_softmax(
 		setKernelDim1D(col, gridDim, blockDim);
 
 		babel_batch_softmax_kernel << <gridDim, blockDim >> >(
-			thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), labels);
+			thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outProb), labels);
 	}
 }
 
