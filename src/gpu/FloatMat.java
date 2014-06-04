@@ -167,24 +167,6 @@ public class FloatMat
 			device = GpuBlas.hostToCublasFloat(host);
 		return device;
 	}
-	
-	/**
-	 * Get the device pointer
-	 * No matter whether 'device' field is null or not, we copy host to GPU
-	 * Syncs device w.r.t. host
-	 */
-	public Pointer getDeviceFromHost()
-	{
-		if (host == null)  return null;
-		if (device != null)
-		{
-			cudaFree(device);
-			GpuBlas.hostToCublasFloat(host, device);
-		}
-		else // device is null
-    		device = GpuBlas.hostToCublasFloat(host);
-		return device;
-	}
 
 	/**
 	 * Get the host pointer
@@ -196,13 +178,31 @@ public class FloatMat
 			host = GpuBlas.cublasToHostFloat(device, size());
 		return host;
 	}
+		
+	/**
+	 * No matter whether 'device' field is null or not, we copy host to GPU
+	 * Syncs device w.r.t. host
+	 * @return device pointer
+	 */
+	public Pointer copyHostToDevice()
+	{
+		if (host == null)  return null;
+		if (device != null)
+		{
+			cudaFree(device);
+			GpuBlas.hostToCublasFloat(host, device);
+		}
+		else // device is null
+    		device = GpuBlas.hostToCublasFloat(host);
+		return device;
+	}
 	
 	/**
-	 * Get the host pointer
 	 * No matter whether 'host' field is null or not, we copy device to CPU
 	 * Syncs host w.r.t. device
+	 * @return host array
 	 */
-	public float[] getHostFromDevice()
+	public float[] copyDeviceToHost()
 	{
 		if (device == null) 	return null;
 		if (host != null)
@@ -317,7 +317,7 @@ public class FloatMat
 	public float[][] deflatten()
 	{
 		return deflatten(device == null ? 
-				getHost() : getHostFromDevice(), this.row);
+				getHost() : copyDeviceToHost(), this.row);
 	}
 	
 	/**

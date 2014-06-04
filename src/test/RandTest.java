@@ -44,7 +44,7 @@ public class RandTest
 		PP.p("Normal 2^26 floats");
 		m = rand.genNormalFloat(1 << 27, 0, 3);
 		timer.readFromLast();
-		m.getHostFromDevice();
+		m.copyDeviceToHost();
 		timer.readFromLast();
 		
 		m.destroy();
