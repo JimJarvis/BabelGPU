@@ -158,6 +158,15 @@ public class FloatMat
 	}
 	
 	/**
+	 * Set the memory of the device pointer to 0
+	 */
+	public void clearDevice()
+	{
+		if (device != null)
+			GpuUtil.clearDeviceFloat(device, size());
+	}
+	
+	/**
 	 * Get the device pointer
 	 * If 'device' field is currently null, we copy host to GPU
 	 */

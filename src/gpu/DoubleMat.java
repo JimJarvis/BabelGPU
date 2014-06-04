@@ -157,6 +157,15 @@ public class DoubleMat
 	public int getOriginalCol()
 	{
 		return op == CUBLAS_OP_N ? col : row;
+	}	
+
+	/**
+	 * Set the memory of the device pointer to 0
+	 */
+	public void clearDevice()
+	{
+		if (device != null)
+			GpuUtil.clearDeviceDouble(device, size());
 	}
 	
 	/**

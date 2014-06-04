@@ -19,12 +19,12 @@ public class GpuUtil
 	/**
 	 * cudaMemcpy from device pointer to host float array
 	 */
-	public static float[] deviceToHostFloat(Pointer device, int n)
+	public static float[] deviceToHostFloat(Pointer device, int size)
 	{
 		 // Copy device memory to host 
-		float[] host = new float[n];
+		float[] host = new float[size];
         cudaMemcpy(Pointer.to(host), device, 
-            n * FLOAT, cudaMemcpyDeviceToHost);
+            size * FLOAT, cudaMemcpyDeviceToHost);
         
         return host;
 	}
@@ -41,21 +41,29 @@ public class GpuUtil
 	 * Create a float array on device
 	 * @param memsetToZero true to initialize the memory to 0. Default false.
 	 */
-	public static Pointer allocDeviceFloat(int n, boolean memsetToZero)
+	public static Pointer allocDeviceFloat(int size, boolean memsetToZero)
 	{
 		Pointer p = new Pointer();
-		cudaMalloc(p, n * FLOAT);
+		cudaMalloc(p, size * FLOAT);
 		if (memsetToZero)
-    		cudaMemset(p, 0, n * FLOAT);
+    		cudaMemset(p, 0, size * FLOAT);
 		return p;
 	}
 
 	/**
 	 * Default: memset = false
 	 */
-	public static Pointer allocDeviceFloat(int n)
+	public static Pointer allocDeviceFloat(int size)
 	{
-		return allocDeviceFloat(n, false);
+		return allocDeviceFloat(size, false);
+	}
+	
+	/**
+	 * Clear the memory of a device pointer to 0
+	 */
+	public static void clearDeviceFloat(Pointer device, int size)
+	{
+		cudaMemset(device, 0, size * FLOAT);
 	}
 
 	/**
@@ -83,12 +91,12 @@ public class GpuUtil
 	/**
 	 * cudaMemcpy from device pointer to host double array
 	 */
-	public static double[] deviceToHostDouble(Pointer device, int n)
+	public static double[] deviceToHostDouble(Pointer device, int size)
 	{
 		 // Copy device memory to host 
-		double[] host = new double[n];
+		double[] host = new double[size];
         cudaMemcpy(Pointer.to(host), device, 
-            n * DOUBLE, cudaMemcpyDeviceToHost);
+            size * DOUBLE, cudaMemcpyDeviceToHost);
         
         return host;
 	}
@@ -105,21 +113,29 @@ public class GpuUtil
 	 * Create a double array on device
 	 * @param memsetToZero true to initialize the memory to 0. Default false.
 	 */
-	public static Pointer allocDeviceDouble(int n, boolean memsetToZero)
+	public static Pointer allocDeviceDouble(int size, boolean memsetToZero)
 	{
 		Pointer p = new Pointer();
-		cudaMalloc(p, n * DOUBLE);
+		cudaMalloc(p, size * DOUBLE);
 		if (memsetToZero)
-    		cudaMemset(p, 0, n * DOUBLE);
+    		cudaMemset(p, 0, size * DOUBLE);
 		return p;
 	}
 
 	/**
 	 * Default: memset = false
 	 */
-	public static Pointer allocDeviceDouble(int n)
+	public static Pointer allocDeviceDouble(int size)
 	{
-		return allocDeviceDouble(n, false);
+		return allocDeviceDouble(size, false);
+	}
+
+	/**
+	 * Clear the memory of a device pointer to 0
+	 */
+	public static void clearDeviceDouble(Pointer device, int size)
+	{
+		cudaMemset(device, 0, size * DOUBLE);
 	}
 	
 	/**
