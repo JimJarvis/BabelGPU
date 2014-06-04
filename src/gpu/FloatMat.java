@@ -261,8 +261,20 @@ public class FloatMat
 		return (this.op == cublasOperation.CUBLAS_OP_N) ? this.numCols : this.numRows;
 	}
 	
-	public void setHostArray(float[] hostArray)
+	public void setHostArray(float[] hostArray) throws BabelGpuException
 	{
+		// default is for this to be a column vector
+		if(this.hostPtr == null)
+		{
+			this.numRows = hostArray.length;
+			this.numCols = 1;
+		}
+		else if (this.size() != hostArray.length)
+		{
+			throw new BabelGpuException("Can't set host array of different size");
+		}
+		
+		this.hostArray = hostArray;
 		this.hostPtr = Pointer.to(hostArray);
 	}
 	
