@@ -155,6 +155,14 @@ public class GpuUtil
 		
 		return p;
 	}
+	
+	/**
+	 * Clear the memory of a device pointer to 0
+	 */
+	public static void clearDeviceFloat(Pointer device, int size)
+	{
+		JCuda.cudaMemset(device, 0, size * Sizeof.FLOAT);
+	}
 
 	/**
 	 * Default: memset = false

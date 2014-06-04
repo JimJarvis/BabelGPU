@@ -261,6 +261,20 @@ public class FloatMat
 		return (this.op == cublasOperation.CUBLAS_OP_N) ? this.numCols : this.numRows;
 	}
 	
+	public void setHostArray(float[] hostArray)
+	{
+		this.hostPtr = Pointer.to(hostArray);
+	}
+	
+	/**
+	 * Set the memory of the device pointer to 0
+	 */
+	public void clearDevice()
+	{
+		if (devicePtr != null)
+			GpuUtil.clearDeviceFloat(devicePtr, size());
+	}
+	
 	// HOST -> GPU
 	public void copyHostToDevice() throws GpuException
 	{
