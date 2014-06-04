@@ -195,10 +195,11 @@ public class CpuUtil
 		return s;
 	}
 	
-	public static void float2double(float[] in, double[] out)
+	public static double[] float2double(float[] in, double[] out)
 	{
 		for (int i = 0 ; i < in.length ; i++)
 			out[i] = (double) in[i];
+		return out;
 	}
 	
 	//**************************************************/
@@ -354,9 +355,10 @@ public class CpuUtil
 		return s;
 	}
 	
-	public static void double2float(double[] in, float[] out)
+	public static float[] double2float(double[] in, float[] out)
 	{
 		for (int i = 0 ; i < in.length ; i++)
 			out[i] = (float) in[i];
+		return out;
 	}
 }
