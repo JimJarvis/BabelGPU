@@ -637,6 +637,18 @@ public class FloatMat
 	}
 	
 	/**
+	 * abs(a * x + b)
+	 */
+	public FloatMat abs(float a, float b) throws GpuException
+	{
+		Thrust.abs(this, a, b); return this;
+	}
+	public FloatMat abs() throws GpuException
+	{
+		Thrust.abs(this); return this;
+	}
+	
+	/**
 	 * sqrt(a * x + b)
 	 */
 	public FloatMat sqrt(float a, float b) throws GpuException

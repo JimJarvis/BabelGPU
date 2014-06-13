@@ -62,6 +62,12 @@ public class ThrustNative
 	 */
     public static native void gpu_tan_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
     public static native void gpu_tan_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+
+	/**
+	 * tan(a*x + b) in place, or with an output pointer
+	 */
+    public static native void gpu_fabs_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_fabs_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
     
     /**
      * a * x + b linear transformation

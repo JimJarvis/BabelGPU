@@ -131,6 +131,26 @@ public class Thrust
 	}
 	
 	/**
+	 * abs(a * x + b)
+	 */
+	public static void abs(FloatMat x, float a, float b)  throws GpuException
+	{
+		gpu_fabs_float(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void abs(FloatMat x,  FloatMat out, float a, float b) throws GpuException
+	{
+		gpu_fabs_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void abs(FloatMat x) throws GpuException
+	{
+		abs(x, 1, 0); 
+	}
+	public static void abs(FloatMat x, FloatMat out) throws GpuException
+	{
+		abs(x, out, 1, 0); 
+	}
+	
+	/**
 	 * (a * x + b) ^p
 	 */
 	public static void pow(FloatMat x, float p, float a, float b) throws GpuException
