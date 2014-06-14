@@ -1,6 +1,6 @@
 %% kernel: 'gauss' or 'lap'
 %
-function W = genKernel(oldDim, newDim, lambda, kernel)
+function W = kernelApprox(oldDim, newDim, lambda, kernel)
 
 W = zeros(newDim, oldDim + 1);
 

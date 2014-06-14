@@ -1,7 +1,7 @@
 % Kernel approximation test
 %
 kernel = 'gauss';
-newDim = 10000;
+newDim = 200000;
 oldDim = 360;
 N = 1000;
 lambda = 0.001; % gamma parameter
@@ -9,7 +9,7 @@ verbose = false;
 Xmean = 3;
 
 X = rand(oldDim, N) * Xmean - Xmean/2;
-W = genKernel(oldDim, newDim, lambda, kernel);
+W = kernelApprox(oldDim, newDim, lambda, kernel);
 
 % normalize w.r.t. #samples
 X_new = cos(W * [X; ones(1, N)]) * sqrt(2/newDim);
