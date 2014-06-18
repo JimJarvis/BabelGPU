@@ -1,7 +1,7 @@
 % Kernel approximation test
 %
-kernel = 'gauss';
-newDim = 200000;
+kernel = 'cauchy';
+newDim = 10000;
 oldDim = 360;
 N = 1000;
 lambda = 0.001; % gamma parameter
