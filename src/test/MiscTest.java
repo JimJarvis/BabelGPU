@@ -45,7 +45,7 @@ public class MiscTest
 		Timer timer = Timer.getInstance();
 		Timer.setPrecision(4);
 		timer.start();
-		float[] dumh = dumd.copyDeviceToHost();
+		float[] dumh = dumd.toHostArray();
 		GpuUtil.synchronize();
 		timer.readFromLast("Copy to CPU");
 		dumd.destroy();
@@ -60,7 +60,7 @@ public class MiscTest
 		timer.readFromLast("Casting to float");
 		FloatMat dumd_ = new FloatMat(dumh);
 		timer.start();
-		dumd_.copyHostToDevice();
+		dumd_.toDevice();
 		GpuUtil.synchronize();
 		timer.readFromLast("Copy to GPU");
 	}

@@ -45,9 +45,9 @@ public class GpuBlas
 	 */
 	public static FloatMat mult(FloatMat A, FloatMat B, FloatMat C, float alpha, float beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer pb = B.getDevice();
-		Pointer pc = C.getDevice();
+		Pointer pa = A.toDevice();
+		Pointer pb = B.toDevice();
+		Pointer pc = C.toDevice();
 		// m, n, k are named according to the online documentation
 		// http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm
 		int m = A.row;
@@ -98,9 +98,9 @@ public class GpuBlas
 	 */
 	public static FloatMat multVec(FloatMat A, FloatMat x, FloatMat y, float alpha, float beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer px = x.getDevice();
-		Pointer py = y.getDevice();
+		Pointer pa = A.toDevice();
+		Pointer px = x.toDevice();
+		Pointer py = y.toDevice();
 		// Here is an inconsistency in the API
 		// m and n are the original row/col dimension
 		int m = A.getOriginalRow();
@@ -152,9 +152,9 @@ public class GpuBlas
 	 */
 	public static FloatMat add(FloatMat A, FloatMat B, FloatMat C, float alpha, float beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer pb = B.getDevice();
-		Pointer pc = C.getDevice();
+		Pointer pa = A.toDevice();
+		Pointer pb = B.toDevice();
+		Pointer pc = C.toDevice();
 		int m = A.row;
 		int n = A.col;
 
@@ -201,8 +201,8 @@ public class GpuBlas
 	public static FloatMat copy(FloatMat from, FloatMat to)
 	{
 		cublasScopy(handle, from.size(), 
-				from.getDevice(), 1, 
-				to.getDevice(), 1);
+				from.toDevice(), 1, 
+				to.toDevice(), 1);
 		return to;
 	}
 	
@@ -223,7 +223,7 @@ public class GpuBlas
 	{
 		int[] hostIdx = new int[1];
 		Pointer deviceIdx = Pointer.to(hostIdx);
-		cublasIsamax(handle, A.size(), A.getDevice(), 1, deviceIdx);
+		cublasIsamax(handle, A.size(), A.toDevice(), 1, deviceIdx);
 		cudaFree(deviceIdx);
 		return hostIdx[0] - 1; // adjust to 0-based
 	}
@@ -236,7 +236,7 @@ public class GpuBlas
 	{
 		int[] idx = new int[1];
 		Pointer idxPtr = Pointer.to(idx);
-		cublasIsamin(handle, A.size(), A.getDevice(), 1, idxPtr);
+		cublasIsamin(handle, A.size(), A.toDevice(), 1, idxPtr);
 		return idx[0] - 1; // adjust to 0-based
 	}
 	
@@ -247,7 +247,7 @@ public class GpuBlas
 	{
 		float[] val = new float[1];
 		Pointer valPtr = Pointer.to(val);
-		cublasSnrm2(handle, A.size(), A.getDevice(), 1, valPtr);
+		cublasSnrm2(handle, A.size(), A.toDevice(), 1, valPtr);
 		return val[0];
 	}
 	
@@ -260,8 +260,8 @@ public class GpuBlas
 	{
 		cublasSaxpy(handle, x.size(), 
 				GpuUtil.toFloatPointer(alpha), 
-				x.getDevice(), 1, 
-				y.getDevice(), 1);
+				x.toDevice(), 1, 
+				y.toDevice(), 1);
 		return y;
 	}
 	
@@ -284,7 +284,7 @@ public class GpuBlas
 	{
 		cublasSscal(handle, x.size(), 
 				GpuUtil.toFloatPointer(alpha), 
-				x.getDevice(), 1);
+				x.toDevice(), 1);
 		return x;
 	}
 	
@@ -296,8 +296,8 @@ public class GpuBlas
 		float[] val = new float[1];
 		Pointer valPtr = Pointer.to(val);
 		cublasSdot(handle, x.size(), 
-				x.getDevice(), 1, 
-				y.getDevice(), 1, 
+				x.toDevice(), 1, 
+				y.toDevice(), 1, 
 				valPtr);
 		return val[0];
 	}
@@ -356,9 +356,9 @@ public class GpuBlas
 	 */
 	public static DoubleMat mult(DoubleMat A, DoubleMat B, DoubleMat C, double alpha, double beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer pb = B.getDevice();
-		Pointer pc = C.getDevice();
+		Pointer pa = A.toDevice();
+		Pointer pb = B.toDevice();
+		Pointer pc = C.toDevice();
 		// m, n, k are named according to the online documentation
 		// http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm
 		int m = A.row;
@@ -409,9 +409,9 @@ public class GpuBlas
 	 */
 	public static DoubleMat multVec(DoubleMat A, DoubleMat x, DoubleMat y, double alpha, double beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer px = x.getDevice();
-		Pointer py = y.getDevice();
+		Pointer pa = A.toDevice();
+		Pointer px = x.toDevice();
+		Pointer py = y.toDevice();
 		// Here is an inconsistency in the API
 		// m and n are the original row/col dimension
 		int m = A.getOriginalRow();
@@ -463,9 +463,9 @@ public class GpuBlas
 	 */
 	public static DoubleMat add(DoubleMat A, DoubleMat B, DoubleMat C, double alpha, double beta)
 	{
-		Pointer pa = A.getDevice();
-		Pointer pb = B.getDevice();
-		Pointer pc = C.getDevice();
+		Pointer pa = A.toDevice();
+		Pointer pb = B.toDevice();
+		Pointer pc = C.toDevice();
 		int m = A.row;
 		int n = A.col;
 
@@ -512,8 +512,8 @@ public class GpuBlas
 	public static DoubleMat copy(DoubleMat from, DoubleMat to)
 	{
 		cublasDcopy(handle, from.size(), 
-				from.getDevice(), 1, 
-				to.getDevice(), 1);
+				from.toDevice(), 1, 
+				to.toDevice(), 1);
 		return to;
 	}
 	
@@ -534,7 +534,7 @@ public class GpuBlas
 	{
 		int[] hostIdx = new int[1];
 		Pointer deviceIdx = Pointer.to(hostIdx);
-		cublasIdamax(handle, A.size(), A.getDevice(), 1, deviceIdx);
+		cublasIdamax(handle, A.size(), A.toDevice(), 1, deviceIdx);
 		cudaFree(deviceIdx);
 		return hostIdx[0] - 1; // adjust to 0-based
 	}
@@ -547,7 +547,7 @@ public class GpuBlas
 	{
 		int[] idx = new int[1];
 		Pointer idxPtr = Pointer.to(idx);
-		cublasIdamin(handle, A.size(), A.getDevice(), 1, idxPtr);
+		cublasIdamin(handle, A.size(), A.toDevice(), 1, idxPtr);
 		return idx[0] - 1; // adjust to 0-based
 	}
 	
@@ -558,7 +558,7 @@ public class GpuBlas
 	{
 		double[] val = new double[1];
 		Pointer valPtr = Pointer.to(val);
-		cublasDnrm2(handle, A.size(), A.getDevice(), 1, valPtr);
+		cublasDnrm2(handle, A.size(), A.toDevice(), 1, valPtr);
 		return val[0];
 	}
 	
@@ -571,8 +571,8 @@ public class GpuBlas
 	{
 		cublasDaxpy(handle, x.size(), 
 				GpuUtil.toDoublePointer(alpha), 
-				x.getDevice(), 1, 
-				y.getDevice(), 1);
+				x.toDevice(), 1, 
+				y.toDevice(), 1);
 		return y;
 	}
 	
@@ -595,7 +595,7 @@ public class GpuBlas
 	{
 		cublasDscal(handle, x.size(), 
 				GpuUtil.toDoublePointer(alpha), 
-				x.getDevice(), 1);
+				x.toDevice(), 1);
 		return x;
 	}
 	
@@ -607,8 +607,8 @@ public class GpuBlas
 		double[] val = new double[1];
 		Pointer valPtr = Pointer.to(val);
 		cublasDdot(handle, x.size(), 
-				x.getDevice(), 1, 
-				y.getDevice(), 1, 
+				x.toDevice(), 1, 
+				y.toDevice(), 1, 
 				valPtr);
 		return val[0];
 	}

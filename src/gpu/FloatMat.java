@@ -201,6 +201,15 @@ public class FloatMat
 	}
 	
 	/**
+	 * Not recommended.
+	 * Manually set the HostMode
+	 */
+	public void setHostMode(HostMode hostMode)
+	{
+		this.hostMode = hostMode;
+	}
+	
+	/**
 	 * Copy to and return the device pointer.
 	 * If current HostMode is None, 
 	 * we take whichever hostArray or hostBuffer that isn't null
@@ -245,7 +254,8 @@ public class FloatMat
 	/**
 	 * Copy to and return host array
 	 * Conflict exception if HostMode is Buffer
-	 * if HostMode is None, set to Array
+	 * If HostMode is None, set to Array
+	 * If device is null, return current hostArray
 	 * @param forceCopy default false: if hostArray already has a value, 
 	 * simply return it. True: copy GPU to CPU no matter what
 	 */
@@ -256,7 +266,7 @@ public class FloatMat
 		else if (hostMode != HostMode.Array)
 			throw new GpuException("HostMode conflict: attempt to getHostArray while HostMode is Buffer");
 		
-		if (hostArray != null && !forceCopy)
+		if (hostArray != null && !forceCopy || device == null)
 			return hostArray;
 		if (hostArray == null) // create a new array
 			hostArray = new float[size()];
@@ -272,7 +282,8 @@ public class FloatMat
 	/**
 	 * Copy to and return host buffer
 	 * Conflict exception if HostMode is Array
-	 * if HostMode is None, set to Buffer
+	 * If HostMode is None, set to Buffer
+	 * If device is null, return current hostBuffer
 	 * @param forceCopy default false: if hostBuffer already has a value, 
 	 * simply return it. True: copy GPU to CPU no matter what
 	 */
@@ -283,7 +294,7 @@ public class FloatMat
 		else if (hostMode != HostMode.Buffer)
 			throw new GpuException("HostMode conflict: attempt to getHostBuffer while HostMode is Array");
 		
-		if (hostBuffer != null && !forceCopy)
+		if (hostBuffer != null && !forceCopy || device == null)
 			return hostBuffer;
 		if (hostBuffer == null)
 			hostBuffer = FloatBuffer.allocate(size());
@@ -353,6 +364,8 @@ public class FloatMat
 	public void destroy()
 	{
 		hostArray = null;
+		hostBuffer = null;
+		hostMode = HostMode.None;
 		if (device != null)
 		{
     		cudaFree(device);
@@ -397,13 +410,11 @@ public class FloatMat
 	
 	/**
 	 * Deflatten this to a 2D float array, column major
+	 * Always force copy to hostArray
 	 */
 	public float[][] deflatten()
 	{
-		//return deflatten(device == null ? 
-			//	getHostArray() : copyDeviceToHost(), this.row);
-		return deflatten(device == null ?
-				this.hostArray : toHostArray(true), this.row);
+		return deflatten(toHostArray(true), this.row);
 	}
 	
 	/**
