@@ -440,6 +440,28 @@ public class FloatMat
 	}
 	
 	/**
+	 */
+	public static void flattenAndTranspose(float[][] A, float[] out)
+	{
+		PP.out.println("The flatten method is super inefficient.  Don't use this in production code");
+		
+		int numRows = A.length;
+		int numCols = A[0].length;
+		int pt = 0;
+
+		for (int i = 0; i < numRows; i ++)
+			for (int j = 0; j < numCols; j ++)
+				out[pt ++] = A[i][j];
+	}
+	
+	public static float[] flattenAndTranspose(float[][] A)
+	{
+		float[] out = new float[A.length * A[0].length];
+		flattenAndTranspose(A, out);
+		return out;
+	}
+	
+	/**
 	 * Utility: deflatten the 1D hostArray into a 2D array of the appropriate dimensions.
 	 * hostArray is assumed to be in column major format.
 	 */
