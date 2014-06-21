@@ -3,7 +3,9 @@ package utils;
 import static jcuda.runtime.JCuda.*;
 import static jcuda.runtime.cudaMemcpyKind.*;
 import static jcuda.Sizeof.*;
-import static utils.CpuUtil.matAvgDiff;
+
+import java.nio.*;
+
 import gpu.*;
 import jcuda.*;
 import jcuda.jcublas.*;
@@ -17,18 +19,105 @@ public class GpuUtil
 	//******************* FLOAT *******************/
 	//**************************************************/
 	/**
+	 * cudaMemcpy from device pointer to host pointer
+	 * Main method overloaded by others
+	 */
+	public static void deviceToHostFloat(Pointer device, Pointer host, int size)
+	{
+		cudaMemcpy(host, device, 
+	            size * FLOAT, cudaMemcpyDeviceToHost);
+	}
+	
+	/**
 	 * cudaMemcpy from device pointer to host float array
+	 * @param size number of floats to copy
+	 * @return input param host array
+	 */
+	public static float[] deviceToHostFloat(Pointer device, float[] host, int size)
+	{
+		deviceToHostFloat(device, Pointer.to(host), size);
+        return host;
+	}
+
+	/**
+	 * cudaMemcpy from device pointer to host float array
+	 * @return input param host array
+	 */
+	public static float[] deviceToHostFloat(Pointer device, float[] host)
+	{
+		return deviceToHostFloat(device, host, host.length);
+	}
+
+	/**
+	 * cudaMemcpy from device pointer to host float array
+	 * @return create new host array
 	 */
 	public static float[] deviceToHostFloat(Pointer device, int size)
 	{
 		 // Copy device memory to host 
 		float[] host = new float[size];
-        cudaMemcpy(Pointer.to(host), device, 
-            size * FLOAT, cudaMemcpyDeviceToHost);
-        
-        return host;
+		return deviceToHostFloat(device, host, size);
+	}
+	
+	/**
+	 * cudaMemcpy from device pointer to host float buffer
+	 * @return input param host buffer
+	 */
+	public static FloatBuffer deviceToHostFloat(Pointer device, FloatBuffer host, int size)
+	{
+		 // Copy device memory to host 
+		deviceToHostFloat(device, Pointer.to(host), size);
+		return host;
+	}
+	
+	/**
+	 * cudaMemcpy from host pointer to devicee
+	 */
+	public static void hostToDeviceFloat(Pointer host, Pointer device, int size)
+	{
+		cudaMemcpy(device, host, 
+	            size * FLOAT, cudaMemcpyHostToDevice);
+	}
+	
+	/**
+	 * cudaMemcpy from host float[] to device
+	 * @param size number of floats to copy
+	 * @return input param device
+	 */
+	public static Pointer hostToDeviceFloat(float[] host, Pointer device, int size)
+	{
+		hostToDeviceFloat(Pointer.to(host), device, size);
+		return device;
 	}
 
+	/**
+	 * cudaMemcpy from host float[] to device
+	 * @return input param device
+	 */
+	public static Pointer hostToDeviceFloat(float[] host, Pointer device)
+	{
+		return hostToDeviceFloat(host, device, host.length);
+	}
+
+	/**
+	 * cudaMemcpy from host float[] to device
+	 * @return newly allocated device pointer
+	 */
+	public static Pointer hostToDeviceFloat(float[] host, int size)
+	{
+		return hostToDeviceFloat(host, allocDeviceFloat(size), size);
+	}
+	
+	/**
+	 * cudaMemcpy from host float buffer to device
+	 * @return input param buffer
+	 */
+	public static Pointer hostToDeviceFloat(FloatBuffer host, Pointer device, int size)
+	{
+		hostToDeviceFloat(Pointer.to(host), device, size);
+		return device;
+	}
+	
 	/**
 	 * A single float to a pointer wrapper on the host
 	 */
@@ -78,7 +167,7 @@ public class GpuUtil
 		float[][] Gold = csv.readFloatMat();
 		float[][] Host = gpu.deflatten();
 		
-		float diff = matAvgDiff(Gold, Host);
+		float diff = CpuUtil.matAvgDiff(Gold, Host);
 		PP.setPrecision(3);
 		PP.setScientific(true);
 		
@@ -89,16 +178,103 @@ public class GpuUtil
 	//******************* DOUBLE *******************/
 	//**************************************************/
 	/**
+	 * cudaMemcpy from device pointer to host pointer
+	 * Main method overloaded by others
+	 */
+	public static void deviceToHostDouble(Pointer device, Pointer host, int size)
+	{
+		cudaMemcpy(host, device, 
+	            size * DOUBLE, cudaMemcpyDeviceToHost);
+	}
+	
+	/**
 	 * cudaMemcpy from device pointer to host double array
+	 * @param size number of doubles to copy
+	 * @return input param host array
+	 */
+	public static double[] deviceToHostDouble(Pointer device, double[] host, int size)
+	{
+		deviceToHostDouble(device, Pointer.to(host), size);
+        return host;
+	}
+
+	/**
+	 * cudaMemcpy from device pointer to host double array
+	 * @return input param host array
+	 */
+	public static double[] deviceToHostDouble(Pointer device, double[] host)
+	{
+		return deviceToHostDouble(device, host, host.length);
+	}
+
+	/**
+	 * cudaMemcpy from device pointer to host double array
+	 * @return create new host array
 	 */
 	public static double[] deviceToHostDouble(Pointer device, int size)
 	{
 		 // Copy device memory to host 
 		double[] host = new double[size];
-        cudaMemcpy(Pointer.to(host), device, 
-            size * DOUBLE, cudaMemcpyDeviceToHost);
-        
-        return host;
+		return deviceToHostDouble(device, host, size);
+	}
+	
+	/**
+	 * cudaMemcpy from device pointer to host double buffer
+	 * @return input param host buffer
+	 */
+	public static DoubleBuffer deviceToHostDouble(Pointer device, DoubleBuffer host, int size)
+	{
+		 // Copy device memory to host 
+		deviceToHostDouble(device, Pointer.to(host), size);
+		return host;
+	}
+	
+	/**
+	 * cudaMemcpy from host pointer to device
+	 */
+	public static void hostToDeviceDouble(Pointer host, Pointer device, int size)
+	{
+		cudaMemcpy(device, host, 
+	            size * DOUBLE, cudaMemcpyHostToDevice);
+	}
+	
+	/**
+	 * cudaMemcpy from host double[] to device
+	 * @param size number of doubles to copy
+	 * @return input param device
+	 */
+	public static Pointer hostToDeviceDouble(double[] host, Pointer device, int size)
+	{
+		hostToDeviceDouble(Pointer.to(host), device, size);
+		return device;
+	}
+
+	/**
+	 * cudaMemcpy from host double[] to device
+	 * @return input param device
+	 */
+	public static Pointer hostToDeviceDouble(double[] host, Pointer device)
+	{
+		return hostToDeviceDouble(host, device, host.length);
+	}
+
+	/**
+	 * cudaMemcpy from host double[] to device
+	 * @return newly allocated device pointer
+	 */
+	public static Pointer hostToDeviceDouble(double[] host, int size)
+	{
+		return hostToDeviceDouble(host, allocDeviceDouble(size), size);
+	}
+	
+	/**
+	 * cudaMemcpy from host double buffer to device
+	 * @return input param buffer
+	 */
+	public static Pointer hostToDeviceDouble(DoubleBuffer host, Pointer device, int size)
+	{
+		hostToDeviceDouble(Pointer.to(host), device, size);
+		return device;
 	}
 
 	/**
@@ -150,7 +326,7 @@ public class GpuUtil
 		double[][] Gold = csv.readDoubleMat();
 		double[][] Host = gpu.deflatten();
 		
-		double diff = matAvgDiff(Gold, Host);
+		double diff = CpuUtil.matAvgDiff(Gold, Host);
 		PP.setPrecision(3);
 		PP.setScientific(true);
 		
