@@ -24,6 +24,9 @@ public class GpuUtil
 	 */
 	public static void deviceToHostFloat(Pointer device, Pointer host, int size)
 	{
+		if (device == null || host == null)
+			throw new GpuException(
+					(device == null ? "Device" : "Host") + " pointer should not be null");
 		cudaMemcpy(host, device, 
 	            size * FLOAT, cudaMemcpyDeviceToHost);
 	}
@@ -109,13 +112,31 @@ public class GpuUtil
 	}
 	
 	/**
+	 * cudaMemcpy from host float[] to device
+	 * @return newly allocated device pointer
+	 */
+	public static Pointer hostToDeviceFloat(float[] host)
+	{
+		return hostToDeviceFloat(host, host.length);
+	}
+	
+	/**
 	 * cudaMemcpy from host float buffer to device
-	 * @return input param buffer
+	 * @return input param device
 	 */
 	public static Pointer hostToDeviceFloat(FloatBuffer host, Pointer device, int size)
 	{
 		hostToDeviceFloat(Pointer.to(host), device, size);
 		return device;
+	}
+	
+	/**
+	 * cudaMemcpy from host float buffer to device
+	 * @return newly created device
+	 */
+	public static Pointer hostToDeviceFloat(FloatBuffer host, int size)
+	{
+		return hostToDeviceFloat(host, allocDeviceFloat(size), size);
 	}
 	
 	/**
@@ -268,6 +289,15 @@ public class GpuUtil
 	}
 	
 	/**
+	 * cudaMemcpy from host double[] to device
+	 * @return newly allocated device pointer
+	 */
+	public static Pointer hostToDeviceDouble(double[] host)
+	{
+		return hostToDeviceDouble(host, host.length);
+	}
+	
+	/**
 	 * cudaMemcpy from host double buffer to device
 	 * @return input param buffer
 	 */
@@ -276,7 +306,16 @@ public class GpuUtil
 		hostToDeviceDouble(Pointer.to(host), device, size);
 		return device;
 	}
-
+	
+	/**
+	 * cudaMemcpy from host double buffer to device
+	 * @return newly created device
+	 */
+	public static Pointer hostToDeviceDouble(DoubleBuffer host, int size)
+	{
+		return hostToDeviceDouble(host, allocDeviceDouble(size), size);
+	}
+	
 	/**
 	 * A single double to a pointer wrapper on the host
 	 */

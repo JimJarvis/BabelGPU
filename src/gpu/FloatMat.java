@@ -1,5 +1,7 @@
 package gpu;
 
+import java.nio.FloatBuffer;
+
 import gpu.ThrustStruct.FloatDevicePointer;
 import utils.CpuUtil.Coord;
 import utils.*;
@@ -10,12 +12,23 @@ import static jcuda.jcublas.cublasOperation.*;
 
 /**
  * Struct around a matrix with row/col dimension info
+ * HostMode: either hostArray or hostBuffer. hostArray has priority.
  */
 public class FloatMat
 {
-	private float[] host = null;
+	// Should only use either hostArray or hostBuf at a time
+	private float[] hostArray = null;
+	private FloatBuffer hostBuffer = null;
+	/**
+	 * None: everything's on device
+	 * Array: float array on host
+	 * Buffer: FloatBuffer on host
+	 */
+	public static enum HostMode {None, Array, Buffer};
+	private HostMode hostMode = HostMode.None;
+
 	private Pointer device = null; // jCuda pointer
-	private FloatDevicePointer thrustPointer = null; // Thrust pointer
+	private FloatDevicePointer thrustPtr = null; // Thrust pointer
 	
 	// This field records whether the matrix should be transposed or not
 	private int op = CUBLAS_OP_N; 
@@ -31,16 +44,17 @@ public class FloatMat
 	public FloatMat() {	}
 	
 	/**
-	 * Ctor from host data
+	 * Ctor from host array
 	 */
 	public FloatMat(float[] host, int row, int col)
 	{
-		this.host = host;
+		this.hostArray = host;
+		this.hostMode = HostMode.Array;
 		initDim(row, col);
 	}
 	
 	/**
-	 * Ctor from 2D host data
+	 * Ctor from 2D host array
 	 */
 	public FloatMat(float[][] host)
 	{
@@ -48,15 +62,33 @@ public class FloatMat
 	}
 	
 	/**
-	 * Ctor for 1D vector (column vector)
+	 * Ctor for 1D vector-array (column vector)
 	 */
 	public FloatMat(float[] host)
 	{
 		this(host, host.length, 1);
 	}
+	
+	/**
+	 * Ctor from 2D host buffer
+	 */
+	public FloatMat(FloatBuffer host, int row, int col)
+	{
+		this.hostBuffer = host;
+		this.hostMode = HostMode.Buffer;
+		initDim(row, col);
+	}
+	
+	/**
+	 * Ctor from 1D vector-buffer
+	 */
+	public FloatMat(FloatBuffer host, int len)
+	{
+		this(host, len, 1);
+	}
 
 	/**
-	 * Ctor from device data
+	 * Ctor from device pointer
 	 */
 	public FloatMat(Pointer device, int row, int col)
 	{
@@ -65,7 +97,7 @@ public class FloatMat
 	}
 	
 	/**
-	 * Ctor from device data: 1D vector (column vector)
+	 * Ctor from device pointer: 1D vector (column vector)
 	 */
 	public FloatMat(Pointer device, int len)
 	{
@@ -117,8 +149,10 @@ public class FloatMat
 		mat.ldim = this.ldim;
 		mat.op = this.op;
 		mat.device = this.device;
-		mat.host = this.host;
-		mat.thrustPointer = this.thrustPointer;
+		mat.hostArray = this.hostArray;
+		mat.hostBuffer = this.hostBuffer;
+		mat.hostMode = this.hostMode;
+		mat.thrustPtr = this.thrustPtr;
 		
 		return mat;
 	}
@@ -167,60 +201,101 @@ public class FloatMat
 	}
 	
 	/**
-	 * Get the device pointer
-	 * If 'device' field is currently null, we copy host to GPU
+	 * Copy to and return the device pointer.
+	 * If current HostMode is None, 
+	 * we take whichever hostArray or hostBuffer that isn't null
+	 * hostArray is given priority. 
+	 * Then HostMode is set to the one that isn't null
+	 * @param forceCopy default: false, only copy if device pointer is null
+	 * otherwise retrieve device without copying.
+	 * true: copy to device no matter what
 	 */
-	public Pointer getDevice()
+	public Pointer toDevice(boolean forceCopy)
 	{
-		if (device == null)
-			device = GpuBlas.hostToCublasFloat(host);
-		return device;
-	}
-
-	/**
-	 * Get the host pointer
-	 * If host is currently null, we copy device to CPU
-	 */
-	public float[] getHost()
-	{
-		if (host == null)
-			host = GpuBlas.cublasToHostFloat(device, size());
-		return host;
-	}
+		if (device != null && !forceCopy)
+			return device; // retrieve without copying
 		
-	/**
-	 * No matter whether 'device' field is null or not, we copy host to GPU
-	 * Syncs device w.r.t. host
-	 * @return device pointer
-	 */
-	public Pointer copyHostToDevice()
-	{
-		if (host == null)  return null;
-		if (device != null)
+		if (hostArray == null && hostBuffer == null)
+			throw new GpuException("At least one of hostArray and hostBuffer should not be null");
+		
+		boolean useArray = true;  // default: get device from hostArray
+		if (hostMode == HostMode.None) 
 		{
-			cudaFree(device);
-			GpuBlas.hostToCublasFloat(host, device);
+			useArray = hostArray != null;
+			hostMode = useArray ? HostMode.Array : HostMode.Buffer;
 		}
-		else // device is null
-    		device = GpuBlas.hostToCublasFloat(host);
+		else
+			useArray = hostMode == HostMode.Array;
+		
+    	if (device == null)
+    		device = GpuUtil.allocDeviceFloat(size());
+    	if (useArray)
+    		GpuUtil.hostToDeviceFloat(hostArray, device, size());
+    	else
+    		GpuUtil.hostToDeviceFloat(hostBuffer, device, size());
 		return device;
 	}
 	
 	/**
-	 * No matter whether 'host' field is null or not, we copy device to CPU
-	 * Syncs host w.r.t. device
-	 * @return host array
+	 * Copy to and return device pointer
+	 * @see FloatMat#toDevice(boolean) toDevice(false)
 	 */
-	public float[] copyDeviceToHost()
+	public Pointer toDevice() {	return toDevice(false);	}
+
+	/**
+	 * Copy to and return host array
+	 * Conflict exception if HostMode is Buffer
+	 * if HostMode is None, set to Array
+	 * @param forceCopy default false: if hostArray already has a value, 
+	 * simply return it. True: copy GPU to CPU no matter what
+	 */
+	public float[] toHostArray(boolean forceCopy)
 	{
-		if (device == null) 	return null;
-		if (host != null)
-			GpuBlas.cublasToHostFloat(device, host);
-		else // host is null
-			host = GpuBlas.cublasToHostFloat(device, size());
+		if (hostMode == HostMode.None)
+			hostMode = HostMode.Array;
+		else if (hostMode != HostMode.Array)
+			throw new GpuException("HostMode conflict: attempt to getHostArray while HostMode is Buffer");
 		
-		return host;
+		if (hostArray != null && !forceCopy)
+			return hostArray;
+		if (hostArray == null) // create a new array
+			hostArray = new float[size()];
+		return GpuUtil.deviceToHostFloat(device, hostArray, size());
 	}
+	
+	/**
+	 * Copy to and return host array
+	 * @see FloatMat#toHostArray(boolean) toHostArray(false)
+	 */
+	public float[] toHostArray() {	return toHostArray(false);	}
+	
+	/**
+	 * Copy to and return host buffer
+	 * Conflict exception if HostMode is Array
+	 * if HostMode is None, set to Buffer
+	 * @param forceCopy default false: if hostBuffer already has a value, 
+	 * simply return it. True: copy GPU to CPU no matter what
+	 */
+	public FloatBuffer toHostBuffer(boolean forceCopy)
+	{
+		if (hostMode == HostMode.None)
+			hostMode = HostMode.Buffer;
+		else if (hostMode != HostMode.Buffer)
+			throw new GpuException("HostMode conflict: attempt to getHostBuffer while HostMode is Array");
+		
+		if (hostBuffer != null && !forceCopy)
+			return hostBuffer;
+		if (hostBuffer == null)
+			hostBuffer = FloatBuffer.allocate(size());
+		return GpuUtil.deviceToHostFloat(device, hostBuffer, size());
+	}
+	
+	/**
+	 * Copy to and return host buffer
+	 * @see FloatMat#toHostBuffer(boolean) toHostBuffer(false)
+	 */
+	public FloatBuffer toHostBuffer() {	return toHostBuffer(false);	}
+	
 	
 	/**
 	 * Get a device pointer (wrapped in a FloatMat) 
@@ -232,7 +307,7 @@ public class FloatMat
 	 */
 	public FloatMat createOffset(FloatMat offMat, int offset, int size, int newRow)
 	{
-		offMat.device = this.getDevice().withByteOffset(offset * Sizeof.FLOAT);
+		offMat.device = this.toDevice().withByteOffset(offset * Sizeof.FLOAT);
 		offMat.initDim(newRow, size/newRow);
 		return offMat;
 	}
@@ -277,13 +352,13 @@ public class FloatMat
 	 */
 	public void destroy()
 	{
-		host = null;
+		hostArray = null;
 		if (device != null)
 		{
     		cudaFree(device);
     		device = null;
 		}
-		thrustPointer = null;
+		thrustPtr = null;
 	}
 	
 	/**
@@ -325,8 +400,10 @@ public class FloatMat
 	 */
 	public float[][] deflatten()
 	{
-		return deflatten(device == null ? 
-				getHost() : copyDeviceToHost(), this.row);
+		//return deflatten(device == null ? 
+			//	getHostArray() : copyDeviceToHost(), this.row);
+		return deflatten(device == null ?
+				this.hostArray : toHostArray(true), this.row);
 	}
 	
 	/**
@@ -366,13 +443,12 @@ public class FloatMat
 	 */
 	public FloatDevicePointer getThrustPointer()
 	{
-		if (thrustPointer == null)
+		if (thrustPtr == null)
 		{
-			if (device == null) // initialize device
-				this.getDevice();
-			thrustPointer = new FloatDevicePointer(this.device);
+			this.toDevice();
+			thrustPtr = new FloatDevicePointer(this.device);
 		}
-		return thrustPointer;
+		return thrustPtr;
 	}
 	
 	/**
