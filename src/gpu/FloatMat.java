@@ -319,6 +319,7 @@ public class FloatMat
 	public FloatMat createOffset(FloatMat offMat, int offset, int size, int newRow)
 	{
 		offMat.device = this.toDevice().withByteOffset(offset * Sizeof.FLOAT);
+		offMat.hostMode = this.hostMode;
 		offMat.initDim(newRow, size/newRow);
 		return offMat;
 	}
@@ -351,6 +352,23 @@ public class FloatMat
 	public FloatMat createOffset(int offset, int size)
 	{
 		return createOffset(offset, size, this.row);
+	}
+	
+	/**
+	 * createOffset from column 'start' to column 'end'
+	 */
+	public FloatMat createColOffset(FloatMat offMat, int colStart, int colEnd)
+	{
+		return createOffset(colStart * this.row, (colEnd - colStart) * this.row);
+	}
+	
+	/**
+	 * Default version of createColOffset
+	 * @return new FloatMat
+	 */
+	public FloatMat createColOffset(int colStart, int colEnd)
+	{
+		return createColOffset(new FloatMat(), colStart, colEnd);
 	}
 	
 	/**
