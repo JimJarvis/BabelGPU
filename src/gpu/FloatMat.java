@@ -38,6 +38,8 @@ public class FloatMat
 	// Doesn't change even with transpose
 	public int ldim; 
 	
+	private static boolean hostModeCheck = true; // see enableHostModeCheck() method
+	
 	/**
 	 * Default ctor
 	 */
@@ -250,6 +252,30 @@ public class FloatMat
 	 * @see FloatMat#toDevice(boolean) toDevice(false)
 	 */
 	public Pointer toDevice() {	return toDevice(false);	}
+	
+	/**
+	 * Class-wide setting
+	 * If strict check is on, you can only use one channel. 
+	 * Either array or buffer, but not both.
+	 * For example, you can't call toHostArray and toHostBuffer successively
+	 * @param hostModeCheck default true
+	 */
+	public static void enableHostModeCheck(boolean hostModeCheck)
+	{
+		FloatMat.hostModeCheck = hostModeCheck;
+	}
+	
+	// private helper, used in to/setHostArray/Buffer
+	// can be disabled by enableHostModeCheck(false)
+	private void checkHostMode(HostMode correctMode)
+	{
+		if (!hostModeCheck || hostMode == HostMode.None)
+			hostMode = correctMode;
+		else if (hostMode != correctMode)
+			throw new GpuException(
+					String.format("HostMode conflict: attempt to get %s while HostMode is %s", 
+							correctMode.toString(), hostMode.toString()));
+	}
 
 	/**
 	 * Copy to and return host array
@@ -261,10 +287,7 @@ public class FloatMat
 	 */
 	public float[] toHostArray(boolean forceCopy)
 	{
-		if (hostMode == HostMode.None)
-			hostMode = HostMode.Array;
-		else if (hostMode != HostMode.Array)
-			throw new GpuException("HostMode conflict: attempt to getHostArray while HostMode is Buffer");
+		checkHostMode(HostMode.Array);
 		
 		if (hostArray != null && !forceCopy || device == null)
 			return hostArray;
@@ -289,10 +312,7 @@ public class FloatMat
 	 */
 	public FloatBuffer toHostBuffer(boolean forceCopy)
 	{
-		if (hostMode == HostMode.None)
-			hostMode = HostMode.Buffer;
-		else if (hostMode != HostMode.Buffer)
-			throw new GpuException("HostMode conflict: attempt to getHostBuffer while HostMode is Array");
+		checkHostMode(HostMode.Buffer);
 		
 		if (hostBuffer != null && !forceCopy || device == null)
 			return hostBuffer;
@@ -307,6 +327,25 @@ public class FloatMat
 	 */
 	public FloatBuffer toHostBuffer() {	return toHostBuffer(false);	}
 	
+	/**
+	 * Set the host array with HostMode check 
+	 * you can disable by enableHostModeCheck(false)
+	 */
+	public void setHostArray(float[] hostArray)
+	{
+		checkHostMode(HostMode.Array);
+		this.hostArray = hostArray;
+	}
+	
+	/**
+	 * Set the host buffer with HostMode check 
+	 * you can disable by enableHostModeCheck(false)
+	 */
+	public void setHostBuffer(FloatBuffer hostBuffer)
+	{
+		checkHostMode(HostMode.Buffer);
+		this.hostBuffer = hostBuffer;
+	}
 	
 	/**
 	 * Get a device pointer (wrapped in a FloatMat) 
