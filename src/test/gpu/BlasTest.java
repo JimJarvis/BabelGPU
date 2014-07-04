@@ -1,4 +1,4 @@
-package test;
+package test.gpu;
 
 import static gpu.GpuBlas.*;
 import static jcuda.jcublas.JCublas2.*;

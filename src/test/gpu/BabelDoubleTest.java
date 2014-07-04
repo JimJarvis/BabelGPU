@@ -1,19 +1,19 @@
-package test;
+package test.gpu;
 
 import gpu.*;
 import utils.*;
 import static utils.CpuUtil.*;
 
-public class BabelFloatTest
+public class BabelDoubleTest
 {
-	private static final float TOL = 1e-5f;
+	private static final double TOL = 1e-5f;
 	private static final int ITER = 10000;
 	
 	public static void main(String[] args)
 	{
 		GpuUtil.enableExceptions();
         
-		PP.p("Float CPU-GPU-Matlab test");
+		PP.p("Double CPU-GPU-Matlab test");
 		PP.setPrecision(3);
 		
 		/*
@@ -28,12 +28,12 @@ public class BabelFloatTest
 		
 		// Read in dummy data
 		csv = new CsvReader("input_X.txt");
-		float[][] jX = csv.readFloatMat();
-		FloatMat X = new FloatMat(jX);
+		double[][] jX = csv.readDoubleMat();
+		DoubleMat X = new DoubleMat(jX);
 		csv = new CsvReader("input_W.txt");
 		
-		float[][] jW = csv.readFloatMat();
-		FloatMat W = new FloatMat(jW);
+		double[][] jW = csv.readDoubleMat();
+		DoubleMat W = new DoubleMat(jW);
 		csv = new CsvReader("input_Y.txt");
 		int[] Y = csv.readIntVec(true);
 		
@@ -41,9 +41,9 @@ public class BabelFloatTest
 		 * Define a few learning constants
 		 */
 		csv = new CsvReader("input_learn.txt");
-		float[] learns = csv.readFloatVec(true);
-		final float LearningRate = learns[0];
-		final float Lambda = learns[1];
+		double[] learns = csv.readDoubleVec(true);
+		final double LearningRate = learns[0];
+		final double Lambda = learns[1];
 		
 		GpuBlas.init();
 
@@ -52,14 +52,14 @@ public class BabelFloatTest
 		 * W and b are combined. 
 		 */
 		// augment X with a column of 1
-		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1, false);
+		DoubleMat X1 = new DoubleMat(SAMPLES, X_DIM + 1, false);
 		X1.copyFrom(X);
-		ThrustNative.gpu_fill_float(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
-		float[][] jX1 = addCol1(jX);
+		ThrustNative.gpu_fill_double(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
+		double[][] jX1 = addCol1(jX);
 		
 		// Xnew: X_NEW_DIM * SAMPLES
-		FloatMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
-		float[][] jXnew = cos(mult(jW, transpose(jX1)));
+		DoubleMat Xnew = GpuBlas.mult(W, X1.transpose()).cos();
+		double[][] jXnew = cos(mult(jW, transpose(jX1)));
 //		PP.p("check Xnew"); 
 //		checkGold(Xnew, jXnew);
 //		checkGold(jXnew, "Xnew");
@@ -68,17 +68,17 @@ public class BabelFloatTest
 		/*
 		 * Step2: Create Theta matrix and compute Theta * X_new
 		 */
-		FloatMat Theta = new FloatMat(LABELS, X_NEW_DIM);
-		float[][] jTheta = new float[LABELS][X_NEW_DIM];
+		DoubleMat Theta = new DoubleMat(LABELS, X_NEW_DIM);
+		double[][] jTheta = new double[LABELS][X_NEW_DIM];
 
-		FloatMat A = new FloatMat(LABELS, 1, false);
-		float[][] jA = new float[LABELS][1];
+		DoubleMat A = new DoubleMat(LABELS, 1, false);
+		double[][] jA = new double[LABELS][1];
 		// Loop over samples column by column
 		for (int s = 0; s < ITER; ++ s)
 		{
 			// Step2: extract a column
-			FloatMat Xnew_s = Xnew.createOffset(s * X_NEW_DIM, X_NEW_DIM);
-			float[][] jXnew_s = getCol(jXnew, s);
+			DoubleMat Xnew_s = Xnew.createOffset(s * X_NEW_DIM, X_NEW_DIM);
+			double[][] jXnew_s = getCol(jXnew, s);
 			
 
 			// alpha_vector = Theta * Xnew_s, LABELS * 1
@@ -104,7 +104,7 @@ public class BabelFloatTest
 		}
 		PP.p("Check vector A");
 //		PP.p(A.sort().getHost());
-//		float[] jA_ = transpose(jA)[0];  Arrays.sort(jA_);
+//		double[] jA_ = transpose(jA)[0];  Arrays.sort(jA_);
 //		PP.po(jA_);
 		PP.p(A);
 		PP.po(jA);
@@ -124,9 +124,9 @@ public class BabelFloatTest
 		/*
 		 * Clean up and exit
 		 */
-		FloatMat[] mats = new FloatMat[] 
+		DoubleMat[] mats = new DoubleMat[] 
 				{X, W, X1, Xnew, Theta};
-		for (FloatMat mat : mats)
+		for (DoubleMat mat : mats)
 			mat.destroy();
 		GpuBlas.destroy();
 	}
@@ -134,47 +134,47 @@ public class BabelFloatTest
 	/**
 	 * Check the gold standard from plain Java
 	 */
-	private static void checkGold(FloatMat gpu, float[][] cpu)
+	private static void checkGold(DoubleMat gpu, double[][] cpu)
 	{
-		float[][] Host = gpu.deflatten();
+		double[][] Host = gpu.deflatten();
 		
-		float diff = matAvgDiff(cpu, Host);
+		double diff = matAvgDiff(cpu, Host);
 		PP.setPrecision(3);
 		PP.setScientific(true);
 		
 		if (matAvgDiff(cpu, Host) < TOL)
-    		PP.p("PASS float GPU-CPU: ", diff);
+    		PP.p("PASS double GPU-CPU: ", diff);
 		else
-			PP.p("FAIL float GPU-CPU: ", diff);
+			PP.p("FAIL double GPU-CPU: ", diff);
 	}
 	
 	/**
 	 * Check the gold standard generated from Matlab
 	 */
-	private static void checkGold(float[][] cpu, String goldFile)
+	private static void checkGold(double[][] cpu, String goldFile)
 	{
 		CsvReader csv = new CsvReader("gold_" + goldFile + ".txt");
-		float[][] Gold = csv.readFloatMat();
+		double[][] Gold = csv.readDoubleMat();
 		
-		float diff = matAvgDiff(Gold, cpu);
+		double diff = matAvgDiff(Gold, cpu);
 		PP.setPrecision(3);
 		PP.setScientific(true);
 		
 		if (matAvgDiff(Gold, cpu) < TOL)
-    		PP.p("PASS float CPU-Matlab: ", diff);
+    		PP.p("PASS double CPU-Matlab: ", diff);
 		else
-			PP.p("FAIL float CPU-Matlab: ", diff);
+			PP.p("FAIL double CPU-Matlab: ", diff);
 	}
 	
 	/**
 	 * Check the gold standard generated from Matlab
 	 */
-	private static void checkGold(FloatMat gpu, String goldFile)
+	private static void checkGold(DoubleMat gpu, String goldFile)
 	{
 		GpuUtil.checkGold(gpu, "gold_" + goldFile, "GPU-Matlab", TOL);
 	}
 
-	private static void updateTheta(float[][] theta, float alpha, float[][] b, float beta)
+	private static void updateTheta(double[][] theta, double alpha, double[][] b, double beta)
 	{
 		int r = theta.length;
 		int c = theta[0].length;
@@ -184,18 +184,18 @@ public class BabelFloatTest
 				theta[i][j] += theta[i][j] * alpha + b[i][j] * beta;
 	}
 	
-	private static void jbabel_id_minus_softmax(float[][] a, int id)
+	private static void jbabel_id_minus_softmax(double[][] a, int id)
 	{
 		int r = a.length;
-		float max = -Float.MAX_VALUE;
+		double max = -Double.MAX_VALUE;
 		for (int i = 0; i < r; i++)
 			if (a[i][0] > max)
 				max = a[i][0];
 		
 		for (int i = 0; i < r; i++)
-			a[i][0] = (float) Math.exp( a[i][0] - max );
+			a[i][0] = (double) Math.exp( a[i][0] - max );
 		
-		float sum = 0;
+		double sum = 0;
 		for (int i = 0; i < r; i++)
 			sum += a[i][0];
 		

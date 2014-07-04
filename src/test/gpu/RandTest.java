@@ -1,4 +1,4 @@
-package test;
+package test.gpu;
 
 import gpu.FloatMat;
 import gpu.GpuRand;

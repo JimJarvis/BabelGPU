@@ -1,4 +1,4 @@
-package test;
+package test.gpu;
 
 import utils.GpuUtil;
 import utils.Timer;
