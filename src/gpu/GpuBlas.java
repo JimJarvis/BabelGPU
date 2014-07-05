@@ -216,6 +216,26 @@ public class GpuBlas
 	}
 	
 	/**
+	 * Element-wise multiplication
+	 * @return B = A .* B
+	 */
+	public static FloatMat dotMult(FloatMat A, FloatMat B)
+	{
+		Thrust.dot_mult(A, B);
+		return B;
+	}
+
+	/**
+	 * Element-wise multiplication
+	 * @return C = A .* B
+	 */
+	public static FloatMat dotMult(FloatMat A, FloatMat B, FloatMat C)
+	{
+		Thrust.dot_mult(A, B, C);
+		return C;
+	}
+	
+	/**
 	 * @return the index of the maximum absolute value
 	 * NOTE: absolute value, no sign
 	 */
@@ -507,6 +527,26 @@ public class GpuBlas
 	public static DoubleMat add(DoubleMat A, DoubleMat B)
 	{
 		return add(A, B, 1, 1);
+	}
+	
+	/**
+	 * Element-wise multiplication
+	 * @return B = A .* B
+	 */
+	public static DoubleMat dotMult(DoubleMat A, DoubleMat B)
+	{
+		Thrust.dot_mult(A, B);
+		return B;
+	}
+
+	/**
+	 * Element-wise multiplication
+	 * @return C = A .* B
+	 */
+	public static DoubleMat dotMult(DoubleMat A, DoubleMat B, DoubleMat C)
+	{
+		Thrust.dot_mult(A, B, C);
+		return C;
 	}
 	
 	/**

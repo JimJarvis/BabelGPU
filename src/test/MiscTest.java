@@ -24,10 +24,13 @@ public class MiscTest
 		FloatMat b = new FloatMat(B);
 		FloatMat a = new FloatMat(A.clone());
 		
-		PP.p(a.sigmoid());
+		PP.p(GpuBlas.dotMult(a, b));
+		PP.p(b);
+		FloatMat c = new FloatMat(6, 1, false);
+		PP.p(GpuBlas.dotMult(a, b, c));
+		System.exit(0);
 		a = new FloatMat(A);
 		PP.p(a.sigmoid_deriv());
-		System.exit(0);
 		
 		PP.setSep("\n");
 		Thrust.set_last_row_one(b);

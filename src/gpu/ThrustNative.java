@@ -94,6 +94,12 @@ public class ThrustNative
     public static native float gpu_sum_float(@ByVal FloatDevicePointer begin, int size);
     public static native float gpu_product_float(@ByVal FloatDevicePointer begin, int size);
     
+    /**
+     * Element-wise multiplication
+     */
+    public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2);
+    public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2, @ByVal FloatDevicePointer out);
+    
     
     /**
      * Sort: dir = 1 ascending, dir = -1 descending
@@ -261,6 +267,12 @@ public class ThrustNative
 
     public static native double gpu_sum_double(@ByVal DoubleDevicePointer begin, int size);
     public static native double gpu_product_double(@ByVal DoubleDevicePointer begin, int size);
+
+    /**
+     * Element-wise multiplication
+     */
+    public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2);
+    public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2, @ByVal DoubleDevicePointer out);
     
     /**
      * Sort: dir = 1 ascending, dir = -1 descending

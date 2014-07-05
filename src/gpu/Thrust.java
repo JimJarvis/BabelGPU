@@ -175,6 +175,23 @@ public class Thrust
 		return gpu_min_float(x.getThrustPointer(), x.size());
 	}
 	
+	/**
+	 * Element-wise multiplication
+	 * @see GpuBlas#dotMult(FloatMat, FloatMat)
+	 */
+	public static void dot_mult(FloatMat x, FloatMat y)
+	{
+		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer());
+	}
+	/**
+	 * Element-wise multiplication
+	 * @see GpuBlas#dotMult(FloatMat, FloatMat, FloatMat)
+	 */
+	public static void dot_mult(FloatMat x, FloatMat y, FloatMat out)
+	{
+		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer());
+	}
+	
 	
 	/**
 	 * Sort. dir = 1 for ascending, -1 for descending
@@ -495,6 +512,23 @@ public class Thrust
 	public static double min(DoubleMat x)
 	{
 		return gpu_min_double(x.getThrustPointer(), x.size());
+	}
+	
+	/**
+	 * Element-wise multiplication
+	 * @see GpuBlas#dotMult(DoubleMat, DoubleMat)
+	 */
+	public static void dot_mult(DoubleMat x, DoubleMat y)
+	{
+		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer());
+	}
+	/**
+	 * Element-wise multiplication
+	 * @see GpuBlas#dotMult(DoubleMat, DoubleMat, DoubleMat)
+	 */
+	public static void dot_mult(DoubleMat x, DoubleMat y, DoubleMat out)
+	{
+		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer());
 	}
 	
 	/**

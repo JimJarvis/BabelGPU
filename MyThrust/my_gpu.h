@@ -209,22 +209,6 @@ namespace MyGpu
 	GEN_minmax(min);
 	GEN_minmax(max);
 
-#define GEN_sum(Ftype) \
-	inline Ftype gpu_sum_##Ftype(device_ptr<Ftype> begin, int size) \
-	{ \
-		return reduce(begin, begin+size, 0.0, thrust::plus<Ftype>()); \
-	}
-
-	GEN_sum(float); GEN_sum(double);
-
-#define GEN_product(Ftype) \
-	inline Ftype gpu_product_##Ftype(device_ptr<Ftype> begin, int size) \
-	{ \
-		return reduce(begin, begin+size, 1.0, thrust::multiplies<Ftype>()); \
-	}
-
-	GEN_product(float); GEN_product(double);
-
 // dir = ascending: 1, descending -1
 #define GEN_sort(Ftype) \
 	inline void gpu_sort_##Ftype(device_ptr<Ftype> begin, int size, int dir = 1) \
@@ -237,6 +221,25 @@ namespace MyGpu
 
 	GEN_sort(float); GEN_sort(double);
 
+#define GEN_dot_mult(Ftype) \
+	/* begin2 = begin1 .* begin2 */ \
+	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2) \
+	{ transform(begin1, begin1 + size, begin2, begin2, thrust::multiplies<Ftype>()); } \
+	/* out = begin1 .* begin2 */ \
+	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2, device_ptr<Ftype> out) \
+	{ transform(begin1, begin1 + size, begin2, out, thrust::multiplies<Ftype>()); }
+
+	GEN_dot_mult(float); GEN_dot_mult(double);
+
+	inline float gpu_sum_float(device_ptr<float> begin, int size)
+	{ return reduce(begin, begin+size, 0.0, thrust::plus<float>()); }
+	inline double gpu_sum_double(device_ptr<double> begin, int size)
+	{ return reduce(begin, begin+size, 0.0, thrust::plus<double>()); }
+
+	inline float gpu_product_float(device_ptr<float> begin, int size)
+	{ return reduce(begin, begin+size, 1.0, thrust::multiplies<float>()); }
+	inline double gpu_product_double(device_ptr<double> begin, int size)
+	{ return reduce(begin, begin+size, 1.0, thrust::multiplies<double>()); }
 
 	// Fill the array with the same value
 	inline void gpu_fill_float(device_ptr<float> begin, int size, float val)
