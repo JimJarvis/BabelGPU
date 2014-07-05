@@ -1,8 +1,9 @@
 #!/bin/bash
 
-main="test/SoftmaxTest"
-main="test/MinibatchTest"
-main="test/MiscTest"
+main="gpu/SoftmaxTest"
+main="gpu/MinibatchTest"
+main="gpu/MiscTest"
+main="gpu/RandTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/
@@ -21,4 +22,4 @@ fi
 
 echo ;echo
 echo 'Testing ...'; echo
-java -Djava.library.path="E:/Dropbox/Programming/Java/Libraries/JCuda" -cp ".;E:/Dropbox/Programming/Java/Libraries/JCuda/jcuda-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcublas-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcurand-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" $main
+java -Djava.library.path="E:/Dropbox/Programming/Java/Libraries/JCuda" -cp ".;E:/Dropbox/Programming/Java/Libraries/JCuda/jcuda-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcublas-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcurand-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" test/$main

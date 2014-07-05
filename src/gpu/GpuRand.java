@@ -49,18 +49,25 @@ public class GpuRand
 	}
 
 	/**
-	 * Generate a FloatMat with random uniform float
+	 * Fill a FloatMat with random uniform float
+	 * @return input FloatMat A
+	 */
+	public FloatMat genUniformFloat(FloatMat A)
+	{
+		curandGenerateUniform(generator, A.toDevice(), A.size());
+		return A;
+	}
+
+	/**
+	 * Generate a new FloatMat with random uniform float
 	 */
 	public FloatMat genUniformFloat(int row, int col)
 	{
-		int n = row * col;
-		Pointer device = GpuUtil.allocDeviceFloat(n);
-		curandGenerateUniform(generator, device, n);
-		return new FloatMat(device, row, col);
+		return genUniformFloat(new FloatMat(row, col, false));
 	}
 	
 	/**
-	 * Generate a FloatMat (vector) with random uniform float
+	 * Generate a new FloatMat (vector) with random uniform float
 	 */
 	public FloatMat genUniformFloat(int n)
 	{
@@ -68,20 +75,28 @@ public class GpuRand
 	}
 	
 	/**
-	 * Generate a FloatMat with normal distribution
+	 * Fill a FloatMat with normal distribution
+	 * @param mean 
+	 * @param stdev standard deviation
+	 */
+	public FloatMat genNormalFloat(FloatMat A, float mean, float stdev)
+	{
+		curandGenerateNormal(generator, A.toDevice(), A.size(), mean, stdev);
+		return A;
+	}
+	
+	/**
+	 * Generate a new FloatMat with normal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
 	public FloatMat genNormalFloat(int row, int col, float mean, float stdev)
 	{
-		int n = row * col;
-		Pointer device = GpuUtil.allocDeviceFloat(n);
-		curandGenerateNormal(generator, device, n, mean, stdev);
-		return new FloatMat(device, row, col);
+		return genNormalFloat(new FloatMat(row, col, false), mean, stdev);
 	}
 	
 	/**
-	 * Generate a FloatMat (vector) with normal distribution
+	 * Generate a new FloatMat (vector) with normal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
@@ -89,22 +104,30 @@ public class GpuRand
 	{
 		return genNormalFloat(n, 1, mean, stdev);
 	}
+	
+	/**
+	 * Fill a FloatMat with lognormal distribution
+	 * @param mean 
+	 * @param stdev standard deviation
+	 */
+	public FloatMat genLogNormalFloat(FloatMat A, float mean, float stdev)
+	{
+		curandGenerateLogNormal(generator, A.toDevice(), A.size(), mean, stdev);
+		return A;
+	}
 
 	/**
-	 * Generate a FloatMat with lognormal distribution
+	 * Generate a new FloatMat with lognormal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
 	public FloatMat genLogNormalFloat(int row, int col, float mean, float stdev)
 	{
-		int n = row * col;
-		Pointer device = GpuUtil.allocDeviceFloat(n);
-		curandGenerateLogNormal(generator, device, n, mean, stdev);
-		return new FloatMat(device, row, col);
+		return genLogNormalFloat(new FloatMat(row, col, false), mean, stdev);
 	}
 	
 	/**
-	 * Generate a FloatMat (vector) with lognormal distribution 
+	 * Generate a new FloatMat (vector) with lognormal distribution 
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
@@ -114,15 +137,22 @@ public class GpuRand
 	}
 	
 	/**
-	 * Generate a FloatMat (int valued) with Poisson distribution
+	 * Fill a FloatMat (int valued) with Poisson distribution
+	 * @param lambda 
+	 */
+	public FloatMat genPoissonFloat(FloatMat A, double lambda)
+	{
+		curandGeneratePoisson(generator, A.toDevice(), A.size(), lambda);
+		return A;
+	}
+	
+	/**
+	 * Generate a new FloatMat (int valued) with Poisson distribution
 	 * @param lambda 
 	 */
 	public FloatMat genPoissonFloat(int row, int col, double lambda)
 	{
-		int n = row * col;
-		Pointer device = GpuUtil.allocDeviceFloat(n);
-		curandGeneratePoisson(generator, device, n, lambda);
-		return new FloatMat(device, row, col);
+		return genPoissonFloat(new FloatMat(row, col, false), lambda);
 	}
 	
 	/**
@@ -140,18 +170,25 @@ public class GpuRand
 	//******************* DOUBLE *******************/
 	//**************************************************/
 	/**
-	 * Generate a DoubleMat with random uniform double
+	 * Fill a DoubleMat with random uniform double
+	 * @return input DoubleMat A
+	 */
+	public DoubleMat genUniformDouble(DoubleMat A)
+	{
+		curandGenerateUniformDouble(generator, A.toDevice(), A.size());
+		return A;
+	}
+
+	/**
+	 * Generate a new DoubleMat with random uniform double
 	 */
 	public DoubleMat genUniformDouble(int row, int col)
 	{
-		int n = row * col;
-		Pointer device = GpuUtil.allocDeviceDouble(n);
-		curandGenerateUniformDouble(generator, device, n);
-		return new DoubleMat(device, row, col);
+		return genUniformDouble(new DoubleMat(row, col, false));
 	}
 	
 	/**
-	 * Generate a DoubleMat (vector) with random uniform double
+	 * Generate a new DoubleMat (vector) with random uniform double
 	 */
 	public DoubleMat genUniformDouble(int n)
 	{
@@ -159,20 +196,28 @@ public class GpuRand
 	}
 	
 	/**
-	 * Generate a DoubleMat with normal distribution
+	 * Fill a DoubleMat with normal distribution
+	 * @param mean 
+	 * @param stdev standard deviation
+	 */
+	public DoubleMat genNormalDouble(DoubleMat A, double mean, double stdev)
+	{
+		curandGenerateNormalDouble(generator, A.toDevice(), A.size(), mean, stdev);
+		return A;
+	}
+	
+	/**
+	 * Generate a new DoubleMat with normal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
 	public DoubleMat genNormalDouble(int row, int col, double mean, double stdev)
 	{
-		int n = row * col;
-		Pointer device = GpuUtil.allocDeviceDouble(n);
-		curandGenerateNormalDouble(generator, device, n, mean, stdev);
-		return new DoubleMat(device, row, col);
+		return genNormalDouble(new DoubleMat(row, col, false), mean, stdev);
 	}
 	
 	/**
-	 * Generate a DoubleMat (vector) with normal distribution
+	 * Generate a new DoubleMat (vector) with normal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
@@ -180,22 +225,30 @@ public class GpuRand
 	{
 		return genNormalDouble(n, 1, mean, stdev);
 	}
+	
+	/**
+	 * Fill a DoubleMat with lognormal distribution
+	 * @param mean 
+	 * @param stdev standard deviation
+	 */
+	public DoubleMat genLogNormalDouble(DoubleMat A, double mean, double stdev)
+	{
+		curandGenerateLogNormalDouble(generator, A.toDevice(), A.size(), mean, stdev);
+		return A;
+	}
 
 	/**
-	 * Generate a DoubleMat with lognormal distribution
+	 * Generate a new DoubleMat with lognormal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
 	public DoubleMat genLogNormalDouble(int row, int col, double mean, double stdev)
 	{
-		int n = row * col;
-		Pointer device = GpuUtil.allocDeviceDouble(n);
-		curandGenerateLogNormalDouble(generator, device, n, mean, stdev);
-		return new DoubleMat(device, row, col);
+		return genLogNormalDouble(new DoubleMat(row, col, false), mean, stdev);
 	}
 	
 	/**
-	 * Generate a DoubleMat (vector) with lognormal distribution 
+	 * Generate a new DoubleMat (vector) with lognormal distribution 
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
