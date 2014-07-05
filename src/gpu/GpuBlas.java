@@ -305,6 +305,7 @@ public class GpuBlas
 
 	/**
 	 * Create and copy to Cublas device vector
+	 * @deprecated
 	 * @return new device pointer
 	 */
 	public static Pointer hostToCublasFloat(float[] host)
@@ -315,6 +316,7 @@ public class GpuBlas
 	
 	/**
 	 * Create and copy to Cublas device vector
+	 * @deprecated
 	 * @return output parameter 'device'
 	 */
 	public static Pointer hostToCublasFloat(float[] host, Pointer device)
@@ -327,6 +329,7 @@ public class GpuBlas
 	
 	/**
 	 * Copy the device vector at Cublas back to host
+	 * @deprecated
 	 * @return new host array
 	 */
 	public static float[] cublasToHostFloat(Pointer device, int size)
@@ -336,6 +339,7 @@ public class GpuBlas
 
 	/**
 	 * Copy the device vector at Cublas back to host
+	 * @deprecated
 	 * @return output parameter 'host'
 	 */
 	public static float[] cublasToHostFloat(Pointer device, float[] host)
@@ -616,6 +620,7 @@ public class GpuBlas
 
 	/**
 	 * Create and copy to Cublas device vector
+	 * @deprecated
 	 * @return new device pointer
 	 */
 	public static Pointer hostToCublasDouble(double[] host)
@@ -626,6 +631,7 @@ public class GpuBlas
 	
 	/**
 	 * Create and copy to Cublas device vector
+	 * @deprecated
 	 * @return output parameter 'device'
 	 */
 	public static Pointer hostToCublasDouble(double[] host, Pointer device)
@@ -638,6 +644,7 @@ public class GpuBlas
 	
 	/**
 	 * Copy the device vector at Cublas back to host
+	 * @deprecated
 	 * @return new host array
 	 */
 	public static double[] cublasToHostDouble(Pointer device, int size)
@@ -647,6 +654,7 @@ public class GpuBlas
 
 	/**
 	 * Copy the device vector at Cublas back to host
+	 * @deprecated
 	 * @return output parameter 'host'
 	 */
 	public static double[] cublasToHostDouble(Pointer device, double[] host)
