@@ -1,6 +1,5 @@
 package deep.units;
 
-import gpu.FloatMat;
 import deep.*;
 
 public abstract class ParamComputeUnit extends ComputeUnit

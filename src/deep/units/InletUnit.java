@@ -1,7 +1,5 @@
 package deep.units;
 
-import gpu.FloatMat;
-
 public abstract class InletUnit extends DataUnit
 {
 

@@ -33,9 +33,14 @@ public abstract class ComputeUnit extends Unit
 	
 	public void setup()
 	{
+		setupLink();
+		setupOutput();
+	}
+	
+	protected void setupLink()
+	{
 		if (prev != null)
     		this.input = prev.output;
-		setupOutput();
 	}
 	
 	protected void setupOutput()

@@ -8,6 +8,4 @@ public class ParamUnit extends DataUnit
 	{
 		super(name, new FloatMat(row, col), DUMMY);
 	}
-	
-	
 }

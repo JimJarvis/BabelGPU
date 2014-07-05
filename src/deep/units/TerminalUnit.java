@@ -7,8 +7,14 @@ public abstract class TerminalUnit extends PureComputeUnit
 
 	public TerminalUnit(String name, DataUnit y)
 	{
-		super(name);
+		super(name, 1);
 		this.y = y;
+	}
+	
+	@Override
+	public void setup()
+	{
+		setupLink();
 	}
 	
 	public float getResult() {	return result;	}

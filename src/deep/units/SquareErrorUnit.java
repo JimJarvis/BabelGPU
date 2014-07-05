@@ -1,8 +1,6 @@
 package deep.units;
 
-import gpu.FloatMat;
-import gpu.GpuBlas;
-import gpu.Thrust;
+import gpu.*;
 
 // terminal unit
 public class SquareErrorUnit extends TerminalUnit
