@@ -15,11 +15,7 @@ public class DataUnit extends Unit
 		this.data = data;
 		this.gradient = gradient;
 	}
-	
-	public int dim() { return data.row; }
-	
-	public int batchSize() {	return data.col;	}
-	
+
 	/**
 	 * Ctor for units without gradient
 	 */
@@ -27,6 +23,10 @@ public class DataUnit extends Unit
 	{
 		this(name, data, null);
 	}
+	
+	public int dim() { return data.row; }
+	
+	public int batchSize() {	return data.col;	}
 	
 	public void initGradient()
 	{

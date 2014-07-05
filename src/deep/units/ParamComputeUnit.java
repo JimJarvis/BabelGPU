@@ -1,5 +1,6 @@
 package deep.units;
 
+import gpu.FloatMat;
 import deep.*;
 
 public abstract class ParamComputeUnit extends ComputeUnit
@@ -17,6 +18,11 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	public void setup()
 	{
 		super.setup();
+		setupW();
+	}
+	
+	protected void setupW()
+	{
 		this.W = new ParamUnit("W[" + this.name + "]", outDim, input.dim());
 		this.wInitializer.init(W);
 	}

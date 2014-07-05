@@ -26,7 +26,7 @@ public class LinearUnit extends ParamComputeUnit
 
 		if (W.hasGradient())
 		{
-    		// update W with regg
+    		// update W with reg
     		float batchSize = input.data.col;
     		float lr = learningPlan.lr;
     		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 

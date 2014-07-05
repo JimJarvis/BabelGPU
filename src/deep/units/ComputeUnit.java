@@ -1,5 +1,6 @@
 package deep.units;
 
+import gpu.*;
 import deep.*;
 
 public abstract class ComputeUnit extends Unit
@@ -34,6 +35,13 @@ public abstract class ComputeUnit extends Unit
 	{
 		if (prev != null)
     		this.input = prev.output;
+		setupOutput();
+	}
+	
+	protected void setupOutput()
+	{
+		this.output = new DataUnit("out[" + this.name + "]", new FloatMat(outDim, input.batchSize()));
+		this.output.initGradient();
 	}
 	
 	public abstract void forward(); 
