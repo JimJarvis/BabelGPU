@@ -3,7 +3,7 @@ package deep.units;
 import deep.Initializer;
 import gpu.GpuBlas;
 
-public class LinearUnit extends ComputeUnit
+public class LinearUnit extends ParamComputeUnit
 {
 	public LinearUnit(String name, int outDim, Initializer wInitializer)
 	{

@@ -1,6 +1,6 @@
 package deep.units;
 
-public abstract class TerminalUnit extends ComputeUnit
+public abstract class TerminalUnit extends PureComputeUnit
 {
 	public DataUnit y;
 	protected float result = 0;
@@ -9,7 +9,6 @@ public abstract class TerminalUnit extends ComputeUnit
 	{
 		super(name);
 		this.y = y;
-		this.W = null;
 	}
 	
 	public float getResult() {	return result;	}

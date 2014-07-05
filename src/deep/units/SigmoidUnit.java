@@ -2,14 +2,11 @@ package deep.units;
 
 import gpu.*;
 
-public class SigmoidUnit extends ComputeUnit
+public class SigmoidUnit extends PureComputeUnit
 {
 	public SigmoidUnit(String name)
 	{
 		super(name);
-		// newDim should be the same as the dim from the last layer
-		this.outDim = prev != null ?
-				prev.outDim : input.dim();
 	}
 
 	@Override
