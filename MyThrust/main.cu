@@ -298,10 +298,34 @@ void test_softmax_batch()
 	printH(outLabelHost, 10);
 }
 
+void test_sigmoid()
+{
+	host_vector<float> A(4);
+	A[0] = 0;
+	A[1] = -1;
+	A[2] = 1;
+	A[3] = 1e15;
+
+	device_vector<float> D = A;
+	device_vector<float> E = A;
+
+	printf("sigmoid\n");
+	printf("x\n");
+	gpu_sigmoid_float(range, &E[0], 1, 0); printD(E);
+	gpu_sigmoid_deriv_float(range, &E[0], 1, 0); printD(E);
+	printf("0.5 * x\n");
+	gpu_sigmoid_float(range, &E[0], 0.5, 0); printD(E);
+	printf("x + 3\n");
+	gpu_sigmoid_float(range, &E[0], 1, 3); printD(E);
+	printf("0.5 * x + 3\n");
+	gpu_sigmoid_float(range, &E[0], 0.5, 3); printD(E);
+}
+
 
 int main()
 {
-	test_id_minus_softmax_batch();
+	test_sigmoid();
+	//test_id_minus_softmax_batch();
 	//test_softmax_batch();
 	//test_set_row_col();
 	//test_exp_double();

@@ -1,11 +1,9 @@
 package gpu;
 
 import static gpu.ThrustNative.*;
-import gpu.ThrustStruct.FloatDevicePointer;
 
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
-
 
 /**
  * Wrapper around ThrustNative native methods.
@@ -128,6 +126,34 @@ public class Thrust
 	}
 	public static void abs(FloatMat x) {  abs(x, 1, 0); }
 	public static void abs(FloatMat x, FloatMat out) {  abs(x, out, 1, 0); }
+	
+	/**
+	 * Sigmoid(a * x + b)
+	 */
+	public static void sigmoid(FloatMat x, float a, float b)
+	{
+		gpu_sigmoid_float(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void sigmoid(FloatMat x,  FloatMat out, float a, float b)
+	{
+		gpu_sigmoid_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void sigmoid(FloatMat x) {  sigmoid(x, 1, 0); }
+	public static void sigmoid(FloatMat x, FloatMat out) {  sigmoid(x, out, 1, 0); }
+	
+	/**
+	 * sigmoid_deriv(a * x + b):  x .* (1 - x)
+	 */
+	public static void sigmoid_deriv(FloatMat x, float a, float b)
+	{
+		gpu_sigmoid_deriv_float(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void sigmoid_deriv(FloatMat x,  FloatMat out, float a, float b)
+	{
+		gpu_sigmoid_deriv_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void sigmoid_deriv(FloatMat x) {  sigmoid_deriv(x, 1, 0); }
+	public static void sigmoid_deriv(FloatMat x, FloatMat out) {  sigmoid_deriv(x, out, 1, 0); }
 	
 	public static float sum(FloatMat x)
 	{
@@ -422,6 +448,34 @@ public class Thrust
 	}
 	public static void abs(DoubleMat x) {  abs(x, 1, 0); }
 	public static void abs(DoubleMat x, DoubleMat out) {  abs(x, out, 1, 0); }
+	
+	/**
+	 * Sigmoid(a * x + b)
+	 */
+	public static void sigmoid(DoubleMat x, double a, double b)
+	{
+		gpu_sigmoid_double(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void sigmoid(DoubleMat x,  DoubleMat out, double a, double b)
+	{
+		gpu_sigmoid_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void sigmoid(DoubleMat x) {  sigmoid(x, 1, 0); }
+	public static void sigmoid(DoubleMat x, DoubleMat out) {  sigmoid(x, out, 1, 0); }
+	
+	/**
+	 * sigmoid_deriv(a * x + b):  x .* (1 - x)
+	 */
+	public static void sigmoid_deriv(DoubleMat x, double a, double b)
+	{
+		gpu_sigmoid_deriv_double(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void sigmoid_deriv(DoubleMat x,  DoubleMat out, double a, double b)
+	{
+		gpu_sigmoid_deriv_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void sigmoid_deriv(DoubleMat x) {  sigmoid_deriv(x, 1, 0); }
+	public static void sigmoid_deriv(DoubleMat x, DoubleMat out) {  sigmoid_deriv(x, out, 1, 0); }
 	
 	public static double sum(DoubleMat x)
 	{

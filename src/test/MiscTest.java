@@ -22,7 +22,12 @@ public class MiscTest
 		PP.p(m.toIndex(3, 2));
 		
 		FloatMat b = new FloatMat(B);
-		FloatMat a = new FloatMat(A);
+		FloatMat a = new FloatMat(A.clone());
+		
+		PP.p(a.sigmoid());
+		a = new FloatMat(A);
+		PP.p(a.sigmoid_deriv());
+		System.exit(0);
 		
 		PP.setSep("\n");
 		Thrust.set_last_row_one(b);
@@ -39,29 +44,5 @@ public class MiscTest
 		GpuBlas.destroy();
 		
 //		PP.p( GpuUtil.getGpuInfo());
-		
-		GpuRand rand = new GpuRand(10);
-		FloatMat dumd = rand.genUniformFloat(10000000);
-		Timer timer = Timer.getInstance();
-		Timer.setPrecision(4);
-		timer.start();
-		float[] dumh = dumd.toHostArray();
-		GpuUtil.synchronize();
-		timer.readFromLast("Copy to CPU");
-		dumd.destroy();
-		timer.start();
-		double[] dumh_ = new double[dumh.length];
-		for (int i = 0 ; i < dumh.length; i ++)
-			dumh_[i] = (double) dumh[i];
-		timer.readFromLast("Casting to double");
-		timer.start();
-		for (int i = 0 ; i < dumh.length; i ++)
-			dumh[i] = (float) dumh_[i];
-		timer.readFromLast("Casting to float");
-		FloatMat dumd_ = new FloatMat(dumh);
-		timer.start();
-		dumd_.toDevice();
-		GpuUtil.synchronize();
-		timer.readFromLast("Copy to GPU");
 	}
 }

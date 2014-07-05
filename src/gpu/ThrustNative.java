@@ -64,7 +64,7 @@ public class ThrustNative
     public static native void gpu_tan_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
     
     /**
-     * a * x + b linear transformation
+     * a * x + b linear transformation in place, or with an output pointer
      */
     public static native void gpu__float(@ByVal FloatDevicePointer begin, int size, float a, float b);
     public static native void gpu__float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
@@ -74,6 +74,18 @@ public class ThrustNative
 	 */
     public static native void gpu_fabs_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
     public static native void gpu_fabs_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    
+    /**
+	 * sigmoid(a*x + b) in place, or with an output pointer
+	 */
+    public static native void gpu_sigmoid_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_sigmoid_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    
+    /**
+	 * sigmoid_deriv(a*x + b) <=> x .* (1 - x) in place, or with an output pointer
+	 */
+    public static native void gpu_sigmoid_deriv_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_sigmoid_deriv_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
     
     // other
     public static native float gpu_max_float(@ByVal FloatDevicePointer begin, int size);
@@ -219,16 +231,29 @@ public class ThrustNative
     public static native void gpu_tan_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
     
     /**
-  	 * abs(a*x + b) in place, or with an output pointer
-  	 */
-      public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
-      public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
-    
-    /**
      * a * x + b linear transformation
      */
     public static native void gpu__double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
     public static native void gpu__double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+    
+    /**
+  	 * abs(a*x + b) in place, or with an output pointer
+  	 */
+      public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+      public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+   
+    /**
+   	 * sigmoid(a*x + b) in place, or with an output pointer
+   	 */
+       public static native void gpu_sigmoid_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+       public static native void gpu_sigmoid_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+       
+       /**
+   	 * sigmoid_deriv(a*x + b) <=> x .* (1 - x) in place, or with an output pointer
+   	 */
+       public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+       public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+       
     
     // other
     public static native double gpu_max_double(@ByVal DoubleDevicePointer begin, int size);

@@ -166,6 +166,15 @@ namespace MyGpu
 	GEN_transf(ceil);
 	GEN_transf(); // gpu__float(), for plain linear transformation
 
+	// Sigmoid
+	__host__ __device__
+	inline float sigmoid(float x) { return 1.0 / (1 + exp(-x)); }
+	GEN_transf(sigmoid);
+	// Sigmoid derivative: x .* (1 - x)
+	__host__ __device__
+	inline float sigmoid_deriv(float x) { return x * (1 - x); }
+	GEN_transf(sigmoid_deriv);
+
 	// Generate binary transform functions
 	GEN_transf_2(pow);
 	GEN_transf_2(fmod);

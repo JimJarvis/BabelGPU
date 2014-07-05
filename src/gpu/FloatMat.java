@@ -591,6 +591,7 @@ public class FloatMat
 		Thrust.abs(this); return this;
 	}
 	
+	
 	/**
 	 * (a * x + b) ^p
 	 */
@@ -609,6 +610,30 @@ public class FloatMat
 	public FloatMat linear(float a, float b)
 	{
 		Thrust.linear(this, a, b); return this;
+	}
+	
+	/**
+	 * Sigmoid(a * x + b)
+	 */
+	public FloatMat sigmoid(float a, float b)
+	{
+		Thrust.sigmoid(this, a, b); return this;
+	}
+	public FloatMat sigmoid()
+	{
+		Thrust.sigmoid(this); return this;
+	}
+	
+	/**
+	 * x .* (1 - x)
+	 */
+	public FloatMat sigmoid_deriv(float a, float b)
+	{
+		Thrust.sigmoid_deriv(this, a, b); return this;
+	}
+	public FloatMat sigmoid_deriv()
+	{
+		Thrust.sigmoid_deriv(this); return this;
 	}
 	
 	public float max()
