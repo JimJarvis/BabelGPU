@@ -21,14 +21,17 @@ public class MiscTest
 		PP.p(m.toCoord(10));
 		PP.p(m.toIndex(3, 2));
 		
-		FloatMat b = new FloatMat(B);
+		FloatMat b = new FloatMat(B.clone());
 		FloatMat a = new FloatMat(A.clone());
 		
 		PP.p(GpuBlas.dotMult(a, b));
-		PP.p(b);
+		PP.p(b.reciprocal());
+		PP.p(b.reciprocal().square());
+		b = new FloatMat(B.clone());
+		PP.p(b.cube());
+		System.exit(0);
 		FloatMat c = new FloatMat(6, 1, false);
 		PP.p(GpuBlas.dotMult(a, b, c));
-		System.exit(0);
 		a = new FloatMat(A);
 		PP.p(a.sigmoid_deriv());
 		

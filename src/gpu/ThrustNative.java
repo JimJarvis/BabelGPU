@@ -43,6 +43,24 @@ public class ThrustNative
 	 */
     public static native void gpu_pow_float(@ByVal FloatDevicePointer begin, int size, float p, float a, float b);
     public static native void gpu_pow_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float p, float a, float b);
+    
+    /**
+	 * (a*x + b)^2 in place, or with an output pointer
+     */
+    public static native void gpu_square_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_square_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+
+    /**
+	 * (a*x + b)^3 in place, or with an output pointer
+     */
+    public static native void gpu_cube_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_cube_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+
+    /**
+	 * 1/(a*x + b) in place, or with an output pointer
+     */
+    public static native void gpu_reciprocal_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_reciprocal_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
 
     // trigs
 	/**

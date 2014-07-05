@@ -175,6 +175,19 @@ namespace MyGpu
 	inline float sigmoid_deriv(float x) { return x * (1 - x); }
 	GEN_transf(sigmoid_deriv);
 
+	// simple square routine
+	__host__ __device__
+	inline float square(float x) { return x * x; }
+	GEN_transf(square);
+	// simple cube routine
+	__host__ __device__
+	inline float cube(float x) { return x * x * x; }
+	GEN_transf(cube);
+	// simple reciprocal routine
+	__host__ __device__
+	inline float reciprocal(float x) { return 1.0/x; }
+	GEN_transf(reciprocal);
+
 	// Generate binary transform functions
 	GEN_transf_2(pow);
 	GEN_transf_2(fmod);

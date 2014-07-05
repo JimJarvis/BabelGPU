@@ -568,6 +568,18 @@ public class FloatMat
 	}
 	
 	/**
+	 * abs(a * x + b)
+	 */
+	public FloatMat abs(float a, float b)
+	{
+		Thrust.abs(this, a, b); return this;
+	}
+	public FloatMat abs()
+	{
+		Thrust.abs(this); return this;
+	}
+	
+	/**
 	 * sqrt(a * x + b)
 	 */
 	public FloatMat sqrt(float a, float b)
@@ -580,17 +592,40 @@ public class FloatMat
 	}
 	
 	/**
-	 * abs(a * x + b)
+	 * (a * x + b)^2
 	 */
-	public FloatMat abs(float a, float b)
+	public FloatMat square(float a, float b)
 	{
-		Thrust.abs(this, a, b); return this;
+		Thrust.square(this, a, b); return this;
 	}
-	public FloatMat abs()
+	public FloatMat square()
 	{
-		Thrust.abs(this); return this;
+		Thrust.square(this); return this;
 	}
 	
+	/**
+	 * (a * x + b)^3
+	 */
+	public FloatMat cube(float a, float b)
+	{
+		Thrust.cube(this, a, b); return this;
+	}
+	public FloatMat cube()
+	{
+		Thrust.cube(this); return this;
+	}
+	
+	/**
+	 * 1 / (a * x + b)
+	 */
+	public FloatMat reciprocal(float a, float b)
+	{
+		Thrust.reciprocal(this, a, b); return this;
+	}
+	public FloatMat reciprocal()
+	{
+		Thrust.reciprocal(this); return this;
+	}
 	
 	/**
 	 * (a * x + b) ^p

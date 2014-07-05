@@ -102,6 +102,48 @@ public class Thrust
 	public static void pow(FloatMat x, FloatMat out, float p) {  pow(x, out, p, 1, 0); }
 	
 	/**
+	 * (a * x + b)^2
+	 */
+	public static void square(FloatMat x, float a, float b)
+	{
+		gpu_square_float(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void square(FloatMat x,  FloatMat out, float a, float b)
+	{
+		gpu_square_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void square(FloatMat x) {  square(x, 1, 0); }
+	public static void square(FloatMat x, FloatMat out) {  square(x, out, 1, 0); }
+
+	/**
+	 * (a * x + b)^3
+	 */
+	public static void cube(FloatMat x, float a, float b)
+	{
+		gpu_cube_float(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void cube(FloatMat x,  FloatMat out, float a, float b)
+	{
+		gpu_cube_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void cube(FloatMat x) {  cube(x, 1, 0); }
+	public static void cube(FloatMat x, FloatMat out) {  cube(x, out, 1, 0); }
+	
+	/**
+	 * 1 / (a * x + b)
+	 */
+	public static void reciprocal(FloatMat x, float a, float b)
+	{
+		gpu_reciprocal_float(x.getThrustPointer(), x.size(), a, b);
+	}
+	public static void reciprocal(FloatMat x,  FloatMat out, float a, float b)
+	{
+		gpu_reciprocal_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+	}
+	public static void reciprocal(FloatMat x) {  reciprocal(x, 1, 0); }
+	public static void reciprocal(FloatMat x, FloatMat out) {  reciprocal(x, out, 1, 0); }
+	
+	/**
 	 * (a * x + b)
 	 */
 	public static void linear(FloatMat x, float a, float b)
