@@ -161,4 +161,41 @@ public class DeepNet implements Iterable<ComputeUnit>
 			public void remove() { }
 		};
 	}
+	
+	// ******************** DEBUG only ********************/
+	public void runDebug(LearningPlan learningPlan)
+	{
+	 	setLearningPlan(learningPlan);
+	 	PP.pTitledSectionLine("SETUP");
+		setup();
+		printDebug();
+		int i = 1;
+		
+		while (inlet.hasNext())
+		{
+			PP.pSectionLine("=", 90);
+			PP.p("Iteration", i++, "reading inlet");
+			inlet.nextBatch();
+			PP.pTitledSectionLine("FORWARD");
+			forwprop();
+			printDebug();
+			PP.pTitledSectionLine("BACKWARD");
+			backprop();
+			printDebug();
+		}
+		
+		PP.p("\nRESULT =", terminal.getResult());
+	}
+	
+	public void printDebug()
+	{
+		for (ComputeUnit unit : this)
+		{
+			PP.p(unit.name);
+			PP.p("input:", unit.input);
+			if (unit instanceof ParamComputeUnit)
+				PP.p("W:", ((ParamComputeUnit) unit).W);
+			PP.pSectionLine();
+		}
+	}
 }

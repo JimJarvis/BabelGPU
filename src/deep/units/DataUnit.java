@@ -1,5 +1,6 @@
 package deep.units;
 
+import utils.PP;
 import gpu.FloatMat;
 
 public class DataUnit extends Unit
@@ -46,5 +47,11 @@ public class DataUnit extends Unit
 	public void setNoGradient()
 	{
 		this.gradient = null;
+	}
+	
+	// Debug only
+	public String toString()
+	{
+		return PP.all2str("<Data>", data, "\n<Gradient>", gradient);
 	}
 }

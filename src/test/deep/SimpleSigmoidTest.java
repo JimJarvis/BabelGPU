@@ -9,6 +9,9 @@ import deep.units.*;
 
 public class SimpleSigmoidTest
 {
+	private static DeepNet sigmoidNet;
+    private static HashMap<String, ComputeUnit> unitMap;
+	
 	public static void main(String[] args)
 	{
 		GpuBlas.init();
@@ -55,15 +58,10 @@ public class SimpleSigmoidTest
 				return hasNext;
 			}
 		};
-		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 3});
-		HashMap<String, ComputeUnit> unitMap = sigmoidNet.getUnitMap();
-		
-		sigmoidNet.setLearningPlan(new LearningPlan(1, 1, 0, dummyInput.length));
-		sigmoidNet.setup();
-		sigmoidNet.forwprop();
-		sigmoidNet.backprop();
-		
-		PP.p();
+		sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 3});
+		unitMap = sigmoidNet.getUnitMap();
+		LearningPlan plan = new LearningPlan(1, 1, 0, dummyInput.length);
+		sigmoidNet.runDebug(plan);
 	}
 
 }
