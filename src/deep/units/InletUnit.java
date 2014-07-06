@@ -8,7 +8,12 @@ public abstract class InletUnit extends DataUnit
 	
 	public InletUnit(String name)
 	{
-		super(name, null);
+		super(name, null, null);
+	}
+
+	public InletUnit(String name, int row, int col)
+	{
+		super(name, new FloatMat(row, col), null);
 	}
 
 	public abstract boolean hasNext();

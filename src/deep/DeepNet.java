@@ -1,5 +1,7 @@
 package deep;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import deep.units.*;
@@ -7,19 +9,30 @@ import deep.units.*;
 public class DeepNet implements Iterable<ComputeUnit>
 {
 	private ComputeUnit head;
+	private InletUnit inlet;
 	private TerminalUnit terminal;
 
 	public DeepNet(ComputeUnit... units)
 	{
 		this.head = units[0];
 		this.terminal = (TerminalUnit) units[units.length - 1];
+		this.inlet = (InletUnit) head.input;
 		chain(units);
 	}
+	
+	public DeepNet(ArrayList<ComputeUnit> units)
+	{
+		this((ComputeUnit[]) units.toArray());
+	}
 
+	/**
+	 * If the network between head and terminal is already chained
+	 */
 	public DeepNet(ComputeUnit head, TerminalUnit terminal)
 	{
 		this.head = head;
 		this.terminal = terminal;
+		this.inlet = (InletUnit) head.input;
 	}
 
 	public static void chain(ComputeUnit... units)
@@ -50,9 +63,43 @@ public class DeepNet implements Iterable<ComputeUnit>
 			unit.backward();
 	}
 
-	public void run()
+	public void run(LearningPlan learningPlan)
 	{
-
+		for (ComputeUnit unit : this)
+			unit.learningPlan = learningPlan;
+		
+		setup();
+		
+		while (inlet.hasNext())
+		{
+			inlet.nextBatch();
+			forwprop();
+			backprop();
+		}
+	}
+	
+	/**
+	 * Fill all compute units with default generated name
+	 */
+	public void genDefaultUnitName()
+	{
+		HashMap<String, Integer> map = new HashMap<>();
+		String className;
+		for (ComputeUnit unit : this)
+		{
+			className = unit.getClass().getSimpleName();
+			// className always ends with 'Unit'
+			className = className.substring(0, className.length() - 4);
+			Integer idx = map.get(className);
+			if (idx == null)
+			{
+				map.put(className, 1);
+				idx = 1;
+			}
+			else // use the last index + 1
+				map.put(className, idx + 1);
+			unit.name = String.format("%s{%d}", className, idx);
+		}
 	}
 
 	// ******************** Enable forward/backward iteration ********************/
