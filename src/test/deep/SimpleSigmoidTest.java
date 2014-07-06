@@ -62,6 +62,7 @@ public class SimpleSigmoidTest
 		unitMap = sigmoidNet.getUnitMap();
 		LearningPlan plan = new LearningPlan(1, 1, 0, dummyInput.length);
 		sigmoidNet.runDebug(plan);
+		
 	}
 
 }

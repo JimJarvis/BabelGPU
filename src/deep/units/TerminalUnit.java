@@ -40,7 +40,7 @@ public abstract class TerminalUnit extends PureComputeUnit
 	protected abstract void forward_();
 	
 	/**
-	 * @return all paramUnit from previous ParamComputeUnit
+	 * @return all paramUnit from previous ParamComputeUnit, in backward order
 	 */
 	public ArrayList<ParamUnit> collectParams()
 	{
@@ -69,6 +69,6 @@ public abstract class TerminalUnit extends PureComputeUnit
 		float update = 0;
 		for (ParamUnit w : wList)
 			update += w.data.square().sum();
-		this.result += update / learningPlan.totalTrainSize;
+		this.result += update * learningPlan.reg / learningPlan.totalTrainSize;
 	}
 }

@@ -127,6 +127,16 @@ public class DeepNet implements Iterable<ComputeUnit>
 			unitMap.put(unit.name, unit);
 		return unitMap;
 	}
+	
+	/**
+	 * @return list of all ParamUnit, in forward order
+	 */
+	public ArrayList<ParamUnit> getParams()
+	{
+		ArrayList<ParamUnit> params = this.terminal.collectParams();
+		Collections.reverse(params);
+		return params;
+	}
 
 	// ******************** Enable forward/backward iteration ********************/
 	public Iterable<ComputeUnit> iterable(final boolean forward)
@@ -208,5 +218,27 @@ public class DeepNet implements Iterable<ComputeUnit>
 				PP.p("W:", ((ParamComputeUnit) unit).W);
 			PP.pSectionLine();
 		}
+	}
+	
+	/**
+	 * Gradient checking debug routine
+	 * Will only load one nextBatch() from inlet
+	 */
+	public void gradCheck(LearningPlan learningPlan)
+	{
+	 	setLearningPlan(learningPlan);
+	 	enableDebug();
+	 	PP.pTitledSectionLine("SETUP");
+		setup();
+		inlet.nextBatch();
+		
+		
+		
+		PP.pSectionLine("=", 90);
+		PP.pTitledSectionLine("FORWARD");
+		forwprop();
+		PP.pTitledSectionLine("BACKWARD");
+		backprop();
+		PP.p("\nRESULT =", terminal.getResult());
 	}
 }
