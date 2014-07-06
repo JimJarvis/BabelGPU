@@ -1,5 +1,7 @@
 package test.deep;
 
+import java.util.HashMap;
+
 import utils.*;
 import gpu.*;
 import deep.*;
@@ -54,10 +56,10 @@ public class SimpleSigmoidTest
 			}
 		};
 		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 3});
+		HashMap<String, ComputeUnit> unitMap = sigmoidNet.getUnitMap();
+		
 		sigmoidNet.setLearningPlan(new LearningPlan(1, 1, 0, dummyInput.length));
 		sigmoidNet.setup();
-		for (ComputeUnit unit : sigmoidNet)
-			PP.p(unit.name);
 		sigmoidNet.forwprop();
 		sigmoidNet.backprop();
 		

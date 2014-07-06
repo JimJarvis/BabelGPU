@@ -35,7 +35,7 @@ public class DataUnit extends Unit
     
 	public boolean hasGradient()
 	{
-		return this.gradient == null;
+		return this.gradient != null;
 	}
 	
 	public void setDummyGradient()

@@ -1,9 +1,8 @@
 package deep;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
+import utils.PP;
 import deep.units.*;
 
 public class DeepNet implements Iterable<ComputeUnit>
@@ -102,10 +101,21 @@ public class DeepNet implements Iterable<ComputeUnit>
 				idx = 1;
 			}
 			else // use the last index + 1
-				map.put(className, idx + 1);
+				map.put(className, ++ idx);
 			unit.name = String.format("%s{%d}", className, idx);
 		}
 		return this;
+	}
+	
+	/**
+	 * @return a new HashMap that maps name to ComputeUnit
+	 */
+	public HashMap<String, ComputeUnit> getUnitMap()
+	{
+		HashMap<String, ComputeUnit> unitMap = new HashMap<>();
+		for (ComputeUnit unit : this)
+			unitMap.put(unit.name, unit);
+		return unitMap;
 	}
 
 	// ******************** Enable forward/backward iteration ********************/
