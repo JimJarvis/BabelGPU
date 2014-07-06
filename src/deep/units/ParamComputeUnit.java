@@ -4,7 +4,7 @@ import deep.*;
 
 public abstract class ParamComputeUnit extends ComputeUnit
 {
-	protected Initializer wInitializer = Initializer.DUMMY;
+	public Initializer wInitializer = Initializer.DUMMY;
 	public ParamUnit W;
 	
 	public ParamComputeUnit(String name, int newDim, Initializer wInitializer)
@@ -23,9 +23,17 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	
 	protected void setupW()
 	{
-		this.W = new ParamUnit("W[" + this.name + "]", outDim, input.dim());
-		this.wInitializer.init(W);
+		this.W = new ParamUnit("W[" + this.name + "]", this, outDim, input.dim());
+		reInit();
 		if (debug)
 			this.W.initGradient();
+	}
+	
+	/**
+	 * Re-initialize W
+	 */
+	public void reInit()
+	{
+		this.wInitializer.init(W);
 	}
 }

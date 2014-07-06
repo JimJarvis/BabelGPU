@@ -1,6 +1,7 @@
 package deep.units;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public abstract class TerminalUnit extends PureComputeUnit
 {
@@ -9,7 +10,7 @@ public abstract class TerminalUnit extends PureComputeUnit
 	 */
 	public InletUnit inlet; // will give us gold labels
 	protected float result = 0;
-	protected ArrayList<ParamUnit> wList;
+	protected ArrayList<ParamUnit> wList = null;
 	
 	public TerminalUnit(String name, InletUnit inlet)
 	{
@@ -21,7 +22,7 @@ public abstract class TerminalUnit extends PureComputeUnit
 	public void setup()
 	{
 		setupLink();
-		collectParams();
+		getParams();
 	}
 	
 	/**
@@ -40,10 +41,12 @@ public abstract class TerminalUnit extends PureComputeUnit
 	protected abstract void forward_();
 	
 	/**
-	 * @return all paramUnit from previous ParamComputeUnit, in backward order
+	 * @return all paramUnit from previous ParamComputeUnit, in forward order
 	 */
-	public ArrayList<ParamUnit> collectParams()
+	public ArrayList<ParamUnit> getParams()
 	{
+		if (wList != null) 	return wList;
+		
 		wList = new ArrayList<>();
 		ComputeUnit unitptr = this.prev;
 		while (unitptr != null)
@@ -52,6 +55,7 @@ public abstract class TerminalUnit extends PureComputeUnit
 				wList.add(((ParamComputeUnit) unitptr).W);
 			unitptr = unitptr.prev;
 		}
+		Collections.reverse(wList);
 		return wList;
 	}
 	
