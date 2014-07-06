@@ -22,7 +22,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	public DeepNet(ArrayList<ComputeUnit> units)
 	{
-		this((ComputeUnit[]) units.toArray());
+		this(units.toArray(new ComputeUnit[units.size()]));
 	}
 
 	/**
@@ -62,12 +62,16 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (ComputeUnit unit : iterable(false))
 			unit.backward();
 	}
-
-	public void run(LearningPlan learningPlan)
+	
+	public void setLearningPlan(LearningPlan learningPlan)
 	{
 		for (ComputeUnit unit : this)
 			unit.learningPlan = learningPlan;
-		
+	}
+
+	public void run(LearningPlan learningPlan)
+	{
+		setLearningPlan(learningPlan);
 		setup();
 		
 		while (inlet.hasNext())
@@ -80,8 +84,9 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	/**
 	 * Fill all compute units with default generated name
+	 * @return this
 	 */
-	public void genDefaultUnitName()
+	public DeepNet genDefaultUnitName()
 	{
 		HashMap<String, Integer> map = new HashMap<>();
 		String className;
@@ -100,6 +105,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 				map.put(className, idx + 1);
 			unit.name = String.format("%s{%d}", className, idx);
 		}
+		return this;
 	}
 
 	// ******************** Enable forward/backward iteration ********************/

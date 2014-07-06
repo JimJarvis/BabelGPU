@@ -28,9 +28,8 @@ public class DeepFactory
 			units.add(new SigmoidUnit(""));
 		}
 		units.add(new SquareErrorUnit("", inlet));
-
 		units.get(0).input = inlet;
 
-		return new DeepNet(units);
+		return new DeepNet(units).genDefaultUnitName();
 	}
 }

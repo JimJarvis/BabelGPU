@@ -338,6 +338,14 @@ public class FloatMat
 	}
 	
 	/**
+	 * @see FloatMat#setHostArray(float[])
+	 */
+	public void setHostArray(float[][] hostArray)
+	{
+		setHostArray(CpuUtil.flatten(hostArray, true));
+	}
+	
+	/**
 	 * Set the host buffer with HostMode check 
 	 * you can disable by enableHostModeCheck(false)
 	 */

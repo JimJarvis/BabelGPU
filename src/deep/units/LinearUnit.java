@@ -22,7 +22,7 @@ public class LinearUnit extends ParamComputeUnit
 		// update input.gradient only when necessary 
 		// Don't upgrade the gradient of the input layer, of course
 		if (input.hasGradient())
-    		GpuBlas.mult(W.data.transpose(), output.gradient, input.gradient);
+			GpuBlas.mult(W.data.transpose(), output.gradient, input.gradient);
 
 		if (W.hasGradient())
 		{
