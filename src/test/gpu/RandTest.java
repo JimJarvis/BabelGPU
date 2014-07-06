@@ -5,6 +5,7 @@ import gpu.GpuRand;
 import jcuda.Pointer;
 import jcuda.jcurand.JCurand;
 import static jcuda.runtime.JCuda.*;
+import utils.GpuUtil;
 import utils.PP;
 import utils.Timer;
 
@@ -13,8 +14,7 @@ public class RandTest
 
 	public static void main(String[] args)
 	{
-		setExceptionsEnabled(true);
-		JCurand.setExceptionsEnabled(true);
+		GpuUtil.enableExceptions();
 
 		Timer timer = Timer.getInstance();
 		
@@ -30,6 +30,10 @@ public class RandTest
 		timer.readFromLast();
 		PP.p(m);
 		timer.readFromLast();
+		rand.resetSeed(37);
+		m = rand.genNormalFloat(20, 0, 3);
+		PP.p(m);
+		
 		m.destroy();
 		
 		PP.p("Uniform");
@@ -48,6 +52,7 @@ public class RandTest
 		timer.readFromLast();
 		
 		m.destroy();
+		
 		rand.destroy();
 	}
 

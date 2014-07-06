@@ -19,9 +19,14 @@ public class GpuRand
 	 */
 	public GpuRand(long seed)
 	{
+		createGenerator(seed);
+	}
+	
+	private void createGenerator(long seed)
+	{
 		generator = new curandGenerator();
 		curandCreateGenerator(generator, CURAND_RNG_PSEUDO_DEFAULT);
-		resetSeed(seed);
+		curandSetPseudoRandomGeneratorSeed(generator, seed);
 	}
 	
 	/**
@@ -35,10 +40,13 @@ public class GpuRand
 	
 	/**
 	 * Re-initialize with a specified seed
+	 * We actually destroy and reallocate the generator 
+	 * because resetting seed doesn't ensure the same random sequence
 	 */
 	public void resetSeed(long seed)
 	{
-		curandSetPseudoRandomGeneratorSeed(generator, seed);
+		destroy();
+		createGenerator(seed);
 	}
 
 	/**
