@@ -25,6 +25,11 @@ public class MiscTest
 		FloatMat b = new FloatMat(B.clone());
 		FloatMat a = new FloatMat(A.clone());
 		
+		b.singleIncr(2, 1, 666);
+		PP.p(b);
+		a.singleSet(2, 0, 666);
+		PP.p(a);
+		
 		PP.p(GpuBlas.dotMult(a, b));
 		PP.p(b.reciprocal());
 		PP.p(b.reciprocal().square());

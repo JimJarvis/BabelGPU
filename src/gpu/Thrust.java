@@ -1,6 +1,7 @@
 package gpu;
 
 import static gpu.ThrustNative.*;
+import utils.CpuUtil.Coord;
 
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
@@ -234,6 +235,29 @@ public class Thrust
 		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer());
 	}
 	
+	/**
+	 * Set a single value
+	 */
+	public static void single_set(FloatMat x, int i, int j, float newVal)
+	{
+		gpu_set_single_float(x.getThrustPointer(), x.toIndex(i, j), newVal);
+	}
+	public static void single_set(FloatMat x, Coord c, float newVal)
+	{
+		gpu_set_single_float(x.getThrustPointer(), x.toIndex(c), newVal);
+	}
+	
+	/**
+	 * Increment a single value
+	 */
+	public static void single_incr(FloatMat x, int i, int j, float incrVal)
+	{
+		gpu_incr_single_float(x.getThrustPointer(), x.toIndex(i, j), incrVal);
+	}
+	public static void single_incr(FloatMat x, Coord c, float incrVal)
+	{
+		gpu_incr_single_float(x.getThrustPointer(), x.toIndex(c), incrVal);
+	}
 	
 	/**
 	 * Sort. dir = 1 for ascending, -1 for descending
@@ -571,6 +595,30 @@ public class Thrust
 	public static void dot_mult(DoubleMat x, DoubleMat y, DoubleMat out)
 	{
 		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer());
+	}
+	
+	/**
+	 * Set a single value
+	 */
+	public static void single_set(DoubleMat x, int i, int j, double newVal)
+	{
+		gpu_set_single_double(x.getThrustPointer(), x.toIndex(i, j), newVal);
+	}
+	public static void single_set(DoubleMat x, Coord c, double newVal)
+	{
+		gpu_set_single_double(x.getThrustPointer(), x.toIndex(c), newVal);
+	}
+	
+	/**
+	 * Increment a single value
+	 */
+	public static void single_incr(DoubleMat x, int i, int j, double incrVal)
+	{
+		gpu_incr_single_double(x.getThrustPointer(), x.toIndex(i, j), incrVal);
+	}
+	public static void single_incr(DoubleMat x, Coord c, double incrVal)
+	{
+		gpu_incr_single_double(x.getThrustPointer(), x.toIndex(c), incrVal);
 	}
 	
 	/**

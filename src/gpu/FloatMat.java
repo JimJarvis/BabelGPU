@@ -713,4 +713,34 @@ public class FloatMat
 	{
 		Thrust.copy(other, this);	return this;
 	}
+	
+	/**
+	 * Set a single value to newVal
+	 */
+	public FloatMat singleSet(int i, int j, float newVal)
+	{
+		Thrust.single_set(this, i, j, newVal); return this;
+	}
+	/**
+	 * Set a single value to newVal
+	 */
+	public FloatMat singleSet(Coord c, float newVal)
+	{
+		Thrust.single_set(this, c, newVal); return this;
+	}
+	
+	/**
+	 * Increment a single value to newVal
+	 */
+	public FloatMat singleIncr(int i, int j, float newVal)
+	{
+		Thrust.single_incr(this, i, j, newVal); return this;
+	}
+	/**
+	 * Increment a single value to newVal
+	 */
+	public FloatMat singleIncr(Coord c, float newVal)
+	{
+		Thrust.single_incr(this, c, newVal); return this;
+	}
 }

@@ -118,6 +118,15 @@ public class ThrustNative
     public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2);
     public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2, @ByVal FloatDevicePointer out);
     
+    /**
+     * Set a single value 
+     */
+    public static native void gpu_set_single_float(@ByVal FloatDevicePointer begin, int offset, float newVal);
+    /**
+     * Increment a single value 
+     */
+    public static native void gpu_incr_single_float(@ByVal FloatDevicePointer begin, int offset, float incrVal);
+    
     
     /**
      * Sort: dir = 1 ascending, dir = -1 descending
@@ -259,26 +268,26 @@ public class ThrustNative
      */
     public static native void gpu__double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
     public static native void gpu__double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
-    
+
     /**
-  	 * abs(a*x + b) in place, or with an output pointer
-  	 */
-      public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
-      public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
-   
+     * abs(a*x + b) in place, or with an output pointer
+     */
+    public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+    public static native void gpu_fabs_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+
     /**
-   	 * sigmoid(a*x + b) in place, or with an output pointer
-   	 */
-       public static native void gpu_sigmoid_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
-       public static native void gpu_sigmoid_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
-       
-       /**
-   	 * sigmoid_deriv(a*x + b) <=> x .* (1 - x) in place, or with an output pointer
-   	 */
-       public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
-       public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
-       
-    
+     * sigmoid(a*x + b) in place, or with an output pointer
+     */
+    public static native void gpu_sigmoid_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+    public static native void gpu_sigmoid_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+
+    /**
+     * sigmoid_deriv(a*x + b) <=> x .* (1 - x) in place, or with an output pointer
+     */
+    public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+    public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+
+
     // other
     public static native double gpu_max_double(@ByVal DoubleDevicePointer begin, int size);
     public static native double gpu_min_double(@ByVal DoubleDevicePointer begin, int size);
@@ -291,6 +300,15 @@ public class ThrustNative
      */
     public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2);
     public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2, @ByVal DoubleDevicePointer out);
+    
+    /**
+     * Set a single value 
+     */
+    public static native void gpu_set_single_double(@ByVal DoubleDevicePointer begin, int offset, double newVal);
+    /**
+     * Increment a single value 
+     */
+    public static native void gpu_incr_single_double(@ByVal DoubleDevicePointer begin, int offset, double incrVal);
     
     /**
      * Sort: dir = 1 ascending, dir = -1 descending

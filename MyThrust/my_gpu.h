@@ -277,6 +277,16 @@ namespace MyGpu
 	inline device_ptr<double> offset(device_ptr<double> begin, int offset)
 	{ return begin + offset; }
 
+	// Set or update a single value on device
+	// for gradCheck perturb()
+#define GEN_change_single_val(Ftype) \
+	inline void gpu_set_single_##Ftype(device_ptr<Ftype> begin, int offset, Ftype newVal) \
+	{ begin[offset] = newVal; } \
+	inline void gpu_incr_single_##Ftype(device_ptr<Ftype> begin, int offset, Ftype incrVal) \
+	{ begin[offset] += incrVal; }
+
+	GEN_change_single_val(float); GEN_change_single_val(double);
+
 	// Deal with int, float, and double raw GPU pointers
 #define GEN_raw_pointer_func(Ftype) \
 	inline Ftype* offset(Ftype *begin, int offset) \
