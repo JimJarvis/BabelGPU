@@ -17,6 +17,7 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	public void setup()
 	{
 		super.setup();
+		setupOutput();
 		setupW();
 	}
 	

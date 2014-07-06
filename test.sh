@@ -2,8 +2,8 @@
 
 main="gpu/SoftmaxTest"
 main="gpu/MinibatchTest"
-main="gpu/MiscTest"
 main="gpu/RandTest"
+main="MiscTest"
 
 cp MyThrust/*.h bin/gpu/
 cp matlab/*.txt bin/

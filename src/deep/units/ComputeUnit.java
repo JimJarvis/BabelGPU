@@ -34,7 +34,6 @@ public abstract class ComputeUnit extends Unit
 	public void setup()
 	{
 		setupLink();
-		setupOutput();
 	}
 	
 	protected void setupLink()
