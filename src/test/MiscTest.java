@@ -5,11 +5,11 @@ import utils.PP;
 
 public class MiscTest
 {
-
 	public static void main(String[] args)
 	{
 		Integer a = 6;
-		PP.po(CpuUtil.repeatedArray(a, 10));
+		Integer b[] = CpuUtil.repeatedArray(a, 8);
+		PP.po(b);
 	}
 
 }

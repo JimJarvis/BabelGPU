@@ -4,13 +4,17 @@ import deep.*;
 
 public abstract class ParamComputeUnit extends ComputeUnit
 {
-	public Initializer wInitializer = Initializer.DUMMY;
+	public Initializer initer = Initializer.dummyIniter;
 	public ParamUnit W;
 	
-	public ParamComputeUnit(String name, int newDim, Initializer wInitializer)
+	/**
+	 * @param newDim output dimension from this computing unit
+	 * @param initer parameter W initializer
+	 */
+	public ParamComputeUnit(String name, int newDim, Initializer initer)
 	{
 		super(name, newDim);
-		this.wInitializer = wInitializer;
+		this.initer = initer;
 	}
 	
 	@Override
@@ -34,6 +38,6 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	 */
 	public void reInit()
 	{
-		this.wInitializer.init(W);
+		this.initer.init(W);
 	}
 }

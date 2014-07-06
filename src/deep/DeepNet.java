@@ -71,6 +71,16 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	/**
+	 * Set one initializer for all ParamComputeUnit 
+	 */
+	public void setInitializer(Initializer initer)
+	{
+		for (ComputeUnit unit : this)
+			if (unit instanceof ParamComputeUnit)
+				((ParamComputeUnit) unit).initer = initer;
+	}
+	
+	/**
 	 * If debug mode enabled, we explicitly store the parameter gradient
 	 */
 	public void enableDebug(boolean debug)

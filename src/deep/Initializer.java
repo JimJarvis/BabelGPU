@@ -13,7 +13,7 @@ public abstract class Initializer
 	/**
 	 * Does absolutely nothing
 	 */
-	public static final Initializer DUMMY = 
+	public static final Initializer dummyIniter = 
 			new Initializer()
         	{
         		@Override
@@ -21,9 +21,17 @@ public abstract class Initializer
         	};
 	
 	/**
+	 * Reset random generator to default seed
+	 */
+	public static void resetRand()
+	{
+		rand.resetSeed(seed);
+	}
+
+	/**
 	 * Initialize uniform random parameter matrix from low to high
 	 */
-	public static Initializer uniformRandInitializer(final float low, final float high)
+	public static Initializer uniformRandIniter(final float low, final float high)
 	{
 		final float range = high - low;
 		return new Initializer()
@@ -42,16 +50,23 @@ public abstract class Initializer
 	/**
 	 * Initialize uniform random parameter matrix from -symmetric to +symmetric
 	 */
-	public static Initializer uniformRandInitializer(final float symmetric)
+	public static Initializer uniformRandIniter(final float symmetric)
 	{
-		return uniformRandInitializer(-symmetric, symmetric);
+		return uniformRandIniter(-symmetric, symmetric);
 	}
 	
 	/**
-	 * Reset random generator to default seed
+	 * Initialize (fill) with one same value
 	 */
-	public static void resetRand()
+	public static Initializer fillIniter(final float val)
 	{
-		rand.resetSeed(seed);
+		return new Initializer()
+		{
+			@Override
+			public void init(ParamUnit W)
+			{
+				W.data.fill(val);
+			}
+		};
 	}
 }

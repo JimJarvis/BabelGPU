@@ -1,8 +1,20 @@
 package utils;
 
+import java.lang.reflect.Array;
+
 public class CpuUtil
 {
 	// ******************** COMMON ********************/
+	/**
+	 * Make a repeated array from a single object
+	 */
+	public static <T> T[] repeatedArray(T obj, int len)
+	{
+		T[] objs = (T[]) Array.newInstance(obj.getClass(), len);
+		for (int i = 0 ; i < len ; i ++)
+			objs[i] = obj;
+		return objs;
+	}
 	
 	/**
 	 * Inner class for 2D coordinate in the matrix

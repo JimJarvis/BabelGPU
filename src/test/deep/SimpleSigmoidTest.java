@@ -58,13 +58,13 @@ public class SimpleSigmoidTest
 				return hasNext;
 			}
 		};
-		sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 3});
+		sigmoidNet = DeepFactory.debugSimpleSigmoidNet(inlet, new int[] {5, 3});
 		unitMap = sigmoidNet.getUnitMap();
 		LearningPlan plan = new LearningPlan(1, 0, 0, dummyInput.length);
 
-//		sigmoidNet.runDebug(plan);
+		sigmoidNet.runDebug(plan);
 //		PP.pSectionLine("\n", 3);
-		sigmoidNet.gradCheck(plan);
+//		sigmoidNet.gradCheck(plan);
 	}
 
 }
