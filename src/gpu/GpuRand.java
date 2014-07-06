@@ -2,14 +2,9 @@ package gpu;
 
 import static jcuda.jcurand.JCurand.*;
 import static jcuda.jcurand.curandRngType.*;
-import static jcuda.runtime.JCuda.*;
-import static jcuda.runtime.cudaMemcpyKind.*;
-import static jcuda.Sizeof.*;
 
 import java.util.Random;
 
-import utils.GpuUtil;
-import jcuda.Pointer;
 import jcuda.jcurand.curandGenerator;
 
 /**

@@ -24,11 +24,20 @@ public abstract class TerminalUnit extends PureComputeUnit
 		collectParams();
 	}
 	
+	/**
+	 * 'final' ensures that subclass cannot directly override forward()
+	 * but must implement forward_()
+	 */
 	@Override
-	public void forward()
+	public final void forward()
 	{
 		inlet.nextGold();
+		forward_();
 	}
+	/**
+	 * Hack: ensure that you call super.forward() first
+	 */
+	protected abstract void forward_();
 	
 	/**
 	 * @return all paramUnit from previous ParamComputeUnit
@@ -49,7 +58,7 @@ public abstract class TerminalUnit extends PureComputeUnit
 	public float getResult() {	return result;	}
 	
 	public float update(float update)
-	{	
+	{
 		this.learningPlan.curTrainSize += input.batchSize();
 		return this.result += update;
 	}

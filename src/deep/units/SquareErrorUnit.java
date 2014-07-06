@@ -13,10 +13,8 @@ public class SquareErrorUnit extends TerminalUnit
 	}
 
 	@Override
-	public void forward()
+	public void forward_()
 	{
-		super.forward();
-		
 		if (y_minus_input_squared == null)
 			y_minus_input_squared = new FloatMat(input.data);
 		GpuBlas.add(input.data, inlet.goldMat, input.gradient, 1, -1);
@@ -30,5 +28,4 @@ public class SquareErrorUnit extends TerminalUnit
 	{
     	// backward is already done by forward
 	}
-
 }
