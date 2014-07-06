@@ -21,7 +21,7 @@ public class GpuRand
 	{
 		generator = new curandGenerator();
 		curandCreateGenerator(generator, CURAND_RNG_PSEUDO_DEFAULT);
-		curandSetPseudoRandomGeneratorSeed(generator, seed);
+		resetSeed(seed);
 	}
 	
 	/**
@@ -31,6 +31,14 @@ public class GpuRand
 	public GpuRand()
 	{
 		this(rand.nextLong());
+	}
+	
+	/**
+	 * Re-initialize with a specified seed
+	 */
+	public void resetSeed(long seed)
+	{
+		curandSetPseudoRandomGeneratorSeed(generator, seed);
 	}
 
 	/**
