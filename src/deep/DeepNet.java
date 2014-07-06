@@ -67,6 +67,16 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (ComputeUnit unit : this)
 			unit.learningPlan = learningPlan;
 	}
+	
+	/**
+	 * If debug mode enabled, we explicitly store the parameter gradient
+	 */
+	public void enableDebug(boolean debug)
+	{
+		for (ComputeUnit unit : this)
+			unit.enableDebug(debug);
+	}
+	public void enableDebug() {	this.enableDebug(true); }
 
 	public void run(LearningPlan learningPlan)
 	{
@@ -166,6 +176,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public void runDebug(LearningPlan learningPlan)
 	{
 	 	setLearningPlan(learningPlan);
+	 	enableDebug();
 	 	PP.pTitledSectionLine("SETUP");
 		setup();
 		printDebug();

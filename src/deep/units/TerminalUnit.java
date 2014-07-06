@@ -55,7 +55,7 @@ public abstract class TerminalUnit extends PureComputeUnit
 		return wList;
 	}
 	
-	public float getResult() {	return result;	}
+	public float getResult() {	return result / learningPlan.totalTrainSize;	}
 	
 	public float update(float update)
 	{

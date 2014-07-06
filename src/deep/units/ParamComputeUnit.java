@@ -25,5 +25,7 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	{
 		this.W = new ParamUnit("W[" + this.name + "]", outDim, input.dim());
 		this.wInitializer.init(W);
+		if (debug)
+			this.W.initGradient();
 	}
 }
