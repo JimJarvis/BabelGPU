@@ -221,7 +221,7 @@ public class PP
      * @param sep separator pattern
      * @param length repeat how many times the separator
      */
-    public static String getSectionLine(String sep, int length)
+    public static String sectionLine(String sep, int length)
     {
     	String line = "";
     	for (int i = 0; i < length; i++)
@@ -231,26 +231,50 @@ public class PP
     /**
      * Default to separator is asterisk "*"
      */
-    public static String getSectionLine(int length) {	return getSectionLine("*", length);	}
+    public static String sectionLine(int length) {	return sectionLine("*", length);	}
     /**
      * Default separator asterisk and length 33
      */
-    public static String getSectionLine() {	return getSectionLine("*", 33);	}
-
+    public static String sectionLine() {	return sectionLine("*", 33);	}
+    
     /**
      * Print a line that separates different sections
      * @param sep separator pattern
      * @param length repeat how many times the separator
      */
-    public static void pSectionLine(String sep, int length) {	po(getSectionLine(sep, length));	}
+    public static void pSectionLine(String sep, int length) {	po(sectionLine(sep, length));	}
     /**
      * Default to separator is asterisk "*"
      */
-    public static void pSectionLine(int length) {	po(getSectionLine(length));	}
+    public static void pSectionLine(int length) {	po(sectionLine(length));	}
     /**
      * Default separator asterisk and length 33
      */
-    public static void pSectionLine() {	po(getSectionLine());	}
+    public static void pSectionLine() {	po(sectionLine());	}
+
+    /**
+     * Print section line with title
+     * @param length half length, title in middle
+     */
+    public static void pTitledSectionLine(String title, String sep, int halfLength)
+    {
+    	String secLine = sectionLine(sep, halfLength);
+    	po( secLine + " " + title + " " + secLine );
+    }
+    /**
+     * Default to separator asterisk '*'
+     */
+    public static void pTitledSectionLine(String title, int halfLength)
+    {
+    	pTitledSectionLine(title, "*", halfLength);
+    }
+    /**
+     * Default to separator asterisk and length 20
+     */
+    public static void pTitledSectionLine(String title)
+    {
+    	pTitledSectionLine(title, "*", 20);
+    }
 
     /**
      * Prints a formatted string with new line
