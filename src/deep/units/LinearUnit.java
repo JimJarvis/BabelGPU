@@ -28,11 +28,15 @@ public class LinearUnit extends ParamComputeUnit
 		{
     		// update W with reg
     		float lr = learningPlan.lr;
-    		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 
-    				lr/input.batchSize(), 1 - lr * learningPlan.reg / learningPlan.totalTrainSize);
     		// In debug mode, we explicitly store the parameter gradient
     		if (debug)
+    		{
     			GpuBlas.mult(output.gradient, input.data.transpose(), W.gradient);
+    			GpuBlas.scaleAdd(W.data, W.gradient, learningPlan.normReg());
+    		}
+
+    		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 
+    				lr/input.batchSize(), 1 - lr * learningPlan.normReg());
 		}
 	}
 

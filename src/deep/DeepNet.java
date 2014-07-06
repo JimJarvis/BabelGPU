@@ -1,5 +1,7 @@
 package deep;
 
+import gpu.FloatMat;
+
 import java.util.*;
 
 import utils.PP;
@@ -92,6 +94,18 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	/**
+	 * Prepare a network for re-run
+	 */
+	public void reset()
+	{
+		Initializer.resetRand();
+		for (ParamUnit w : terminal.getParams())
+			w.reInit();
+		terminal.clearResult();
+		terminal.learningPlan.reset();
+	}
+	
+	/**
 	 * Fill all compute units with default generated name
 	 * @return this
 	 */
@@ -128,16 +142,6 @@ public class DeepNet implements Iterable<ComputeUnit>
 		return unitMap;
 	}
 	
-	/**
-	 * @return list of all ParamUnit, in forward order
-	 */
-	public ArrayList<ParamUnit> getParams()
-	{
-		ArrayList<ParamUnit> params = this.terminal.collectParams();
-		Collections.reverse(params);
-		return params;
-	}
-
 	// ******************** Enable forward/backward iteration ********************/
 	public Iterable<ComputeUnit> iterable(final boolean forward)
 	{
@@ -226,19 +230,64 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public void gradCheck(LearningPlan learningPlan)
 	{
+		final float EPS = 1e-5f;
+		
 	 	setLearningPlan(learningPlan);
 	 	enableDebug();
-	 	PP.pTitledSectionLine("SETUP");
 		setup();
 		inlet.nextBatch();
 		
-		
-		
-		PP.pSectionLine("=", 90);
-		PP.pTitledSectionLine("FORWARD");
+		ArrayList<ParamUnit> params = terminal.getParams();
+		FloatMat exactGrad[] = new FloatMat[params.size()];
+		FloatMat propGrad[] = new FloatMat[params.size()];
+
+		// Get the exact gradient by backprop first
 		forwprop();
-		PP.pTitledSectionLine("BACKWARD");
 		backprop();
-		PP.p("\nRESULT =", terminal.getResult());
+		
+		FloatMat mat;
+		
+		int i = 0;
+		for (ParamUnit w : params)
+		{
+			mat = new FloatMat(w.gradient);
+			mat.copyFrom(w.gradient);
+			exactGrad[i ++] = mat;
+		}
+		
+		// Do finite-diff forward prop for every entry in every parameter
+		i = 0;
+		for (ParamUnit w : params)
+		{
+			mat = new FloatMat(w.data);
+			for (int idx = 0 ; idx < w.size(); idx ++)
+			{
+				// +EPS and -EPS perturb
+				float negResult = 0, posResult = 0;
+				for (int perturb : new int[] {-1, 1})
+				{
+    				// Re-init everything as the exact gradient initialization
+					this.reset();
+    				
+            		// Perturb -EPS
+            		w.data.singleIncr(idx, perturb * EPS);
+            		forwprop();
+            		float result = terminal.getResult();
+
+            		if (perturb < 0) negResult = result; else posResult = result;
+				}
+				// Compute symmetric numerical gradient and store to 'mat'
+				mat.singleSet(idx, (posResult - negResult) / (2 * EPS));
+			}
+			// Store
+			propGrad[i ++] = mat;
+		}
+		
+		PP.setSep("\n\n");
+		PP.pTitledSectionLine("EXACT");
+		PP.p(exactGrad);
+		PP.p();
+		PP.pTitledSectionLine("BACK-PROP");
+		PP.p(propGrad);
 	}
 }

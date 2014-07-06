@@ -238,25 +238,25 @@ public class Thrust
 	/**
 	 * Set a single value
 	 */
+	public static void single_set(FloatMat x, int idx, float newVal)
+	{
+		gpu_set_single_float(x.getThrustPointer(), idx, newVal);
+	}
 	public static void single_set(FloatMat x, int i, int j, float newVal)
 	{
-		gpu_set_single_float(x.getThrustPointer(), x.toIndex(i, j), newVal);
-	}
-	public static void single_set(FloatMat x, Coord c, float newVal)
-	{
-		gpu_set_single_float(x.getThrustPointer(), x.toIndex(c), newVal);
+		single_set(x, x.toIndex(i, j), newVal);
 	}
 	
 	/**
 	 * Increment a single value
 	 */
+	public static void single_incr(FloatMat x, int idx, float incrVal)
+	{
+		gpu_incr_single_float(x.getThrustPointer(), idx, incrVal);
+	}
 	public static void single_incr(FloatMat x, int i, int j, float incrVal)
 	{
-		gpu_incr_single_float(x.getThrustPointer(), x.toIndex(i, j), incrVal);
-	}
-	public static void single_incr(FloatMat x, Coord c, float incrVal)
-	{
-		gpu_incr_single_float(x.getThrustPointer(), x.toIndex(c), incrVal);
+		single_incr(x, x.toIndex(i, j), incrVal);
 	}
 	
 	/**
@@ -600,25 +600,25 @@ public class Thrust
 	/**
 	 * Set a single value
 	 */
+	public static void single_set(DoubleMat x, int idx, double newVal)
+	{
+		gpu_set_single_double(x.getThrustPointer(), idx, newVal);
+	}
 	public static void single_set(DoubleMat x, int i, int j, double newVal)
 	{
-		gpu_set_single_double(x.getThrustPointer(), x.toIndex(i, j), newVal);
-	}
-	public static void single_set(DoubleMat x, Coord c, double newVal)
-	{
-		gpu_set_single_double(x.getThrustPointer(), x.toIndex(c), newVal);
+		single_set(x, x.toIndex(i, j), newVal);
 	}
 	
 	/**
 	 * Increment a single value
 	 */
+	public static void single_incr(DoubleMat x, int idx, double incrVal)
+	{
+		gpu_incr_single_double(x.getThrustPointer(), idx, incrVal);
+	}
 	public static void single_incr(DoubleMat x, int i, int j, double incrVal)
 	{
-		gpu_incr_single_double(x.getThrustPointer(), x.toIndex(i, j), incrVal);
-	}
-	public static void single_incr(DoubleMat x, Coord c, double incrVal)
-	{
-		gpu_incr_single_double(x.getThrustPointer(), x.toIndex(c), incrVal);
+		single_incr(x, x.toIndex(i, j), incrVal);
 	}
 	
 	/**

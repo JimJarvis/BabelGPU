@@ -8,11 +8,26 @@ public class LearningPlan
 	public int totalTrainSize;
 	public int curTrainSize = 0;
 	
+	public LearningPlan() {};
+	
 	public LearningPlan(float lr, float reg, float gamma, int totalTrainSize)
 	{
 		this.lr = lr;
 		this.reg = reg;
 		this.gamma = gamma;
 		this.totalTrainSize = totalTrainSize;
+	}
+	
+	/**
+	 * Prepare for re-run
+	 */
+	public void reset() { this.curTrainSize = 0; }
+	
+	/**
+	 * @return reg / totalTrainSize
+	 */
+	public float normReg()
+	{
+		return this.reg / this.totalTrainSize;
 	}
 }

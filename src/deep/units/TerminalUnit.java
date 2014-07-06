@@ -1,5 +1,7 @@
 package deep.units;
 
+import gpu.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -67,12 +69,26 @@ public abstract class TerminalUnit extends PureComputeUnit
 		return this.result += update;
 	}
 	
+	private FloatMat tmp_data_sqs[];  // hold temp squared values
 	public void updateReg()
 	{
+		// init once
+		if (tmp_data_sqs == null)
+		{
+			tmp_data_sqs = new FloatMat[wList.size()];
+			int i = 0;
+			for (ParamUnit w : wList)
+				tmp_data_sqs[i ++] = new FloatMat(w.data);
+		}
 		// L2 regularizer
 		float update = 0;
-		for (ParamUnit w : wList)
-			update += w.data.square().sum();
-		this.result += update * learningPlan.reg / learningPlan.totalTrainSize;
+		for (int i = 0; i < wList.size(); i++)
+		{
+            Thrust.square(wList.get(i).data, tmp_data_sqs[i]);
+			update += tmp_data_sqs[i].sum();
+		}
+		this.result += 0.5 * update * learningPlan.reg;
 	}
+	
+	public void clearResult() { this.result = 0; }
 }

@@ -30,8 +30,7 @@ public class ParamUnit extends DataUnit
 		throw new DeepException("ParamUnit doesn't have 'batchSize', use col() instead");
 	}
 	
-	public int row() {	return this.data.row;	}
-	public int col() {	return this.data.col;	}
+	public int size() {	return this.data.size();	}
 	
 	/**
 	 * Reinitialize this parameter with parent's wInitializer

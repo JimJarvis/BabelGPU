@@ -724,9 +724,9 @@ public class FloatMat
 	/**
 	 * Set a single value to newVal
 	 */
-	public FloatMat singleSet(Coord c, float newVal)
+	public FloatMat singleSet(int idx, float newVal)
 	{
-		Thrust.single_set(this, c, newVal); return this;
+		Thrust.single_set(this, idx, newVal); return this;
 	}
 	
 	/**
@@ -739,8 +739,8 @@ public class FloatMat
 	/**
 	 * Increment a single value to newVal
 	 */
-	public FloatMat singleIncr(Coord c, float newVal)
+	public FloatMat singleIncr(int idx, float newVal)
 	{
-		Thrust.single_incr(this, c, newVal); return this;
+		Thrust.single_incr(this, idx, newVal); return this;
 	}
 }
