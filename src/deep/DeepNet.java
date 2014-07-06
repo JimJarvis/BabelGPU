@@ -2,8 +2,7 @@ package deep;
 
 import java.util.Iterator;
 
-import deep.units.ComputeUnit;
-import deep.units.TerminalUnit;
+import deep.units.*;
 
 public class DeepNet implements Iterable<ComputeUnit>
 {

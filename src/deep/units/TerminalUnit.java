@@ -1,23 +1,65 @@
 package deep.units;
 
+import java.util.ArrayList;
+
 public abstract class TerminalUnit extends PureComputeUnit
 {
-	public DataUnit y;
+	/**
+	 * Gold standard, normally the correct labels -> sparse 1-0 matrix
+	 */
+	public InletUnit inlet; // will give us gold labels
 	protected float result = 0;
-
-	public TerminalUnit(String name, DataUnit y)
+	protected ArrayList<ParamUnit> wList;
+	
+	public TerminalUnit(String name, InletUnit inlet)
 	{
 		super(name, 1);
-		this.y = y;
+		this.inlet = inlet;
 	}
 	
 	@Override
 	public void setup()
 	{
 		setupLink();
+		collectParams();
+	}
+	
+	@Override
+	public void forward()
+	{
+		inlet.nextGold();
+	}
+	
+	/**
+	 * @return all paramUnit from previous ParamComputeUnit
+	 */
+	public ArrayList<ParamUnit> collectParams()
+	{
+		wList = new ArrayList<>();
+		ComputeUnit unitptr = this.prev;
+		while (unitptr != null)
+		{
+			if (unitptr instanceof ParamComputeUnit)
+				wList.add(((ParamComputeUnit) unitptr).W);
+			unitptr = unitptr.prev;
+		}
+		return wList;
 	}
 	
 	public float getResult() {	return result;	}
 	
-	public float update(float update) {	return result += update;	}
+	public float update(float update)
+	{	
+		this.learningPlan.curTrainSize += input.batchSize();
+		return this.result += update;
+	}
+	
+	public void updateReg()
+	{
+		// L2 regularizer
+		float update = 0;
+		for (ParamUnit w : wList)
+			update += w.data.square().sum();
+		this.result += update / learningPlan.totalTrainSize;
+	}
 }

@@ -5,26 +5,30 @@ import gpu.*;
 // terminal unit
 public class SquareErrorUnit extends TerminalUnit
 {
-	private FloatMat y_minus_input_squared; // temp cache
+	private FloatMat y_minus_input_squared = null; // temp cache
 
-	public SquareErrorUnit(String name, DataUnit y)
+	public SquareErrorUnit(String name, InletUnit inlet)
 	{
-		super(name, y);
-		y_minus_input_squared= new FloatMat(y.data);
+		super(name, inlet);
 	}
 
 	@Override
 	public void forward()
 	{
-		GpuBlas.add(input.data, y.data, input.gradient, 1, -1);
+		super.forward();
+		
+		if (y_minus_input_squared == null)
+			y_minus_input_squared = new FloatMat(input.data);
+		GpuBlas.add(input.data, inlet.goldMat, input.gradient, 1, -1);
 		Thrust.square(input.gradient, y_minus_input_squared);
 		update(y_minus_input_squared.linear(0.5f, 0).sum());
+		updateReg();
 	}
 
 	@Override
 	public void backward()
 	{
-		// Already done by forward()
+    	// backward is already done by forward
 	}
 
 }
