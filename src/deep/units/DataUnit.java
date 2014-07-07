@@ -52,6 +52,6 @@ public class DataUnit extends Unit
 	// Debug only
 	public String toString()
 	{
-		return PP.all2str("[", name, "]\n<Data>", data, "\n<Gradient>", gradient);
+		return PP.all2str("\"" + name + "\"\n<Data>", data, "\n<Gradient>", gradient);
 	}
 }

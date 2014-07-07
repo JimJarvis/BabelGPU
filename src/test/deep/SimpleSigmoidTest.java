@@ -61,10 +61,15 @@ public class SimpleSigmoidTest
 		sigmoidNet = DeepFactory.debugSimpleSigmoidNet(inlet, new int[] {5, 3});
 		unitMap = sigmoidNet.getUnitMap();
 		LearningPlan plan = new LearningPlan(1, 0, 0, dummyInput.length);
-
-		sigmoidNet.runDebug(plan);
+		
+//		sigmoidNet.runDebug(plan);
 //		PP.pSectionLine("\n", 3);
 //		sigmoidNet.gradCheck(plan);
+		
+		DeepNet linearLayer = DeepFactory.debugLinearLayer(inlet, new int[] {3});
+		linearLayer.runDebug(plan);
+		linearLayer.reset();
+		linearLayer.gradCheck(plan);
 	}
 
 }

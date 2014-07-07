@@ -56,4 +56,15 @@ public class DeepFactory
 		return simpleSigmoidNet(inlet, layerDims, 
 				CpuUtil.repeatedArray(Initializer.fillIniter(0.5f), layerDims.length));
 	}
+	
+	public static DeepNet debugLinearLayer(InletUnit inlet, int[] layerDims)
+	{
+		ArrayList<ComputeUnit> units = new ArrayList<>();
+		for (int i = 0; i < layerDims.length; i++)
+			units.add( new LinearUnit("", layerDims[i], Initializer.fillIniter(1)) );
+		units.add(new SquareErrorUnit("", inlet));
+		units.get(0).input = inlet;
+
+		return new DeepNet(units).genDefaultUnitName();
+	}
 }

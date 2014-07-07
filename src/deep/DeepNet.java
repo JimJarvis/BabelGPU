@@ -12,6 +12,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 	private ComputeUnit head;
 	private InletUnit inlet;
 	private TerminalUnit terminal;
+	
+	private boolean setup = false; // should only setup once
 
 	public DeepNet(ComputeUnit... units)
 	{
@@ -46,10 +48,17 @@ public class DeepNet implements Iterable<ComputeUnit>
 		}
 	}
 
+	/**
+	 * This function call will only setup once and do nothing later
+	 */
 	public void setup()
 	{
-		for (ComputeUnit unit : this)
-			unit.setup();
+		if (!setup)
+		{
+			for (ComputeUnit unit : this)
+    			unit.setup();
+			setup = true;
+		}
 	}
 
 	public void forwprop()
@@ -240,16 +249,19 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public void gradCheck(LearningPlan learningPlan)
 	{
-		final float EPS = 1e-5f;
+		final float EPS = 1e-4f;
 		
 	 	setLearningPlan(learningPlan);
 	 	enableDebug();
-		setup();
-		inlet.nextBatch();
+		if (!this.setup) // should only read inlet once if we're debugging
+    	{
+			setup();
+			inlet.nextBatch();
+    	}
 		
 		ArrayList<ParamUnit> params = terminal.getParams();
-		FloatMat exactGrad[] = new FloatMat[params.size()];
 		FloatMat propGrad[] = new FloatMat[params.size()];
+		FloatMat goldGrad[] = new FloatMat[params.size()];
 
 		// Get the exact gradient by backprop first
 		forwprop();
@@ -262,7 +274,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		{
 			mat = new FloatMat(w.gradient);
 			mat.copyFrom(w.gradient);
-			exactGrad[i ++] = mat;
+			propGrad[i ++] = mat;
 		}
 		
 		// Do finite-diff forward prop for every entry in every parameter
@@ -290,14 +302,14 @@ public class DeepNet implements Iterable<ComputeUnit>
 				mat.singleSet(idx, (posResult - negResult) / (2 * EPS));
 			}
 			// Store
-			propGrad[i ++] = mat;
+			goldGrad[i ++] = mat;
 		}
 		
 		PP.setSep("\n\n");
-		PP.pTitledSectionLine("EXACT");
-		PP.p(exactGrad);
-		PP.p();
 		PP.pTitledSectionLine("BACK-PROP");
 		PP.p(propGrad);
+		PP.p();
+		PP.pTitledSectionLine("Numerical GOLD");
+		PP.p(goldGrad);
 	}
 }

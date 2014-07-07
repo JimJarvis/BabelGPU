@@ -33,7 +33,7 @@ public class ParamUnit extends DataUnit
 	public int size() {	return this.data.size();	}
 	
 	/**
-	 * Reinitialize this parameter with parent's wInitializer
+	 * Reinitialize this parameter with parent's initer
 	 */
 	public void reInit() { parent.reInit(); }
 }
