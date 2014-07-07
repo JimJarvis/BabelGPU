@@ -1,5 +1,7 @@
 package deep.units;
 
+import gpu.GpuBlas;
+
 public abstract class PureComputeUnit extends ComputeUnit
 {
 	public PureComputeUnit(String name, int outDim)
@@ -23,5 +25,15 @@ public abstract class PureComputeUnit extends ComputeUnit
     		this.outDim = prev != null ?
     				prev.outDim : input.dim();
 		setupOutput();
+	}
+	
+	/**
+	 * Should call this after subclass calculation to accumulate gradient from the last layer
+	 * if not TerminalUnit
+	 */
+	@Override
+	public void backward()
+	{
+		GpuBlas.dotMult(output.gradient, input.gradient);
 	}
 }

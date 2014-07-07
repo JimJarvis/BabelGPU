@@ -19,7 +19,7 @@ public class SigmoidUnit extends PureComputeUnit
 	public void backward()
 	{
 		Thrust.sigmoid_deriv(output.data, input.gradient);
-		GpuBlas.dotMult(output.gradient, input.gradient);
+		super.backward();
 	}
 
 }
