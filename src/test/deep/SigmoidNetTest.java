@@ -6,45 +6,75 @@ import gpu.*;
 import org.junit.*;
 
 import utils.CpuUtil;
+import utils.GpuUtil;
 import deep.*;
 import deep.units.*;
 
 public class SigmoidNetTest
 {
-	static InletUnit inlet;
-	static LearningPlan plan;
-	static int dim, batchSize;
+	// ******************** CONFIG ********************/
+	// Input feature vector dimension
+	static int inDim = 40;
+	// Number of training samples
+	static int batchSize = 30;
+	// Output vector dimension
+	static int outDim = 40;
+	// Test option: use random generated numbers?
+	static boolean randInput = true; 
 	
+	// Regularization
+	static float reg = 1.5f;
+	static LearningPlan plan;
+	
+	static InletUnit inlet;
+	
+	@BeforeClass
+	public static void system()
+	{
+		GpuBlas.init();
+		GpuUtil.enableExceptions();
+	}
+
 	@BeforeClass
 	public static void setUp() throws Exception
 	{
-		GpuBlas.init();
-
-		final float[][] dummyInput = new float[][] {
-				{1.5f, 3, -.5f},
-				{-0.5f, -1, 2},
-				{-2, -4, 2.5f},
-				{3, 6, 0}
-		};
-
-		final float[][] dummyGold = new float[][] {
-				{0, 0, 1},
-				{1, 0, 0},
-				{0, 1, 0},
-				{0, 0, 0}
-		};
+		// for random input/gold gen
+		float symmRange = 2;
 		
-		dim = dummyInput.length;
-		batchSize = dummyInput[0].length;
+		final float[][] dummyInput = randInput ? 
+    		CpuUtil.randFloatMat(inDim, batchSize, -symmRange, symmRange) :
+    		new float[][] {
+    				{.5f, 1, -.5f},
+    				{-1.5f, -.7f, .6f},
+    				{-2, -3, 1.1f},
+    				{.3f, -1.6f, 2.1f}
+    		};
 
+		final float[][] dummyGold = randInput ? 
+    		CpuUtil.randFloatMat(outDim, batchSize, 0, 1) :
+    		new float[][] {
+    				{0, 0, 1},
+    				{1, 0, 0},
+    				{0, 1, 0},
+    				{0, 0, 1},
+    				{1, 0, 0}
+    		};
+		
+    	if (!randInput)
+    	{
+    		inDim = dummyInput.length;
+    		batchSize = dummyInput[0].length;
+    		outDim = dummyGold.length;
+    	}
+		
 		// totalTrainSize = colDim(input)
-		plan = new LearningPlan(2, 1.5f, 0, batchSize);
-		
-		inlet = new InletUnit("Dummy Inlet", dim, batchSize)
+		plan = new LearningPlan(2, reg, 0, batchSize);
+
+		inlet = new InletUnit("Dummy Inlet", inDim, batchSize)
 		{
 			boolean hasNext = true;
 			{
-				this.goldMat = new FloatMat(this.data);
+				this.goldMat = new FloatMat(outDim, batchSize);
 			}
 			
 			@Override
@@ -74,6 +104,7 @@ public class SigmoidNetTest
 				hasNext = true;
 			}
 		};
+		
 	}
 	
 	/**
@@ -89,15 +120,17 @@ public class SigmoidNetTest
 	@Ignore
 	public void simpleSigmoidNetTest()
 	{
-		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 10, 3, 7, 6, dim});
+		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 3, 6, outDim});
 //		sigmoidNet.runDebug(plan);
 		check(sigmoidNet, 0.5);
 	}
 	
 	@Test
+	@Ignore
 	public void linearLayersTest()
 	{
-		DeepNet linearLayers = DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 2, 1, 4, dim});
+		DeepNet linearLayers = 
+				DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 6, 4, outDim}, SquareErrorUnit.class);
 //		linearLayers.runDebug(plan);
 		check(linearLayers, 5e-3);
 	}
@@ -105,8 +138,8 @@ public class SigmoidNetTest
 	@Test
 	public void sigmoidLayersTest()
 	{
-		DeepNet sigmoidLayers = DeepFactory.debugSigmoidLayers(inlet, 1);
-//		sigmoidLayers.runDebug(plan);
-		check(sigmoidLayers, 2);
+		DeepNet sigmoidLayers = DeepFactory.debugSigmoidLayers(inlet, 1, SquareErrorUnit.class);
+		sigmoidLayers.runDebug(plan);
+		check(sigmoidLayers, 1);
 	}
 }

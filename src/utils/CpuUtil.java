@@ -1,10 +1,13 @@
 package utils;
 
 import java.lang.reflect.Array;
+import java.util.Random;
 
 public class CpuUtil
 {
 	// ******************** COMMON ********************/
+	private static Random rand = new Random(3760337);
+	
 	/**
 	 * Make a repeated array from a single object
 	 */
@@ -219,6 +222,15 @@ public class CpuUtil
 		return s;
 	}
 	
+	public static float[][] randFloatMat(int row, int col, float low, float high)
+	{
+		float[][] ans = new float[row][col];
+		for (int i = 0; i < row; i ++)
+			for (int j = 0; j < col; j ++)
+				ans[i][j] = rand.nextFloat() * (high - low) + low;
+		return ans;
+	}
+	
 	/**
 	 * @return output parameter
 	 */
@@ -384,6 +396,15 @@ public class CpuUtil
 			for (int j = 0; j < c; j++)
 				s += a[i][j];
 		return s;
+	}
+	
+	public static double[][] randDoubleMat(int row, int col, double low, double high)
+	{
+		double[][] ans = new double[row][col];
+		for (int i = 0; i < row; i ++)
+			for (int j = 0; j < col; j ++)
+				ans[i][j] = rand.nextDouble() * (high - low) + low;
+		return ans;
 	}
 	
 	/**
