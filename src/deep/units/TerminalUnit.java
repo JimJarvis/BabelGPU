@@ -5,8 +5,6 @@ import gpu.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import utils.PP;
-
 public abstract class TerminalUnit extends PureComputeUnit
 {
 	/**

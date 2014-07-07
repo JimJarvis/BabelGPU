@@ -16,17 +16,18 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	private boolean setup = false; // should only setup once
 
-	public DeepNet(ComputeUnit... units)
+	public DeepNet(InletUnit inlet, ComputeUnit... units)
 	{
 		this.head = units[0];
 		this.terminal = (TerminalUnit) units[units.length - 1];
-		this.inlet = (InletUnit) head.input;
+		this.inlet = inlet;
+		head.input = inlet;
 		chain(units);
 	}
 	
-	public DeepNet(ArrayList<ComputeUnit> units)
+	public DeepNet(InletUnit inlet, ArrayList<ComputeUnit> units)
 	{
-		this(units.toArray(new ComputeUnit[units.size()]));
+		this(inlet, units.toArray(new ComputeUnit[units.size()]));
 	}
 
 	/**
@@ -210,16 +211,21 @@ public class DeepNet implements Iterable<ComputeUnit>
 	// ******************** DEBUG only ********************/
 	public void runDebug(LearningPlan learningPlan)
 	{
+		PP.pTitledSectionLine("RUN DEBUG", "=", 25);
 	 	setLearningPlan(learningPlan);
 	 	enableDebug();
 	 	PP.pTitledSectionLine("SETUP");
 		setup();
 		printDebug();
-		int i = 1;
 		
+		// Handle debug networks that have no params
+		if (terminal.getParams().size() == 0)
+			inlet.initGradient();
+
+		int i = 1;
 		while (inlet.hasNext())
 		{
-			PP.pSectionLine("=", 90);
+			PP.pSectionLine("-", 70);
 			PP.p("Iteration", i++, "reading inlet");
 			inlet.nextBatch();
 			PP.pTitledSectionLine("FORWARD");
@@ -230,7 +236,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 			printDebug();
 		}
 		
-		PP.p("\nRESULT =", terminal.lossTotal());
+		PP.p("\nRESULT =", terminal.lossTotal(), "\n");
 	}
 	
 	public void printDebug()
@@ -247,18 +253,33 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	/**
 	 * Gradient checking debug routine
-	 * Will only load one nextBatch() from inlet
+	 * Supports both networks with and without parameters (e.g. pure compute layers)
+	 * Will only process one batch from inlet
+	 * Perturbation eps constant is auto-selected based on avg abs value of parameters (minimum: 1e-4f)
 	 */
 	public void gradCheck(LearningPlan learningPlan)
 	{
-	 	setLearningPlan(learningPlan);
-	 	enableDebug();
-		setup();
-		inlet.nextBatch();
+		PP.pTitledSectionLine("GRAD CHECK", "=", 25);
+	 	this.setLearningPlan(learningPlan);
+	 	this.enableDebug();
+		this.setup();
+		this.reset(); inlet.nextBatch();
 		
-		ArrayList<ParamUnit> params = terminal.getParams();
-		FloatMat propGrad[] = new FloatMat[params.size()];
-		FloatMat goldGrad[] = new FloatMat[params.size()];
+		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) terminal.getParams().clone();
+		// We also do gradient checking for pure computing networks that have no parameters
+		boolean hasParams = params.size() != 0;
+		
+		int gradN = hasParams ? params.size() : 1;
+		FloatMat propGrad[] = new FloatMat[gradN];
+		FloatMat goldGrad[] = new FloatMat[gradN];
+		
+		if (!hasParams)
+		{
+			// add sentinel value: hack the loops below
+			params.add(null); 
+            // we treat inlet as 'parameter' and compute its finite-difference grad
+			inlet.initGradient(); 
+		}
 
 		// Get the exact gradient by backprop first
 		forwprop();
@@ -266,11 +287,18 @@ public class DeepNet implements Iterable<ComputeUnit>
 		
 		FloatMat mat;
 		
+		// hack: can be a ParamUnit or an InletUnit, 
+		// depend on whether this network is a pure compute net or not
+		DataUnit w; 
+		
 		int totalSize = 0;
 		float totalAbsSum = 0;
 		int i = 0;
-		for (ParamUnit w : params)
+		for (ParamUnit param : params)
 		{
+            // if doesn't have any param, 'params' will only have 1 null, iterate once and exit this loop
+			w = hasParams ? param : inlet;
+			
 			mat = new FloatMat(w.gradient);
 			mat.copyFrom(w.gradient);
 			propGrad[i ++] = mat;
@@ -279,21 +307,23 @@ public class DeepNet implements Iterable<ComputeUnit>
 		}
 		// Get average abs parameter entry value
 		float avgAbsVal = totalAbsSum / totalSize;
-		final float EPS = avgAbsVal / 1e3f;
+		final float EPS = Math.max( avgAbsVal / 1e3f, 1e-4f );
 		
 		// Do finite-diff forward prop for every entry in every parameter
 		i = 0;
-		for (ParamUnit w : params)
+		for (ParamUnit param : params)
 		{
+			w = hasParams ? param : inlet;
 			mat = new FloatMat(w.data);
-			for (int idx = 0 ; idx < w.size(); idx ++)
+					
+			for (int idx = 0 ; idx < mat.size(); idx ++)
 			{
 				// +EPS and -EPS perturb
 				float negResult = 0, posResult = 0;
 				for (int perturb : new int[] {-1, 1})
 				{
     				// Re-init everything as the exact gradient initialization
-					this.reset();
+					this.reset(); inlet.nextBatch();
     				
             		// Perturb -EPS
             		w.data.singleIncr(idx, perturb * EPS);
@@ -310,12 +340,14 @@ public class DeepNet implements Iterable<ComputeUnit>
 		}
 		
 		PP.setSep("\n\n");
-		PP.pTitledSectionLine("BACK-PROP");
+		PP.pTitledSectionLine("Back-Prop");
 		PP.p(propGrad);
 		PP.p();
-		PP.pTitledSectionLine("Numerical GOLD");
+		PP.pTitledSectionLine("Numerical Gold");
 		PP.p(goldGrad);
+		PP.p();
 		
+		PP.pTitledSectionLine("Error Report", "-", 10);
         PP.setSep();
 		PP.setPrecision(2); PP.setScientific(true);
 		PP.p("\nPerturb EPS = ", EPS);
@@ -327,5 +359,6 @@ public class DeepNet implements Iterable<ComputeUnit>
 		
 		PP.p("Average absolute error =", avgAbsErr);
 		PP.p("Average percent error =", avgAbsErr / avgAbsVal * 100, "%");
+		PP.setScientific(false);
 	}
 }

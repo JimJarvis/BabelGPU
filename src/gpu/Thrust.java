@@ -1,7 +1,6 @@
 package gpu;
 
 import static gpu.ThrustNative.*;
-import utils.CpuUtil.Coord;
 
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;

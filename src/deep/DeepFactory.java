@@ -27,9 +27,8 @@ public class DeepFactory
 			units.add(new SigmoidUnit(""));
 		}
 		units.add(new SquareErrorUnit("", inlet));
-		units.get(0).input = inlet;
 
-		return new DeepNet(units).genDefaultUnitName();
+		return new DeepNet(inlet, units).genDefaultUnitName();
 	}
 	
 	/**
@@ -51,20 +50,26 @@ public class DeepFactory
 		return simpleSigmoidNet(inlet, layerDims, initializers);
 	}
 	
-	public static DeepNet debugSimpleSigmoidNet(InletUnit inlet, int[] layerDims)
-	{
-		return simpleSigmoidNet(inlet, layerDims, 
-				CpuUtil.repeatedArray(Initializer.fillIniter(0.5f), layerDims.length));
-	}
-	
-	public static DeepNet debugLinearLayer(InletUnit inlet, int[] layerDims)
+	public static DeepNet debugLinearLayers(InletUnit inlet, int[] layerDims)
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerDims.length; i++)
 			units.add( new LinearUnit("", layerDims[i], Initializer.uniformRandIniter(1)) );
 		units.add(new SquareErrorUnit("", inlet));
-		units.get(0).input = inlet;
 
-		return new DeepNet(units).genDefaultUnitName();
+		return new DeepNet(inlet, units).genDefaultUnitName();
+	}
+	
+	/**
+	 * Stack a couple of sigmoid layers (each has same dim as Inlet)
+	 */
+	public static DeepNet debugSigmoidLayers(InletUnit inlet, int layerN)
+	{
+		ArrayList<ComputeUnit> units = new ArrayList<>();
+		for (int i = 0; i < layerN; i++)
+			units.add( new SigmoidUnit("") );
+		units.add(new SquareErrorUnit("", inlet));
+
+		return new DeepNet(inlet, units).genDefaultUnitName();
 	}
 }

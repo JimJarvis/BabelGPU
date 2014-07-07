@@ -9,9 +9,6 @@ import deep.units.*;
 
 public class SimpleSigmoidTest
 {
-	private static DeepNet sigmoidNet;
-    private static HashMap<String, ComputeUnit> unitMap;
-	
 	public static void main(String[] args)
 	{
 		GpuBlas.init();
@@ -67,19 +64,24 @@ public class SimpleSigmoidTest
 				hasNext = true;
 			}
 		};
-		sigmoidNet = DeepFactory.debugSimpleSigmoidNet(inlet, new int[] {5, dim});
-		unitMap = sigmoidNet.getUnitMap();
-		// totalTrainSize = colDim(input)
-		LearningPlan plan = new LearningPlan(1, 1, 0, batchSize);
 		
+		// totalTrainSize = colDim(input)
+		LearningPlan plan = new LearningPlan(2, 1.5f, 0, batchSize);
+		/**
+		 * Simple forward sigmoid NN
+		 */
+		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 20, 3, dim});
 //		sigmoidNet.runDebug(plan);
-//		PP.pSectionLine("\n", 3);
 //		sigmoidNet.gradCheck(plan);
 		
-		DeepNet linearLayer = DeepFactory.debugLinearLayer(inlet, new int[] {3, 5, 2, 1, 4, dim});
-//		linearLayer.runDebug(plan);
-//		linearLayer.reset();
-		linearLayer.gradCheck(plan);
+		PP.pSectionLine("\n", 3);
+		DeepNet linearLayers = DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 2, 1, 4, dim});
+//		linearLayers.runDebug(plan);
+//		linearLayers.gradCheck(plan);
+		
+		DeepNet sigmoidLayers = DeepFactory.debugSigmoidLayers(inlet, 1);
+//		sigmoidLayers.runDebug(plan);
+		sigmoidLayers.gradCheck(plan);
 	}
 
 }
