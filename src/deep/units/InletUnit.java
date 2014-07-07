@@ -19,4 +19,5 @@ public abstract class InletUnit extends DataUnit
 	public abstract boolean hasNext();
 	public abstract void nextBatch();
 	public abstract void nextGold();
+	public abstract void reset();
 }

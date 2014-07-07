@@ -122,6 +122,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 			w.reInit();
 		terminal.clearResult();
 		terminal.learningPlan.reset();
+		inlet.reset();
 	}
 	
 	/**
@@ -253,11 +254,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 		
 	 	setLearningPlan(learningPlan);
 	 	enableDebug();
-		if (!this.setup) // should only read inlet once if we're debugging
-    	{
-			setup();
-			inlet.nextBatch();
-    	}
+		setup();
+		inlet.nextBatch();
 		
 		ArrayList<ParamUnit> params = terminal.getParams();
 		FloatMat propGrad[] = new FloatMat[params.size()];

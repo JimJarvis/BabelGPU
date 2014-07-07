@@ -57,6 +57,12 @@ public class SimpleSigmoidTest
 			{
 				return hasNext;
 			}
+
+			@Override
+			public void reset()
+			{
+				hasNext = true;
+			}
 		};
 		sigmoidNet = DeepFactory.debugSimpleSigmoidNet(inlet, new int[] {5, 3});
 		unitMap = sigmoidNet.getUnitMap();
