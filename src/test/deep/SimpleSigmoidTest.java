@@ -30,7 +30,10 @@ public class SimpleSigmoidTest
 				{0, 0, 0}
 		};
 		
-		InletUnit inlet = new InletUnit("Dummy Inlet", 4, 2)
+		int dim = dummyInput.length;
+		int batchSize = dummyInput[0].length;
+		
+		InletUnit inlet = new InletUnit("Dummy Inlet", dim, batchSize)
 		{
 			boolean hasNext = true;
 			{
@@ -67,7 +70,7 @@ public class SimpleSigmoidTest
 		sigmoidNet = DeepFactory.debugSimpleSigmoidNet(inlet, new int[] {5, 3});
 		unitMap = sigmoidNet.getUnitMap();
 		// totalTrainSize = colDim(input)
-		LearningPlan plan = new LearningPlan(1, 0, 0, dummyInput[0].length);
+		LearningPlan plan = new LearningPlan(1, 1, 0, batchSize);
 		
 //		sigmoidNet.runDebug(plan);
 //		PP.pSectionLine("\n", 3);

@@ -120,7 +120,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		Initializer.resetRand();
 		for (ParamUnit w : terminal.getParams())
 			w.reInit();
-		terminal.clearResult();
+		terminal.clearLoss();
 		terminal.learningPlan.reset();
 		inlet.reset();
 	}
@@ -229,7 +229,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 			printDebug();
 		}
 		
-		PP.p("\nRESULT =", terminal.getResult());
+		PP.p("\nRESULT =", terminal.lossTotal());
 	}
 	
 	public void printDebug()
@@ -292,7 +292,7 @@ public class DeepNet implements Iterable<ComputeUnit>
             		// Perturb -EPS
             		w.data.singleIncr(idx, perturb * EPS);
             		forwprop();
-            		float result = terminal.getResult();
+            		float result = terminal.lossTotal();
 
             		if (perturb < 0) negResult = result; else posResult = result;
 				}

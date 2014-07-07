@@ -22,12 +22,4 @@ public class LearningPlan
 	 * Prepare for re-run
 	 */
 	public void reset() { this.curTrainSize = 0; }
-	
-	/**
-	 * @return reg / totalTrainSize
-	 */
-	public float normReg()
-	{
-		return this.reg / this.totalTrainSize;
-	}
 }

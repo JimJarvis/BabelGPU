@@ -32,11 +32,11 @@ public class LinearUnit extends ParamComputeUnit
     		if (debug)
     		{
     			GpuBlas.mult(output.gradient, input.data.transpose(), W.gradient);
-    			GpuBlas.scaleAdd(W.data, W.gradient, learningPlan.normReg());
+    			GpuBlas.scaleAdd(W.data, W.gradient, learningPlan.reg);
     		}
 
     		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 
-    				lr/input.batchSize(), 1 - lr * learningPlan.normReg());
+    				lr/input.batchSize(), 1 - lr * learningPlan.reg);
 		}
 	}
 
