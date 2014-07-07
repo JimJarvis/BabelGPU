@@ -8,13 +8,21 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	public ParamUnit W;
 	
 	/**
-	 * @param newDim output dimension from this computing unit
+	 * @param outDim output dimension from this computing unit
 	 * @param initer parameter W initializer
 	 */
-	public ParamComputeUnit(String name, int newDim, Initializer initer)
+	public ParamComputeUnit(String name, int outDim, Initializer initer)
 	{
-		super(name, newDim);
+		super(name, outDim);
 		this.initer = initer;
+	}
+	
+	/**
+	 * Default: init W to all zero
+	 */
+	public ParamComputeUnit(String name, int outDim)
+	{
+		this(name, outDim, Initializer.fillIniter(0));
 	}
 	
 	@Override
@@ -27,7 +35,7 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	
 	protected void setupW()
 	{
-		this.W = new ParamUnit("W[" + this.name + "]", this, outDim, input.dim());
+		this.W = new ParamUnit("W[" + this.name + "]", this);
 		reInit();
 		if (debug)
 			this.W.initGradient();

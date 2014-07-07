@@ -25,10 +25,13 @@ public abstract class ComputeUnit extends Unit
 		super(name);
 	}
 	
-	public ComputeUnit(String name, int newDim)
+	/**
+	 * @param outDim: the dimension of the output (transformed) data
+	 */
+	public ComputeUnit(String name, int outDim)
 	{
 		super(name);
-		this.outDim = newDim;
+		this.outDim = outDim;
 	}
 	
 	public void setup()

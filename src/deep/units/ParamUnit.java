@@ -18,20 +18,44 @@ public class ParamUnit extends DataUnit
 		this.parent = parent;
 	}
 	
+	/**
+	 * Infer row/col dimensions from 'parent' ParamComputeUnit
+	 * rowDim = parent.outDim
+	 * colDim = parent.input.dim
+	 */
+	public ParamUnit(String name, ParamComputeUnit parent)
+	{
+		this(name, parent, parent.outDim, parent.input.dim());
+	}
+	
+	/**
+	 * No parent ParamComputeUnit: this is not a usual ParamUnit
+	 * @see FourierProjectUnit
+	 */
+	public ParamUnit(String name, int row, int col)
+	{
+		this(name, null, row, col);
+	}
+	
 	@Override
 	public final int dim()
 	{
-		throw new DeepException("ParamUnit doesn't have 'dim'. Use row() instead");
+		throw new DeepException("ParamUnit doesn't have 'dim'. Use data.row instead");
 	}
 	
 	@Override
 	public final int batchSize()
 	{
-		throw new DeepException("ParamUnit doesn't have 'batchSize', use col() instead");
+		throw new DeepException("ParamUnit doesn't have 'batchSize', use data.col instead");
 	}
 	
 	/**
 	 * Reinitialize this parameter with parent's initer
 	 */
-	public void reInit() { parent.reInit(); }
+	public void reInit()
+	{ 
+		if (parent == null)
+			throw new DeepException("Cannot reinitialize this parameter: parent null");
+		parent.reInit();
+	}
 }

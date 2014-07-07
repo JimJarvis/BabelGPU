@@ -29,7 +29,7 @@ public abstract class PureComputeUnit extends ComputeUnit
 	
 	/**
 	 * Should call this after subclass calculation to accumulate gradient from the last layer
-	 * if not TerminalUnit
+	 * if the calculation is simply element wise.
 	 */
 	@Override
 	public void backward()

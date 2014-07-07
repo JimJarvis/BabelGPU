@@ -20,7 +20,7 @@ public class LinearUnit extends ParamComputeUnit
 	public void backward()
 	{
 		// update input.gradient only when necessary 
-		// Don't upgrade the gradient of the input layer, of course
+		// Don't upgrade the gradient of the inlet layer, of course
 		if (input.hasGradient())
 			GpuBlas.mult(W.data.transpose(), output.gradient, input.gradient);
 

@@ -9,11 +9,13 @@ public abstract class InletUnit extends DataUnit
 	public InletUnit(String name)
 	{
 		super(name, null, null);
+		setNoGradient(); // conceptual
 	}
 
 	public InletUnit(String name, int row, int col)
 	{
 		super(name, new FloatMat(row, col), null);
+		setNoGradient();
 	}
 
 	public abstract boolean hasNext();
