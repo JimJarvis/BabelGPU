@@ -4,7 +4,7 @@ import deep.units.*;
 import gpu.*;
 import utils.*;
 
-public class GpuMiscTest
+public class MiscTest
 {
 	public static void main(String[] args)
 	{

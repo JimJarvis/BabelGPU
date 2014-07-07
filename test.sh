@@ -5,7 +5,7 @@
 main="gpu/SoftmaxTest"
 main="gpu/MinibatchTest"
 main="gpu/RandTest"
-main="MiscTest"
+main="gpu/MiscTest"
 
 units="test.deep.SigmoidNetTest"
 

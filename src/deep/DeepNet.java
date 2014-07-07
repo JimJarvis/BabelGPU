@@ -259,9 +259,10 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Supports both networks with and without parameters (e.g. pure compute layers)
 	 * Will only process one batch from inlet
 	 * Perturbation eps constant is auto-selected based on avg abs value of parameters (minimum: 1e-4f)
+	 * @param verbose don't show the actual gradient comparison
 	 * @return average percentage error (already multiplied by 100)
 	 */
-	public float gradCheck(LearningPlan learningPlan)
+	public float gradCheck(LearningPlan learningPlan, boolean verbose)
 	{
 		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 25);
 	 	this.setLearningPlan(learningPlan);
@@ -343,14 +344,16 @@ public class DeepNet implements Iterable<ComputeUnit>
 			goldGrad[i ++] = mat;
 		}
 		
-		PP.setSep("\n\n");
-		PP.pTitledSectionLine("Back-Prop");
-		PP.p(propGrad);
-		PP.p();
-		PP.pTitledSectionLine("Numerical Gold");
-		PP.p(goldGrad);
-		PP.p();
-		
+		if (verbose)
+		{
+    		PP.setSep("\n\n");
+    		PP.pTitledSectionLine("Back-Prop");
+    		PP.p(propGrad);
+    		PP.p();
+    		PP.pTitledSectionLine("Numerical Gold");
+    		PP.p(goldGrad);
+    		PP.p();
+		}
 		PP.pTitledSectionLine("Error Report", "-", 10);
         PP.setSep();
 		PP.setPrecision(2); PP.setScientific(true);
@@ -368,4 +371,10 @@ public class DeepNet implements Iterable<ComputeUnit>
 		
 		return avgPercentErr;
 	}
+	
+	/**
+	 * Default verbose = true
+	 * @see DeepNet#gradCheck(LearningPlan, true)
+	 */
+	public float gradCheck(LearningPlan plan) {	return this.gradCheck(plan, true);	}
 }
