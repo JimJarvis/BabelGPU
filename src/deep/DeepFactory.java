@@ -64,14 +64,14 @@ public class DeepFactory
 	 * Stack a couple of pure computing layers together
 	 * Output vector (goldMat) must have the same dim as input vector
 	 */
-	public static DeepNet debugPureComputeLayers(
-			Class<? extends PureComputeUnit> pureClass, 
+	public static DeepNet debugElementComputeLayers(
+			Class<? extends ElementComputeUnit> pureClass, 
 			InletUnit inlet, int layerN, 
 			Class<? extends TerminalUnit> terminalClass)
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerN; i++)
-			units.add( defaultPureComputeCtor(pureClass) );
+			units.add( defaultElementComputeCtor(pureClass) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
 		return new DeepNet(
@@ -93,8 +93,8 @@ public class DeepFactory
 	}
 	
 	// Helper to construct pure compute layers
-	private static PureComputeUnit defaultPureComputeCtor(
-			Class<? extends PureComputeUnit> pureClass)
+	private static ElementComputeUnit defaultElementComputeCtor(
+			Class<? extends ElementComputeUnit> pureClass)
 	{
 		try {
 			return pureClass.getConstructor(String.class).newInstance("");
@@ -102,7 +102,7 @@ public class DeepFactory
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			throw new DeepException("PureCompute class auto-construction fails");
+			throw new DeepException("ElementCompute class auto-construction fails");
 		}
 	}
 }

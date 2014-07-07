@@ -2,7 +2,7 @@ package deep.units;
 
 import gpu.*;
 
-public class SigmoidUnit extends PureComputeUnit
+public class SigmoidUnit extends ElementComputeUnit
 {
 	public SigmoidUnit(String name)
 	{
@@ -16,10 +16,9 @@ public class SigmoidUnit extends PureComputeUnit
 	}
 
 	@Override
-	public void backward()
+	public void backward_element()
 	{
 		Thrust.sigmoid_deriv(output.data, input.gradient);
-		super.backward();
 	}
 
 }

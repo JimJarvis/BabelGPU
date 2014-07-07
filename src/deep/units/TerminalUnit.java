@@ -5,7 +5,7 @@ import gpu.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public abstract class TerminalUnit extends PureComputeUnit
+public abstract class TerminalUnit extends ComputeUnit
 {
 	/**
 	 * Gold standard, normally the correct labels -> sparse 1-0 matrix
@@ -39,7 +39,7 @@ public abstract class TerminalUnit extends PureComputeUnit
 	
 	/**
 	 * 'final' ensures that subclass cannot directly override forward()
-	 * but must implement forward_()
+	 * but must implement forward_terminal()
 	 */
 	@Override
 	public final void forward()
@@ -49,12 +49,12 @@ public abstract class TerminalUnit extends PureComputeUnit
 			updateLossReg();
 		
 		// Will be implemented by subclasses
-		forward_();
+		forward_terminal();
 	}
 	/**
 	 * Hack: ensure that you call super.forward() first
 	 */
-	protected abstract void forward_();
+	protected abstract void forward_terminal();
 	
 	/**
 	 * @return all paramUnit from previous ParamComputeUnit, in forward order

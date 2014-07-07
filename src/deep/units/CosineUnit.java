@@ -2,7 +2,7 @@ package deep.units;
 
 import gpu.*;
 
-public class CosineUnit extends PureComputeUnit
+public class CosineUnit extends ElementComputeUnit
 {
 	public CosineUnit(String name)
 	{
@@ -16,11 +16,10 @@ public class CosineUnit extends PureComputeUnit
 	}
 
 	@Override
-	public void backward()
+	public void backward_element()
 	{
 		Thrust.sin(input.data, input.gradient);
 		input.gradient.linear(-1, 0);
-		super.backward();
 	}
 
 }

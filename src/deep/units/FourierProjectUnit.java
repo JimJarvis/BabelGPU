@@ -7,7 +7,7 @@ import deep.Initializer;
 /**
  * Rahami-Recht random Fourier projection features
  */
-public class FourierProjectUnit extends PureComputeUnit
+public class FourierProjectUnit extends ComputeUnit
 {
 	// This is NOT a learned parameter: it's a fixed random projection matrix
 	private ParamUnit projector;
@@ -22,8 +22,7 @@ public class FourierProjectUnit extends PureComputeUnit
 	@Override
 	public void setup()
 	{
-		setupLink();
-		setupOutput();
+		super.setup();
 		// Leave the 'parent' ParamComputeUnit null
 		projector = new ParamUnit("projector["+this.name+"]", outDim, input.dim());
 		projector.setNoGradient();

@@ -13,7 +13,7 @@ public class SquareErrorUnit extends TerminalUnit
 	}
 
 	@Override
-	public void forward_()
+	public void forward_terminal()
 	{
 		if (tmp_y_minus_input_sq == null)
 			tmp_y_minus_input_sq = new FloatMat(input.data);

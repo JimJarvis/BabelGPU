@@ -145,7 +145,7 @@ public class LayersTest
 	public void sigmoidLayersTest()
 	{
 		DeepNet sigmoidLayers = 
-				DeepFactory.debugPureComputeLayers(SigmoidUnit.class, inlet, 2, SquareErrorUnit.class);
+				DeepFactory.debugElementComputeLayers(SigmoidUnit.class, inlet, 2, SquareErrorUnit.class);
 //		sigmoidLayers.runDebug(plan);
 		check(sigmoidLayers, 0.5);
 	}
@@ -154,7 +154,7 @@ public class LayersTest
 	public void cosineLayersTest()
 	{
 		DeepNet cosineLayers = 
-				DeepFactory.debugPureComputeLayers(CosineUnit.class, inlet, 3, SumUnit.class);
+				DeepFactory.debugElementComputeLayers(CosineUnit.class, inlet, 3, SumUnit.class);
 		check(cosineLayers, 0.5);
 	}
 }
