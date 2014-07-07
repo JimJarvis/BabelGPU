@@ -1,6 +1,7 @@
 package deep;
 
 import gpu.FloatMat;
+import gpu.GpuBlas;
 
 import java.util.*;
 
@@ -250,8 +251,6 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public void gradCheck(LearningPlan learningPlan)
 	{
-		final float EPS = 1e-3f;
-		
 	 	setLearningPlan(learningPlan);
 	 	enableDebug();
 		setup();
@@ -267,13 +266,20 @@ public class DeepNet implements Iterable<ComputeUnit>
 		
 		FloatMat mat;
 		
+		int totalSize = 0;
+		float totalAbsSum = 0;
 		int i = 0;
 		for (ParamUnit w : params)
 		{
 			mat = new FloatMat(w.gradient);
 			mat.copyFrom(w.gradient);
 			propGrad[i ++] = mat;
+			totalSize += mat.size();
+			totalAbsSum += mat.clone().abs().sum();
 		}
+		// Get average abs parameter entry value
+		float avgAbsVal = totalAbsSum / totalSize;
+		final float EPS = avgAbsVal / 1e3f;
 		
 		// Do finite-diff forward prop for every entry in every parameter
 		i = 0;
@@ -309,5 +315,17 @@ public class DeepNet implements Iterable<ComputeUnit>
 		PP.p();
 		PP.pTitledSectionLine("Numerical GOLD");
 		PP.p(goldGrad);
+		
+        PP.setSep();
+		PP.setPrecision(2); PP.setScientific(true);
+		PP.p("\nPerturb EPS = ", EPS);
+		// Compare difference
+		float absErr = 0;
+		for (i = 0 ; i < propGrad.length; i ++)
+			absErr += GpuBlas.add(propGrad[i], goldGrad[i], 1, -1).abs().sum();
+		float avgAbsErr = absErr / totalSize;
+		
+		PP.p("Average absolute error =", avgAbsErr);
+		PP.p("Average percent error =", avgAbsErr / avgAbsVal * 100, "%");
 	}
 }

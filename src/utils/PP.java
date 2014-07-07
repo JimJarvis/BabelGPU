@@ -49,7 +49,7 @@ public class PP
      * Default: -1, uses the system default precision
      */
     public static void setPrecision(int doublePrec)	{	PP.doublePrec = doublePrec;	}
-    public static void setDoublePrec()	{	PP.doublePrec = -1;	}
+    public static void setPrecision()	{	PP.doublePrec = -1;	}
     
     /**
      * Set whether to use scientific exponential notation for float/double

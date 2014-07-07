@@ -61,7 +61,7 @@ public class DeepFactory
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerDims.length; i++)
-			units.add( new LinearUnit("", layerDims[i], Initializer.fillIniter(1)) );
+			units.add( new LinearUnit("", layerDims[i], Initializer.uniformRandIniter(1)) );
 		units.add(new SquareErrorUnit("", inlet));
 		units.get(0).input = inlet;
 

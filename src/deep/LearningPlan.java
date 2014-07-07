@@ -22,4 +22,12 @@ public class LearningPlan
 	 * Prepare for re-run
 	 */
 	public void reset() { this.curTrainSize = 0; }
+	
+	/**
+	 * Do we use regularization?
+	 */
+	public boolean hasReg()
+	{
+		return this.reg > 0;
+	}
 }
