@@ -160,6 +160,21 @@ public class FloatMat
 	}
 	
 	/**
+	 * ONLY clones the device data (GPU copy)
+	 * Use with caution! Make sure to free the new device memory!!!
+	 * @param new FloatMat with new device memory
+	 */
+	@Override
+	public FloatMat clone()
+	{
+		if (this.device == null)
+			throw new GpuException("Device is null, cannot clone.");
+		FloatMat clone = new FloatMat(this);
+		clone.copyFrom(this);
+		return clone;
+	}
+	
+	/**
 	 * Transpose the matrix and return a new one
 	 * Nothing in the real data actually changes, but only a flag
 	 * @return new instance
@@ -198,8 +213,9 @@ public class FloatMat
 	 */
 	public void clearDevice()
 	{
-		if (device != null)
-			GpuUtil.clearDeviceFloat(device, size());
+		if (device == null)
+			throw new GpuException("Device is null, cannot clear");
+		GpuUtil.clearDeviceFloat(device, size());
 	}
 	
 	/**
