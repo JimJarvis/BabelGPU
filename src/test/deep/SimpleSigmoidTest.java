@@ -17,17 +17,17 @@ public class SimpleSigmoidTest
 		GpuBlas.init();
 		
 		final float[][] dummyInput = new float[][] {
-				{1.5f, 3},
-				{-0.5f, -1},
-				{-2, -4},
-				{3, 6}
+				{1.5f, 3, -.5f},
+				{-0.5f, -1, 2},
+				{-2, -4, 2.5f},
+				{3, 6, 0}
 		};
 
 		final float[][] dummyGold = new float[][] {
-				{0, 0},
-				{1, 0},
-				{0, 1},
-				{0, 0}
+				{0, 0, 1},
+				{1, 0, 0},
+				{0, 1, 0},
+				{0, 0, 0}
 		};
 		
 		InletUnit inlet = new InletUnit("Dummy Inlet", 4, 2)
@@ -60,7 +60,8 @@ public class SimpleSigmoidTest
 		};
 		sigmoidNet = DeepFactory.debugSimpleSigmoidNet(inlet, new int[] {5, 3});
 		unitMap = sigmoidNet.getUnitMap();
-		LearningPlan plan = new LearningPlan(1, 0, 0, dummyInput.length);
+		// totalTrainSize = colDim(input)
+		LearningPlan plan = new LearningPlan(1, 0, 0, dummyInput[0].length);
 		
 //		sigmoidNet.runDebug(plan);
 //		PP.pSectionLine("\n", 3);

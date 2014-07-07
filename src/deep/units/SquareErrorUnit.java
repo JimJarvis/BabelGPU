@@ -17,9 +17,11 @@ public class SquareErrorUnit extends TerminalUnit
 	{
 		if (tmp_y_minus_input_sq == null)
 			tmp_y_minus_input_sq = new FloatMat(input.data);
-		GpuBlas.add(input.data, inlet.goldMat, input.gradient, 1, -1);
+		float sizeNorm = 1f/learningPlan.totalTrainSize;
+		GpuBlas.add(input.data, inlet.goldMat, input.gradient, sizeNorm, -sizeNorm);
 		Thrust.square(input.gradient, tmp_y_minus_input_sq);
-		update(tmp_y_minus_input_sq.linear(0.5f, 0).sum());
+        // we give back what we divide too much
+		update(tmp_y_minus_input_sq.sum() / (2 * sizeNorm * sizeNorm));
 		updateReg();
 	}
 

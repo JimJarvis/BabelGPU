@@ -249,7 +249,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public void gradCheck(LearningPlan learningPlan)
 	{
-		final float EPS = 1e-4f;
+		final float EPS = 1e-3f;
 		
 	 	setLearningPlan(learningPlan);
 	 	enableDebug();
