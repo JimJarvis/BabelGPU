@@ -86,6 +86,7 @@ public class SigmoidNetTest
 	}
 
 	@Test
+	@Ignore
 	public void simpleSigmoidNetTest()
 	{
 		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 10, 3, 7, 6, dim});

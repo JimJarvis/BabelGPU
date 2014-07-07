@@ -45,6 +45,10 @@ public abstract class TerminalUnit extends PureComputeUnit
 	public final void forward()
 	{
 		inlet.nextGold();
+		if (learningPlan.hasReg())
+			updateLossReg();
+		
+		// Will be implemented by subclasses
 		forward_();
 	}
 	/**

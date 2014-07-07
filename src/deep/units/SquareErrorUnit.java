@@ -25,7 +25,6 @@ public class SquareErrorUnit extends TerminalUnit
 		
         // we give back what we divide too much
 		updateLossPure(tmp_y_minus_input_sq.sum() / (2 * sizeNorm * sizeNorm));
-		updateLossReg();
 	}
 
 	@Override
