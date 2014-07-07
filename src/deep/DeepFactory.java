@@ -49,12 +49,27 @@ public class DeepFactory
 		return simpleSigmoidNet(inlet, layerDims, initializers);
 	}
 	
-	public static DeepNet debugLinearLayers(InletUnit inlet, int[] layerDims)
+	// Helper to construct debug terminal units
+	private static TerminalUnit defaultTerminalCtor(InletUnit inlet, Class<? extends TerminalUnit> terminalClass)
+	{
+		try
+		{
+			return terminalClass.getConstructor(String.class, InletUnit.class).newInstance("", inlet);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw new DeepException("Terminal class auto-construction fails");
+		}
+	}
+	
+	public static DeepNet debugLinearLayers(
+			InletUnit inlet, int[] layerDims, Class<? extends TerminalUnit> terminalClass)
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerDims.length; i++)
 			units.add( new LinearUnit("", layerDims[i], Initializer.uniformRandIniter(1)) );
-		units.add(new SquareErrorUnit("", inlet));
+		units.add(defaultTerminalCtor(inlet, terminalClass));
 
 		return new DeepNet("DebugLinearLayers", inlet, units).genDefaultUnitName();
 	}
@@ -62,12 +77,13 @@ public class DeepFactory
 	/**
 	 * Stack a couple of sigmoid layers (each has same dim as Inlet)
 	 */
-	public static DeepNet debugSigmoidLayers(InletUnit inlet, int layerN)
+	public static DeepNet debugSigmoidLayers(
+			InletUnit inlet, int layerN, Class<? extends TerminalUnit> terminalClass)
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerN; i++)
 			units.add( new SigmoidUnit("") );
-		units.add(new SquareErrorUnit("", inlet));
+		units.add(defaultTerminalCtor(inlet, terminalClass));
 
 		return new DeepNet("DebugSigmoidLayers", inlet, units).genDefaultUnitName();
 	}

@@ -312,7 +312,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		}
 		// Get average abs parameter entry value
 		float avgAbsVal = totalAbsSum / totalSize;
-		final float EPS = Math.max( avgAbsVal / 1e3f, 1e-4f );
+		final float EPS = Math.max( avgAbsVal / 1e3f, 1e-3f );
 		
 		// Do finite-diff forward prop for every entry in every parameter
 		i = 0;
