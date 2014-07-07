@@ -49,20 +49,6 @@ public class DeepFactory
 		return simpleSigmoidNet(inlet, layerDims, initializers);
 	}
 	
-	// Helper to construct debug terminal units
-	private static TerminalUnit defaultTerminalCtor(InletUnit inlet, Class<? extends TerminalUnit> terminalClass)
-	{
-		try
-		{
-			return terminalClass.getConstructor(String.class, InletUnit.class).newInstance("", inlet);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			throw new DeepException("Terminal class auto-construction fails");
-		}
-	}
-	
 	public static DeepNet debugLinearLayers(
 			InletUnit inlet, int[] layerDims, Class<? extends TerminalUnit> terminalClass)
 	{
@@ -75,16 +61,48 @@ public class DeepFactory
 	}
 	
 	/**
-	 * Stack a couple of sigmoid layers (each has same dim as Inlet)
+	 * Stack a couple of pure computing layers together
+	 * Output vector (goldMat) must have the same dim as input vector
 	 */
-	public static DeepNet debugSigmoidLayers(
-			InletUnit inlet, int layerN, Class<? extends TerminalUnit> terminalClass)
+	public static DeepNet debugPureComputeLayers(
+			Class<? extends PureComputeUnit> pureClass, 
+			InletUnit inlet, int layerN, 
+			Class<? extends TerminalUnit> terminalClass)
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerN; i++)
-			units.add( new SigmoidUnit("") );
+			units.add( defaultPureComputeCtor(pureClass) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
-		return new DeepNet("DebugSigmoidLayers", inlet, units).genDefaultUnitName();
+		return new DeepNet(
+				"Debug" + pureClass.getSimpleName().replaceFirst("Unit", "Layers"), inlet, units)
+				.genDefaultUnitName();
+	}
+	
+	// Helper to construct terminal units
+	private static TerminalUnit defaultTerminalCtor(InletUnit inlet, Class<? extends TerminalUnit> terminalClass)
+	{
+		try {
+			return terminalClass.getConstructor(String.class, InletUnit.class).newInstance("", inlet);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw new DeepException("Terminal class auto-construction fails");
+		}
+	}
+	
+	// Helper to construct pure compute layers
+	private static PureComputeUnit defaultPureComputeCtor(
+			Class<? extends PureComputeUnit> pureClass)
+	{
+		try {
+			return pureClass.getConstructor(String.class).newInstance("");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw new DeepException("PureCompute class auto-construction fails");
+		}
 	}
 }

@@ -10,10 +10,10 @@ import deep.units.*;
 
 public class DeepNet implements Iterable<ComputeUnit>
 {
-	private String name;
-	private ComputeUnit head;
-	private InletUnit inlet;
-	private TerminalUnit terminal;
+	public String name;
+	public ComputeUnit head;
+	public InletUnit inlet;
+	public TerminalUnit terminal;
 	
 	private boolean setup = false; // should only setup once
 
@@ -165,6 +165,14 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (ComputeUnit unit : this)
 			unitMap.put(unit.name, unit);
 		return unitMap;
+	}
+	
+	/**
+	 * @return param list in forward order
+	 */
+	public ArrayList<ParamUnit> getParams()
+	{
+		return this.terminal.getParams();
 	}
 	
 	// ******************** Enable forward/backward iteration ********************/

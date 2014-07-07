@@ -7,7 +7,7 @@ main="gpu/MinibatchTest"
 main="gpu/RandTest"
 main="gpu/MiscTest"
 
-units="test.deep.SigmoidNetTest"
+units="test.deep.LayersTest"
 
 
 cp MyThrust/*.h bin/gpu/
