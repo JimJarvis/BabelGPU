@@ -1,15 +1,10 @@
 package test.deep;
 
 import static org.junit.Assert.*;
-
-import java.util.Arrays;
-
-import gpu.*;
-
 import org.junit.*;
-
-import utils.CpuUtil;
-import utils.GpuUtil;
+import java.util.Arrays;
+import gpu.*;
+import utils.*;
 import deep.*;
 import deep.units.*;
 
@@ -19,11 +14,11 @@ public class LayersTest
 	// Input feature vector dimension
 	static int inDim = 9;
 	// Number of training samples
-	static int batchSize = 10;
+	static int batchSize = 5;
 	// Output vector dimension
 	static int outDim = 9;
 	// Test option: use random generated numbers?
-	static boolean randInput = false; 
+	static boolean randInput = true; 
 	
 	// Regularization
 	static float reg = 1.5f;
@@ -125,7 +120,7 @@ public class LayersTest
 		}
 		
 		float avgPercentErr = net.gradCheck(plan, verbose);
-		assertTrue(CpuUtil.withinTol(avgPercentErr, 0, TOL));
+		assertTrue(net.name + " grad check", CpuUtil.withinTol(avgPercentErr, 0, TOL));
 	}
 	private void check(DeepNet net, double TOL) {	check(net, TOL, false);	}
 	
@@ -134,14 +129,14 @@ public class LayersTest
 	{
 		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 10, 3, 6, outDim});
 //		sigmoidNet.runDebug(plan);
-		check(sigmoidNet, 0.5);
+		check(sigmoidNet, 0.2);
 	}
 	
 	@Test
 	public void linearLayersTest()
 	{
 		DeepNet linearLayers = 
-				DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 6, 4, outDim}, SquareErrorUnit.class);
+				DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 6, 7, outDim}, SquareErrorUnit.class);
 //		linearLayers.runDebug(plan);
 		check(linearLayers, 5e-3);
 	}
@@ -150,9 +145,9 @@ public class LayersTest
 	public void sigmoidLayersTest()
 	{
 		DeepNet sigmoidLayers = 
-				DeepFactory.debugPureComputeLayers(SigmoidUnit.class, inlet, 2, SumUnit.class);
+				DeepFactory.debugPureComputeLayers(SigmoidUnit.class, inlet, 2, SquareErrorUnit.class);
 //		sigmoidLayers.runDebug(plan);
-		check(sigmoidLayers, 1.5);
+		check(sigmoidLayers, 0.5);
 	}
 	
 	@Test

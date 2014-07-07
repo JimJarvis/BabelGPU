@@ -61,7 +61,10 @@ public abstract class TerminalUnit extends PureComputeUnit
 	 */
 	public ArrayList<ParamUnit> getParams()
 	{
-		if (wList != null) 	return wList;
+		// Make sure we get the latest list of params
+		// a non-empty wList with null entries means the parameters aren't set yet
+		if (wList != null && wList.size() != 0 && wList[0] != null)
+			return wList;
 		
 		wList = new ArrayList<>();
 		ComputeUnit unitptr = this.prev;
