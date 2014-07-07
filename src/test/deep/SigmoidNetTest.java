@@ -1,18 +1,25 @@
 package test.deep;
 
-import java.util.HashMap;
-
-import utils.*;
+import static org.junit.Assert.*;
 import gpu.*;
+
+import org.junit.*;
+
+import utils.CpuUtil;
 import deep.*;
 import deep.units.*;
 
-public class SimpleSigmoidTest
+public class SigmoidNetTest
 {
-	public static void main(String[] args)
+	static InletUnit inlet;
+	static LearningPlan plan;
+	static int dim, batchSize;
+	
+	@BeforeClass
+	public static void setUp() throws Exception
 	{
 		GpuBlas.init();
-		
+
 		final float[][] dummyInput = new float[][] {
 				{1.5f, 3, -.5f},
 				{-0.5f, -1, 2},
@@ -27,10 +34,13 @@ public class SimpleSigmoidTest
 				{0, 0, 0}
 		};
 		
-		int dim = dummyInput.length;
-		int batchSize = dummyInput[0].length;
+		dim = dummyInput.length;
+		batchSize = dummyInput[0].length;
+
+		// totalTrainSize = colDim(input)
+		plan = new LearningPlan(2, 1.5f, 0, batchSize);
 		
-		InletUnit inlet = new InletUnit("Dummy Inlet", dim, batchSize)
+		inlet = new InletUnit("Dummy Inlet", dim, batchSize)
 		{
 			boolean hasNext = true;
 			{
@@ -64,24 +74,38 @@ public class SimpleSigmoidTest
 				hasNext = true;
 			}
 		};
-		
-		// totalTrainSize = colDim(input)
-		LearningPlan plan = new LearningPlan(2, 1.5f, 0, batchSize);
-		/**
-		 * Simple forward sigmoid NN
-		 */
-		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 20, 3, dim});
-//		sigmoidNet.runDebug(plan);
-//		sigmoidNet.gradCheck(plan);
-		
-		PP.pSectionLine("\n", 3);
-		DeepNet linearLayers = DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 2, 1, 4, dim});
-//		linearLayers.runDebug(plan);
-//		linearLayers.gradCheck(plan);
-		
-		DeepNet sigmoidLayers = DeepFactory.debugSigmoidLayers(inlet, 1);
-//		sigmoidLayers.runDebug(plan);
-		sigmoidLayers.gradCheck(plan);
+	}
+	
+	/**
+	 * @param TOL within tolerance percentage (already multiplied by 100)
+	 */
+	private void check(DeepNet net, double TOL)
+	{
+		float avgPercentErr = net.gradCheck(plan);
+		assertTrue(CpuUtil.withinTol(avgPercentErr, 0, TOL));
 	}
 
+	@Test
+	public void simpleSigmoidNetTest()
+	{
+		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 10, 3, 7, 6, dim});
+//		sigmoidNet.runDebug(plan);
+		check(sigmoidNet, 0.5);
+	}
+	
+	@Test
+	public void linearLayersTest()
+	{
+		DeepNet linearLayers = DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 2, 1, 4, dim});
+//		linearLayers.runDebug(plan);
+		check(linearLayers, 5e-3);
+	}
+	
+	@Test
+	public void sigmoidLayersTest()
+	{
+		DeepNet sigmoidLayers = DeepFactory.debugSigmoidLayers(inlet, 1);
+//		sigmoidLayers.runDebug(plan);
+		check(sigmoidLayers, 2);
+	}
 }

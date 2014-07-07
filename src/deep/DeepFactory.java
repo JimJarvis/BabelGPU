@@ -2,7 +2,6 @@ package deep;
 
 import java.util.ArrayList;
 
-import utils.CpuUtil;
 import deep.units.*;
 
 /**
@@ -28,7 +27,7 @@ public class DeepFactory
 		}
 		units.add(new SquareErrorUnit("", inlet));
 
-		return new DeepNet(inlet, units).genDefaultUnitName();
+		return new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
 	}
 	
 	/**
@@ -57,7 +56,7 @@ public class DeepFactory
 			units.add( new LinearUnit("", layerDims[i], Initializer.uniformRandIniter(1)) );
 		units.add(new SquareErrorUnit("", inlet));
 
-		return new DeepNet(inlet, units).genDefaultUnitName();
+		return new DeepNet("DebugLinearLayers", inlet, units).genDefaultUnitName();
 	}
 	
 	/**
@@ -70,6 +69,6 @@ public class DeepFactory
 			units.add( new SigmoidUnit("") );
 		units.add(new SquareErrorUnit("", inlet));
 
-		return new DeepNet(inlet, units).genDefaultUnitName();
+		return new DeepNet("DebugSigmoidLayers", inlet, units).genDefaultUnitName();
 	}
 }

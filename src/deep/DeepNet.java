@@ -10,14 +10,16 @@ import deep.units.*;
 
 public class DeepNet implements Iterable<ComputeUnit>
 {
+	private String name;
 	private ComputeUnit head;
 	private InletUnit inlet;
 	private TerminalUnit terminal;
 	
 	private boolean setup = false; // should only setup once
 
-	public DeepNet(InletUnit inlet, ComputeUnit... units)
+	public DeepNet(String name, InletUnit inlet, ComputeUnit... units)
 	{
+		this.name = name;
 		this.head = units[0];
 		this.terminal = (TerminalUnit) units[units.length - 1];
 		this.inlet = inlet;
@@ -25,16 +27,17 @@ public class DeepNet implements Iterable<ComputeUnit>
 		chain(units);
 	}
 	
-	public DeepNet(InletUnit inlet, ArrayList<ComputeUnit> units)
+	public DeepNet(String name, InletUnit inlet, ArrayList<ComputeUnit> units)
 	{
-		this(inlet, units.toArray(new ComputeUnit[units.size()]));
+		this(name, inlet, units.toArray(new ComputeUnit[units.size()]));
 	}
 
 	/**
 	 * If the network between head and terminal is already chained
 	 */
-	public DeepNet(ComputeUnit head, TerminalUnit terminal)
+	public DeepNet(String name, ComputeUnit head, TerminalUnit terminal)
 	{
+		this.name = name;
 		this.head = head;
 		this.terminal = terminal;
 		this.inlet = (InletUnit) head.input;
@@ -256,10 +259,11 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Supports both networks with and without parameters (e.g. pure compute layers)
 	 * Will only process one batch from inlet
 	 * Perturbation eps constant is auto-selected based on avg abs value of parameters (minimum: 1e-4f)
+	 * @return average percentage error (already multiplied by 100)
 	 */
-	public void gradCheck(LearningPlan learningPlan)
+	public float gradCheck(LearningPlan learningPlan)
 	{
-		PP.pTitledSectionLine("GRAD CHECK", "=", 25);
+		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 25);
 	 	this.setLearningPlan(learningPlan);
 	 	this.enableDebug();
 		this.setup();
@@ -356,9 +360,12 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (i = 0 ; i < propGrad.length; i ++)
 			absErr += GpuBlas.add(propGrad[i], goldGrad[i], 1, -1).abs().sum();
 		float avgAbsErr = absErr / totalSize;
+		float avgPercentErr = avgAbsErr / avgAbsVal * 100;
 		
 		PP.p("Average absolute error =", avgAbsErr);
-		PP.p("Average percent error =", avgAbsErr / avgAbsVal * 100, "%");
-		PP.setScientific(false);
+		PP.p("Average percent error =", avgPercentErr, "%\n");
+		PP.setPrecision(); PP.setScientific(false); // reset printer options
+		
+		return avgPercentErr;
 	}
 }

@@ -17,6 +17,14 @@ public class CpuUtil
 	}
 	
 	/**
+	 * @return whether abs(actual - gold) < TOL
+	 */
+	public static boolean withinTol(double actual, double gold, double TOL)
+	{
+		return Math.abs(actual - gold) < TOL;
+	}
+	
+	/**
 	 * Inner class for 2D coordinate in the matrix
 	 */
 	public static class Coord
