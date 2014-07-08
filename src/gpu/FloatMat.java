@@ -40,6 +40,8 @@ public class FloatMat
 	
 	private static boolean hostModeCheck = true; // see enableHostModeCheck() method
 	
+	public static final FloatMat DUMMY = new FloatMat();
+	
 	/**
 	 * Default ctor
 	 */
@@ -453,6 +455,17 @@ public class FloatMat
     		device = null;
 		}
 		thrustPtr = null;
+	}
+	
+	/**
+	 * Static version of the instance method
+	 * Destroy only when FloatMat isn't null
+	 * @see FloatMat#destroy()
+	 */
+	public static void destroy(FloatMat mat)
+	{
+		if (mat != null && mat != DUMMY)
+			mat.destroy();
 	}
 	
 	/**

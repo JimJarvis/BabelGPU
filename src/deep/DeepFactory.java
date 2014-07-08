@@ -27,7 +27,8 @@ public class DeepFactory
 		}
 		units.add(new SquareErrorUnit("", inlet));
 
-		return new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
+		return 
+			new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
 	}
 	
 	/**
@@ -57,7 +58,8 @@ public class DeepFactory
 			units.add( new LinearUnit("", layerDims[i], Initializer.uniformRandIniter(1)) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
-		return new DeepNet("DebugLinearLayers", inlet, units).genDefaultUnitName();
+		return 
+			new DeepNet("DebugLinearLayers", inlet, units).genDefaultUnitName();
 	}
 	
 	/**
@@ -74,9 +76,10 @@ public class DeepFactory
 			units.add( defaultElementComputeCtor(pureClass) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
-		return new DeepNet(
+		return 
+			new DeepNet(
 				"Debug" + pureClass.getSimpleName().replaceFirst("Unit", "Layers"), inlet, units)
-				.genDefaultUnitName();
+					.genDefaultUnitName();
 	}
 	
 	// Helper to construct terminal units

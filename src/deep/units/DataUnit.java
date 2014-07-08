@@ -7,9 +7,11 @@ public class DataUnit extends Unit
 {
     public FloatMat data = null;
     public FloatMat gradient = null;
-    // Dummy value: if gradient == DUMMY, we calculate but don't store the gradient
-    public static final FloatMat DUMMY = new FloatMat();
     
+    /**
+     *  Dummy placeholder: if gradient == FloatMat.DUMMY, 
+     *  we calculate but don't store the gradient
+     */
 	public DataUnit(String name, FloatMat data, FloatMat gradient)
 	{
 		super(name);
@@ -39,9 +41,13 @@ public class DataUnit extends Unit
 		return this.gradient != null;
 	}
 	
+	/**
+	 * Carefully release FloatMat resource if already allocated
+	 */
 	public void setDummyGradient()
 	{
-		this.gradient = DUMMY;
+		FloatMat.destroy(this.gradient);
+		this.gradient = FloatMat.DUMMY;
 	}
 	
 	/**
@@ -49,6 +55,7 @@ public class DataUnit extends Unit
 	 */
 	public void setNoGradient()
 	{
+		FloatMat.destroy(this.gradient);
 		this.gradient = null;
 	}
 	
