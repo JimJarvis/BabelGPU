@@ -16,6 +16,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public TerminalUnit terminal;
 	
 	private boolean setup = false; // should only setup once
+	private boolean debug = false; // the whole net is in debug mode
 
 	public DeepNet(String name, InletUnit inlet, ComputeUnit... units)
 	{
@@ -55,6 +56,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 
 	/**
 	 * This function call will only setup once and do nothing later
+	 * Any non-ParamComputeUnit before the first ParamComputeUnit doesn't need to calculate gradient
+	 * We explicitly disable it.
 	 */
 	public void setup()
 	{
@@ -62,6 +65,17 @@ public class DeepNet implements Iterable<ComputeUnit>
 		{
 			for (ComputeUnit unit : this)
     			unit.setup();
+			
+			// Explicitly disable gradient calculation in the first few non-paramComputeUnit
+			if (!debug)
+    			for (ComputeUnit unit : this)
+    			{
+    				if (unit instanceof ParamComputeUnit)
+    					break;
+    				else
+    					unit.input.setNoGradient();
+    			}
+			
 			setup = true;
 		}
 	}
@@ -99,6 +113,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public void enableDebug(boolean debug)
 	{
+		this.debug = debug;
 		for (ComputeUnit unit : this)
 			unit.enableDebug(debug);
 	}
@@ -222,12 +237,13 @@ public class DeepNet implements Iterable<ComputeUnit>
 	// ******************** DEBUG only ********************/
 	public void runDebug(LearningPlan learningPlan)
 	{
+	 	this.enableDebug();
+	 	
 		PP.pTitledSectionLine("RUN DEBUG", "=", 25);
-	 	setLearningPlan(learningPlan);
-	 	enableDebug();
+	 	this.setLearningPlan(learningPlan);
 	 	PP.pTitledSectionLine("SETUP");
-		setup();
-		printDebug();
+	 	this.setup();
+	 	this.printDebug();
 		
 		// Handle debug networks that have no params
 		if (terminal.getParams().size() == 0)
@@ -272,9 +288,10 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public float gradCheck(LearningPlan learningPlan, boolean verbose)
 	{
+	 	this.enableDebug();
+	 	
 		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 25);
 	 	this.setLearningPlan(learningPlan);
-	 	this.enableDebug();
 		this.setup();
 		this.reset(); inlet.nextBatch();
 		

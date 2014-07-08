@@ -6,16 +6,17 @@ public abstract class InletUnit extends DataUnit
 {
 	public FloatMat goldMat;
 	
+	/**
+	 * Inlet doesn't have gradient
+	 */
 	public InletUnit(String name)
 	{
 		super(name, null, null);
-		setNoGradient(); // conceptual
 	}
 
 	public InletUnit(String name, int row, int col)
 	{
 		super(name, new FloatMat(row, col), null);
-		setNoGradient();
 	}
 
 	public abstract boolean hasNext();

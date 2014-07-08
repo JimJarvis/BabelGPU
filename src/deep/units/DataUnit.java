@@ -44,6 +44,9 @@ public class DataUnit extends Unit
 		this.gradient = DUMMY;
 	}
 	
+	/**
+	 * Carefully release FloatMat resource if already allocated
+	 */
 	public void setNoGradient()
 	{
 		this.gradient = null;
