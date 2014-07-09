@@ -27,6 +27,7 @@ public class RandTest
 		
 		PP.p("Normal");
 		FloatMat m = rand.genNormalFloat(20, 0, 3);
+		rand.genCauchyFloat(m);
 		timer.readFromLast();
 		PP.p(m);
 		timer.readFromLast();

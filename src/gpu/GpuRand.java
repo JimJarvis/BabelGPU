@@ -63,6 +63,17 @@ public class GpuRand
 	 * Fill a FloatMat with random uniform float
 	 * @return input FloatMat A
 	 */
+	public FloatMat genUniformFloat(FloatMat A, float low, float high)
+	{
+		curandGenerateUniform(generator, A.toDevice(), A.size());
+		A.linear((high - low), low);
+		return A;
+	}
+	
+	/**
+	 * Fill a FloatMat with random uniform float
+	 * @return input FloatMat A
+	 */
 	public FloatMat genUniformFloat(FloatMat A)
 	{
 		curandGenerateUniform(generator, A.toDevice(), A.size());
@@ -75,6 +86,14 @@ public class GpuRand
 	public FloatMat genUniformFloat(int row, int col)
 	{
 		return genUniformFloat(new FloatMat(row, col, false));
+	}
+	
+	/**
+	 * Generate a new FloatMat with random uniform float
+	 */
+	public FloatMat genUniformFloat(int row, int col, float low, float high)
+	{
+		return genUniformFloat(new FloatMat(row, col, false), low, high);
 	}
 	
 	/**
@@ -176,6 +195,43 @@ public class GpuRand
 		return genPoissonFloat(n, 1, lambda);
 	}
 
+	/**
+	 * Generate a FloatMat with standard Laplacian distribution
+	 */
+	public FloatMat genLaplacianFloat(FloatMat A)
+	{
+		genUniformFloat(A);
+		Thrust.laplacian(A);
+		return A;
+	}
+
+	/**
+	 * Generate a FloatMat with standard Laplacian distribution
+	 * @return new
+	 */
+	public FloatMat genLaplacianFloat(int row, int col)
+	{
+		return genLaplacianFloat(new FloatMat(row, col, false));
+	}
+	
+	/**
+	 * Generate a FloatMat with standard Cauchy distribution
+	 */
+	public FloatMat genCauchyFloat(FloatMat A)
+	{
+		genUniformFloat(A);
+		Thrust.cauchy(A);
+		return A;
+	}
+
+	/**
+	 * Generate a FloatMat with standard Cauchy distribution
+	 * @return new
+	 */
+	public FloatMat genCauchyFloat(int row, int col)
+	{
+		return genCauchyFloat(new FloatMat(row, col, false));
+	}
 	
 	//**************************************************/
 	//******************* DOUBLE *******************/
