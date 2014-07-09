@@ -336,6 +336,16 @@ public class Thrust
     	ThrustNative.gpu_fill_col_float(x.getThrustPointer(), x.row, x.col, colIdx, val);
     }
 	
+    /**
+	 * Actually transpose the matrix data on GPU
+	 * NOTE: this isn't the same as the cuBLAS nominal transpose flag!!!
+	 * @param x will not be changed in any way
+	 * @param out will contain the transposed device data from X
+	 */
+    public static void transpose(FloatMat x, FloatMat out)
+    {
+    	ThrustNative.gpu_transpose_float(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
+    }
 	
 	 // ******************** Babel specific methods ****************** /
     /**

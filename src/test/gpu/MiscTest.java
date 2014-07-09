@@ -25,6 +25,9 @@ public class MiscTest
 		FloatMat b = new FloatMat(B.clone());
 		FloatMat a = new FloatMat(A.clone());
 		
+		PP.p(a.deepTranspose().deepTranspose());
+		PP.p(b.deepTranspose());
+		
 		b.singleIncr(2, 1, 666);
 		PP.p(b);
 		a.singleSet(2, 0, 666);

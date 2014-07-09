@@ -134,6 +134,7 @@ public class FloatMat
 	public FloatMat(FloatMat other)
 	{
 		this(other.row, other.col);
+		this.hostMode = other.hostMode;
 	}
 	
 	// Ctor helper
@@ -173,6 +174,7 @@ public class FloatMat
 			throw new GpuException("Device is null, cannot clone.");
 		FloatMat clone = new FloatMat(this);
 		clone.copyFrom(this);
+		clone.hostMode = this.hostMode;
 		return clone;
 	}
 	
@@ -208,6 +210,21 @@ public class FloatMat
 	public int getOriginalCol()
 	{
 		return op == CUBLAS_OP_N ? col : row;
+	}
+	
+	/**
+	 * Actually transpose the matrix data on GPU
+	 * NOTE: this isn't the same as the nominal transpose flag!!!
+	 * 'this' will not be changed
+	 * @return new transposed FloatMat with new device data. Transpose flag won't be changed.
+	 * @see Thrust#transpose(in, out)
+	 */
+	public FloatMat deepTranspose()
+	{
+		FloatMat T = new FloatMat(col, row, false);
+		T.hostMode = this.hostMode;
+		Thrust.transpose(this, T);
+		return T;
 	}
 	
 	/**

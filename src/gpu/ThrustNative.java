@@ -176,6 +176,12 @@ public class ThrustNative
     public static native void gpu_fill_col_float(
     		@ByVal FloatDevicePointer begin, int row, int col, int colIdx, float val);
     
+    /**
+     * Transpose the actual data matrix on GPU
+     */
+    public static native void gpu_transpose_float(
+    		@ByVal FloatDevicePointer in, int row, int col, @ByVal FloatDevicePointer out);
+    
     
     // ******************** Babel specific methods ****************** /
     /**
