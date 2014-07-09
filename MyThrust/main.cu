@@ -321,10 +321,33 @@ void test_sigmoid()
 	gpu_sigmoid_float(range, &E[0], 0.5, 3); printD(E);
 }
 
+void test_tranpose()
+{
+	float in[12] = { 1,2,3,4,5,6,7,8,9,10,11,12 };
+	device_vector<float> In = getDf(in, 12);
+	float out[12];
+	device_vector<float> Out = getDf(out, 12);
+	printf("Original mat\n");
+	printD(In, 4);
+	gpu_transpose_float(&In[0], 4, 3, &Out[0]);
+	printf("Transposed mat 3 x 4\n");
+	printD(Out, 3);
+	gpu_transpose_float(&In[0], 6, 2, &Out[0]);
+	printf("Transposed mat 2 x 6\n");
+	printD(Out, 2);
+	gpu_transpose_float(&In[0], 12, 1, &Out[0]);
+	printf("Transposed mat 1 x 12\n");
+	printD(Out, 1);
+	gpu_transpose_float(&In[0], 2, 6, &Out[0]);
+	printf("Transposed mat 6 x 2\n");
+	printD(Out, 6);
+}
+
 
 int main()
 {
-	test_sigmoid();
+	test_tranpose();
+	//test_sigmoid();
 	//test_id_minus_softmax_batch();
 	//test_softmax_batch();
 	//test_set_row_col();

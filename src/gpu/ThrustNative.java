@@ -105,6 +105,18 @@ public class ThrustNative
     public static native void gpu_sigmoid_deriv_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
     public static native void gpu_sigmoid_deriv_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
     
+    /**
+     * Generate Laplacian distribution from a uniform rand i.i.d
+     */
+    public static native void gpu_laplacian_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_laplacian_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+
+    /**
+     * Generate Cauchy distribution from a uniform rand i.i.d
+     */
+    public static native void gpu_cauchy_float(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_cauchy_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    
     // other
     public static native float gpu_max_float(@ByVal FloatDevicePointer begin, int size);
     public static native float gpu_min_float(@ByVal FloatDevicePointer begin, int size);
@@ -287,6 +299,17 @@ public class ThrustNative
     public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
     public static native void gpu_sigmoid_deriv_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
 
+    /**
+     * Generate Laplacian distribution from a uniform rand i.i.d
+     */
+    public static native void gpu_laplacian_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+    public static native void gpu_laplacian_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
+
+    /**
+     * Generate Cauchy distribution from a uniform rand i.i.d
+     */
+    public static native void gpu_cauchy_double(@ByVal DoubleDevicePointer begin, int size, double a, double b);
+    public static native void gpu_cauchy_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer out, double a, double b);
 
     // other
     public static native double gpu_max_double(@ByVal DoubleDevicePointer begin, int size);

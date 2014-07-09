@@ -5,6 +5,11 @@
 #ifndef try_h__
 #define try_h__
 
+#include "cuda.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#define _USE_MATH_DEFINES // otherwise cmath doesn't have M_PI
+#include <cmath>
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 #include <thrust/generate.h>
@@ -15,7 +20,6 @@
 #include <thrust/sort.h>
 #include <algorithm>
 #include <cstdlib>
-#include <cmath>
 using namespace thrust;
 
 // Macro defines functors for linear transformations inside an elementary unary function
@@ -166,7 +170,11 @@ namespace MyGpu
 	GEN_transf(ceil);
 	GEN_transf(); // gpu__float(), for plain linear transformation
 
-	// Sigmoid
+	// Generate binary transform functions
+	GEN_transf_2(pow);
+	GEN_transf_2(fmod);
+
+	/* Other non-standard functions */
 	__host__ __device__
 	inline float sigmoid(float x) { return 1.0 / (1 + exp(-x)); }
 	GEN_transf(sigmoid);
@@ -188,9 +196,28 @@ namespace MyGpu
 	inline float reciprocal(float x) { return 1.0/x; }
 	GEN_transf(reciprocal);
 
-	// Generate binary transform functions
-	GEN_transf_2(pow);
-	GEN_transf_2(fmod);
+	// Random distribution generators
+	// Cauchy CDF: given a uniform random var, transform it to be cauchy
+	__host__ __device__
+	inline float cauchy(float x) { return tan(M_PI * (x - 0.5)); }
+	GEN_transf(cauchy);
+
+	// Laplacian CDF: given a uniform random var, transform it to be lap
+	// if < 0, return -1; > 0, return 1
+	__host__ __device__
+	inline float signum(float val)
+	{
+		return (0 < val) - (val < 0);
+	}
+	__host__ __device__
+	inline float laplacian(float x)
+	{ 
+		x -= 0.5;
+		return -signum(x) * log(1 - 2 * fabs(x));
+	}
+	GEN_transf(laplacian);
+	GEN_transf(signum);
+
 
 //#ifndef _WIN32
 //	GEN_transf(exp2);
@@ -385,5 +412,44 @@ namespace MyGpu
 			thrust::raw_pointer_cast(begin), row, col, rowIdx, val);
 	}
 
+
+// Matrix transposition
+// Code from http://www.evl.uic.edu/aej/525/code/transpose_kernel.cu
+// http://www.evl.uic.edu/aej/525/code/transpose.cu
+#define BLOCK_DIM 16
+	__global__ void gpu_transpose_float_kernel(float *in, int width, int height, float *out)
+	{
+		__shared__ float block[BLOCK_DIM][BLOCK_DIM + 1];
+
+		// read the matrix tile into shared memory
+		unsigned int xIndex = blockIdx.x * BLOCK_DIM + threadIdx.x;
+		unsigned int yIndex = blockIdx.y * BLOCK_DIM + threadIdx.y;
+		if ((xIndex < width) && (yIndex < height))
+		{
+			unsigned int index_in = yIndex * width + xIndex;
+			block[threadIdx.y][threadIdx.x] = in[index_in];
+		}
+
+		__syncthreads();
+
+		// write the transposed matrix tile to global memory
+		xIndex = blockIdx.y * BLOCK_DIM + threadIdx.x;
+		yIndex = blockIdx.x * BLOCK_DIM + threadIdx.y;
+		if ((xIndex < height) && (yIndex < width))
+		{
+			unsigned int index_out = yIndex * height + xIndex;
+			out[index_out] = block[threadIdx.x][threadIdx.y];
+		}
+	}
+
+	// Transposes 'in' and fills 'out'
+	inline void gpu_transpose_float(device_ptr<float> in, int row, int col, device_ptr<float> out)
+	{
+		dim3 gridDim(std::max(row / BLOCK_DIM, 1), std::max(col / BLOCK_DIM, 1)), 
+			blockDim(BLOCK_DIM, BLOCK_DIM);
+
+		gpu_transpose_float_kernel<<<gridDim, blockDim >>>(
+			thrust::raw_pointer_cast(in), row, col, thrust::raw_pointer_cast(out));
+	}
 }
 #endif // try_h__

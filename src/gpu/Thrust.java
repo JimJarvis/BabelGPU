@@ -197,6 +197,30 @@ public class Thrust
 	public static void sigmoid_deriv(FloatMat x) {  sigmoid_deriv(x, 1, 0); }
 	public static void sigmoid_deriv(FloatMat x, FloatMat out) {  sigmoid_deriv(x, out, 1, 0); }
 	
+	/**
+	 * Generate standard Laplacian distribution from uniform i.i.d
+	 */
+	public static void laplacian(FloatMat x)
+	{
+		gpu_laplacian_float(x.getThrustPointer(), x.size(), 1, 0);
+	}
+	public static void laplacian(FloatMat x, FloatMat out)
+	{
+		gpu_laplacian_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+	}
+	
+	/**
+	 * Generate standard Cauchy distribution from uniform i.i.d
+	 */
+	public static void cauchy(FloatMat x)
+	{
+		gpu_cauchy_float(x.getThrustPointer(), x.size(), 1, 0);
+	}
+	public static void cauchy(FloatMat x, FloatMat out)
+	{
+		gpu_cauchy_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+	}
+	
 	public static float sum(FloatMat x)
 	{
 		return gpu_sum_float(x.getThrustPointer(), x.size());
@@ -558,6 +582,30 @@ public class Thrust
 	}
 	public static void sigmoid_deriv(DoubleMat x) {  sigmoid_deriv(x, 1, 0); }
 	public static void sigmoid_deriv(DoubleMat x, DoubleMat out) {  sigmoid_deriv(x, out, 1, 0); }
+	
+	/**
+	 * Generate standard Laplacian distribution from uniform i.i.d
+	 */
+	public static void laplacian(DoubleMat x)
+	{
+		gpu_laplacian_double(x.getThrustPointer(), x.size(), 1, 0);
+	}
+	public static void laplacian(DoubleMat x, DoubleMat out)
+	{
+		gpu_laplacian_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+	}
+	
+	/**
+	 * Generate standard Cauchy distribution from uniform i.i.d
+	 */
+	public static void cauchy(DoubleMat x)
+	{
+		gpu_cauchy_double(x.getThrustPointer(), x.size(), 1, 0);
+	}
+	public static void cauchy(DoubleMat x, DoubleMat out)
+	{
+		gpu_cauchy_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+	}
 	
 	public static double sum(DoubleMat x)
 	{
