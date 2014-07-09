@@ -116,6 +116,14 @@ public class GpuRand
 	}
 	
 	/**
+	 * Fill a FloatMat with standard normal distribution
+	 */
+	public FloatMat genNormalFloat(FloatMat A)
+	{
+		return genNormalFloat(A, 0, 1);
+	}
+	
+	/**
 	 * Generate a new FloatMat with normal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
@@ -123,6 +131,14 @@ public class GpuRand
 	public FloatMat genNormalFloat(int row, int col, float mean, float stdev)
 	{
 		return genNormalFloat(new FloatMat(row, col, false), mean, stdev);
+	}
+	
+	/**
+	 * Generate a new FloatMat with standard normal distribution
+	 */
+	public FloatMat genNormalFloat(int row, int col)
+	{
+		return genNormalFloat(row, col, 0, 1);
 	}
 	
 	/**
@@ -136,6 +152,14 @@ public class GpuRand
 	}
 	
 	/**
+	 * Generate a new FloatMat (vector) with standard normal distribution
+	 */
+	public FloatMat genNormalFloat(int n)
+	{
+		return genNormalFloat(n, 1, 0f, 1f);
+	}
+	
+	/**
 	 * Fill a FloatMat with lognormal distribution
 	 * @param mean 
 	 * @param stdev standard deviation
@@ -144,6 +168,14 @@ public class GpuRand
 	{
 		curandGenerateLogNormal(generator, A.toDevice(), A.size(), mean, stdev);
 		return A;
+	}
+	
+	/**
+	 * Fill a FloatMat with standard lognormal distribution
+	 */
+	public FloatMat genLogNormalFloat(FloatMat A)
+	{
+		return genLogNormalFloat(A, 0, 1);
 	}
 
 	/**
@@ -157,6 +189,14 @@ public class GpuRand
 	}
 	
 	/**
+	 * Generate a new FloatMat with std lognormal distribution
+	 */
+	public FloatMat genLogNormalFloat(int row, int col)
+	{
+		return genLogNormalFloat(row, col, 0, 1);
+	}
+	
+	/**
 	 * Generate a new FloatMat (vector) with lognormal distribution 
 	 * @param mean 
 	 * @param stdev standard deviation
@@ -164,6 +204,14 @@ public class GpuRand
 	public FloatMat genLogNormalFloat(int n, float mean, float stdev)
 	{
 		return genLogNormalFloat(n, 1, mean, stdev);
+	}
+	
+	/**
+	 * Generate a new FloatMat (vector) with std lognormal distribution 
+	 */
+	public FloatMat genLogNormalFloat(int n)
+	{
+		return genLogNormalFloat(n, 1, 0f, 1f);
 	}
 	
 	/**
