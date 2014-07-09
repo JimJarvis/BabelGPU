@@ -207,6 +207,19 @@ public class PP
     {
     	return C2str(C, encloser.substring(0, 1), encloser.substring(1), ", ");
     }
+    
+    /**
+     * 2D matrix with each row on a separate line.
+     */
+    public static String mat2str(Object A)
+    {
+    	return "[" + join(A, "\n") + "]";
+    }
+    
+    /**
+     * Print out a 2D matrix with each row on a separate line
+     */
+    public static void pMat(Object A) {	 out.println(mat2str(A)); }
 
     // Helper method: for the last closing parenthesis
     private static String makeEnding(String s, String sep, String end)

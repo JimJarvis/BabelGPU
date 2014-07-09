@@ -516,7 +516,7 @@ public class FloatMat
 	 */
 	public String toString()
 	{
-		return PP.o2str(this.deflatten());
+		return PP.mat2str(this.deflatten());
 	}
 
 	/**
