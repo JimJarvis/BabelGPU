@@ -261,25 +261,35 @@ public class Thrust
 	/**
 	 * Set a single value
 	 */
-	public static void single_set(FloatMat x, int idx, float newVal)
+	public static void set_single(FloatMat x, int idx, float newVal)
 	{
 		gpu_set_single_float(x.getThrustPointer(), idx, newVal);
 	}
-	public static void single_set(FloatMat x, int i, int j, float newVal)
+	/**
+	 * @param ij can be negative: python wrap-around
+	 */
+	public static void set_single(FloatMat x, int i, int j, float newVal)
 	{
-		single_set(x, x.toIndex(i, j), newVal);
+		if (i < 0) i += x.row;
+		if (j < 0) j += x.col;
+		set_single(x, x.toIndex(i, j), newVal);
 	}
 	
 	/**
 	 * Increment a single value
 	 */
-	public static void single_incr(FloatMat x, int idx, float incrVal)
+	public static void incr_single(FloatMat x, int idx, float incrVal)
 	{
 		gpu_incr_single_float(x.getThrustPointer(), idx, incrVal);
 	}
-	public static void single_incr(FloatMat x, int i, int j, float incrVal)
+	/**
+	 * @param ij can be negative: python wrap-around
+	 */
+	public static void incr_single(FloatMat x, int i, int j, float incrVal)
 	{
-		single_incr(x, x.toIndex(i, j), incrVal);
+		if (i < 0) i += x.row;
+		if (j < 0) j += x.col;
+		incr_single(x, x.toIndex(i, j), incrVal);
 	}
 	
 	/**

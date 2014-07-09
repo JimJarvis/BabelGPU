@@ -438,6 +438,7 @@ public class FloatMat
 	
 	/**
 	 * createOffset from column 'start' to column 'end'
+	 * 'start' inclusive and 'end' exclusive
 	 */
 	public FloatMat createColOffset(FloatMat offMat, int colStart, int colEnd)
 	{
@@ -445,7 +446,8 @@ public class FloatMat
 	}
 	
 	/**
-	 * Default version of createColOffset
+	 * createOffset from column 'start' to column 'end'
+	 * 'start' inclusive and 'end' exclusive
 	 * @return new FloatMat
 	 */
 	public FloatMat createColOffset(int colStart, int colEnd)
@@ -546,9 +548,12 @@ public class FloatMat
 	
 	/**
 	 * Transform a 2D coordinate to index (column major)
+	 * @param ij can be negative, python-like wrap-around: "-1" means the last row/col
 	 */
 	public int toIndex(int i, int j)
 	{
+		if (i < 0)	i += this.row;
+		if (j < 0)	j += this.col;
 		return CpuUtil.toIndex(row, i, j);
 	}
 	/**
@@ -755,6 +760,22 @@ public class FloatMat
 		Thrust.fill(this, val);	return this;
 	}
 	
+	/**
+	 * @param rowIdx like python, wrapped around: if negative, rowIdx = rowDim + rowIdx
+	 */
+	public FloatMat fillRow(float val, int rowIdx)
+	{
+		Thrust.fill_row(this, rowIdx, val); return this;
+	}
+
+	/**
+	 * @param colIdx like python, wrapped around: if negative, colIdx = rowDim + colIdx
+	 */
+	public FloatMat fillCol(float val, int colIdx)
+	{
+		Thrust.fill_col(this, colIdx, val); return this;
+	}
+	
 	public FloatMat copyFrom(FloatMat other)
 	{
 		Thrust.copy(other, this);	return this;
@@ -763,30 +784,30 @@ public class FloatMat
 	/**
 	 * Set a single value to newVal
 	 */
-	public FloatMat singleSet(int i, int j, float newVal)
+	public FloatMat setSingle(int i, int j, float newVal)
 	{
-		Thrust.single_set(this, i, j, newVal); return this;
+		Thrust.set_single(this, i, j, newVal); return this;
 	}
 	/**
 	 * Set a single value to newVal
 	 */
-	public FloatMat singleSet(int idx, float newVal)
+	public FloatMat setSingle(int idx, float newVal)
 	{
-		Thrust.single_set(this, idx, newVal); return this;
+		Thrust.set_single(this, idx, newVal); return this;
 	}
 	
 	/**
 	 * Increment a single value to newVal
 	 */
-	public FloatMat singleIncr(int i, int j, float newVal)
+	public FloatMat incrSingle(int i, int j, float newVal)
 	{
-		Thrust.single_incr(this, i, j, newVal); return this;
+		Thrust.incr_single(this, i, j, newVal); return this;
 	}
 	/**
 	 * Increment a single value to newVal
 	 */
-	public FloatMat singleIncr(int idx, float newVal)
+	public FloatMat incrSingle(int idx, float newVal)
 	{
-		Thrust.single_incr(this, idx, newVal); return this;
+		Thrust.incr_single(this, idx, newVal); return this;
 	}
 }
