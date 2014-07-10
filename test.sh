@@ -6,6 +6,7 @@ main="gpu/SoftmaxTest"
 main="gpu/MinibatchTest"
 main="gpu/MiscTest"
 main="gpu/RandTest"
+main="deep/IniterTest"
 
 units="test.deep.LayersTest"
 
