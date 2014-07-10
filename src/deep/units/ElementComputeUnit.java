@@ -10,10 +10,16 @@ public abstract class ElementComputeUnit extends ComputeUnit
 {
 	/**
 	 * outDim always equal to prev.outDim or input.dim
+	 * @param hasBias see ComputeUnit
 	 */
+	public ElementComputeUnit(String name, boolean hasBias)
+	{
+		super(name, -1, hasBias);
+	}
+	
 	public ElementComputeUnit(String name)
 	{
-		super(name, -1);
+		this(name, true);
 	}
 
 	@Override
@@ -37,6 +43,8 @@ public abstract class ElementComputeUnit extends ComputeUnit
 		{
 			backward_element();
     		GpuBlas.dotMult(output.gradient, input.gradient);
+    		if (hasBias)
+    			input.gradient.fillRow(0, -1);
 		}
 	}
 	

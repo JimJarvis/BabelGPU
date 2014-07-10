@@ -72,21 +72,29 @@ public abstract class Initializer
 	}
 	
 	/**
+	 * Set the last row to [0, 0, 0,..., 1]
+	 */
+	public static void setLastRowBias(FloatMat A)
+	{
+		A.fillRow(0, -1);
+		A.setSingle(-1, 1);
+	}
+	
+	/**
 	 * Aggregate Initer to handle 'bias' units
 	 * Assume W already has an extra vacant row
 	 * Set the last row of an initiated parameter to be [0, 0, 0, ..., 1]
 	 * The last element of the last row is 1
 	 * In this way, multiplication W * x would preserve the last row of x, which should be all 1
 	 */
-	public static Initializer multBiasAggregIniter(final Initializer origIniter)
+	public static Initializer biasAggregIniter(final Initializer origIniter)
 	{
 		return new Initializer() {
 			@Override
 			public void init(FloatMat w)
 			{
 				origIniter.init(w);
-				w.fillRow(0, -1);
-				w.setSingle(-1, -1, 1);
+				setLastRowBias(w);
 			}
 		};
 	}
@@ -161,7 +169,7 @@ public abstract class Initializer
 						w.createColOffset(w.col-1, w.col), 0, 2 * Math.PI);
 			}
 		};
-		return multBiasAggregIniter(origIniter);
+		return biasAggregIniter(origIniter);
 	}
 	
 	/**

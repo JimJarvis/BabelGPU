@@ -109,6 +109,15 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	/**
+	 * Must be called BEFORE setup() !!
+	 */
+	public void setBias(boolean hasBias)
+	{
+		for (ComputeUnit unit : this)
+			unit.setBias(hasBias);
+	}
+	
+	/**
 	 * If debug mode enabled, we explicitly store the parameter gradient
 	 */
 	public void enableDebug(boolean debug)
@@ -288,9 +297,12 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public float gradCheck(LearningPlan learningPlan, boolean verbose)
 	{
-	 	this.enableDebug();
-	 	
 		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 25);
+		
+	 	this.enableDebug();
+	 	this.setBias(true); // all have bias units
+	 	final boolean hasBias = true;
+	 	
 	 	this.setLearningPlan(learningPlan);
 		this.setup();
 		this.reset(); inlet.nextBatch();
@@ -348,6 +360,10 @@ public class DeepNet implements Iterable<ComputeUnit>
 					
 			for (int idx = 0 ; idx < mat.size(); idx ++)
 			{
+				// Skip checking the last row if include bias units
+				if (hasBias && mat.toCoord(idx).i == mat.row - 1)
+					continue;
+
 				// +EPS and -EPS perturb
 				float negResult = 0, posResult = 0;
 				for (int perturb : new int[] {-1, 1})

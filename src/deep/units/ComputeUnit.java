@@ -8,6 +8,8 @@ public abstract class ComputeUnit extends Unit
 	public ComputeUnit next = null;
 	public ComputeUnit prev = null;
 	public int outDim;
+	// Do we include bias units?
+	protected boolean hasBias;
 
 	/**
 	 * ALWAYS equal to prev.output
@@ -26,12 +28,22 @@ public abstract class ComputeUnit extends Unit
 	}
 	
 	/**
-	 * @param outDim: the dimension of the output (transformed) data
+	 * @param outDim the dimension of the output (transformed) data
+	 * @param hasBias if true, the actual outDim will be your input + 1
+	 */
+	public ComputeUnit(String name, int outDim, boolean hasBias)
+	{
+		super(name);
+		this.hasBias = hasBias;
+		this.outDim = hasBias ? outDim + 1 : outDim;
+	}
+	
+	/**
+	 * Default hasBias = true, the actual outDim will be your input + 1
 	 */
 	public ComputeUnit(String name, int outDim)
 	{
-		super(name);
-		this.outDim = outDim;
+		this(name, outDim, true);
 	}
 	
 	public void setup()
@@ -52,6 +64,28 @@ public abstract class ComputeUnit extends Unit
 		this.output.initGradient();
 	}
 	
+	/**
+	 * Needs to be called BEFORE setup() !!
+	 */
+	public void setBias(boolean hasBias)
+	{
+		if (this.hasBias != hasBias)
+		{
+			if (this.hasBias) // switch bias off
+				-- outDim;
+			else
+				++ outDim;
+			this.hasBias = hasBias;
+		}
+	}
+	
+	/**
+	 * Forward propagation abstraction
+	 */
 	public abstract void forward(); 
+	
+	/**
+	 * Backward propagation abstraction
+	 */
 	public abstract void backward();
 }

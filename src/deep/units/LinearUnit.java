@@ -33,10 +33,13 @@ public class LinearUnit extends ParamComputeUnit
     		{
     			GpuBlas.mult(output.gradient, input.data.transpose(), W.gradient);
     			GpuBlas.scaleAdd(W.data, W.gradient, learningPlan.reg);
+    			if (hasBias) W.gradient.fillRow(0, -1);
     		}
 
     		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 
     				lr/input.batchSize(), 1 - lr * learningPlan.reg);
+    		if (hasBias)
+    			Initializer.setLastRowBias(W.data);
 		}
 	}
 

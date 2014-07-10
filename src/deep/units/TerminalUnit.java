@@ -24,10 +24,15 @@ public abstract class TerminalUnit extends ComputeUnit
 	 */
 	protected ArrayList<ParamUnit> wList = null;
 	
+	public TerminalUnit(String name, InletUnit inlet, boolean hasBias)
+	{
+		super(name, 1, hasBias);
+		this.inlet = inlet;
+	}
+	
 	public TerminalUnit(String name, InletUnit inlet)
 	{
-		super(name, 1);
-		this.inlet = inlet;
+		this(name, inlet, true);
 	}
 	
 	@Override

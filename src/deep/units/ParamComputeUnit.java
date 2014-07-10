@@ -10,11 +10,22 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	/**
 	 * @param outDim output dimension from this computing unit
 	 * @param initer parameter W initializer
+	 * @param hasBias see ComputeUnit
+	 */
+	public ParamComputeUnit(String name, int outDim, boolean hasBias, Initializer initer)
+	{
+		super(name, outDim, hasBias);
+		if (hasBias)
+    		this.initer = Initializer.biasAggregIniter(initer);
+	}
+	
+	/**
+	 * @param outDim output dimension from this computing unit
+	 * @param initer parameter W initializer
 	 */
 	public ParamComputeUnit(String name, int outDim, Initializer initer)
 	{
-		super(name, outDim);
-		this.initer = initer;
+		this(name, outDim, true, initer);
 	}
 	
 	/**
@@ -22,7 +33,7 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	 */
 	public ParamComputeUnit(String name, int outDim)
 	{
-		this(name, outDim, Initializer.fillIniter(0));
+		this(name, outDim, true, Initializer.fillIniter(0));
 	}
 	
 	@Override
