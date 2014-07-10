@@ -445,7 +445,7 @@ namespace MyGpu
 	// Transposes 'in' and fills 'out'
 	inline void gpu_transpose_float(device_ptr<float> in, int row, int col, device_ptr<float> out)
 	{
-		dim3 gridDim(std::max(row / BLOCK_DIM, 1), std::max(col / BLOCK_DIM, 1)), 
+		dim3 gridDim(std::ceil(1.0 *row / BLOCK_DIM), std::ceil(1.0 * col / BLOCK_DIM)), 
 			blockDim(BLOCK_DIM, BLOCK_DIM);
 
 		gpu_transpose_float_kernel<<<gridDim, blockDim >>>(
