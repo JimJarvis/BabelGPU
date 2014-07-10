@@ -72,20 +72,10 @@ public abstract class Initializer
 	}
 	
 	/**
-	 * Set the last row to [0, 0, 0,..., 1]
-	 */
-	public static void setLastRowBias(FloatMat A)
-	{
-		A.fillRow(0, -1);
-		A.setSingle(-1, 1);
-	}
-	
-	/**
 	 * Aggregate Initer to handle 'bias' units
 	 * Assume W already has an extra vacant row
-	 * Set the last row of an initiated parameter to be [0, 0, 0, ..., 1]
-	 * The last element of the last row is 1
-	 * In this way, multiplication W * x would preserve the last row of x, which should be all 1
+	 * Set the last row of an initiated parameter to be all 0
+	 * Then mult W * x will also have an extra row
 	 */
 	public static Initializer biasAggregIniter(final Initializer origIniter)
 	{
@@ -94,7 +84,7 @@ public abstract class Initializer
 			public void init(FloatMat w)
 			{
 				origIniter.init(w);
-				setLastRowBias(w);
+				w.fillRow(0, -1);
 			}
 		};
 	}

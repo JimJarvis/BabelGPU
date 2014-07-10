@@ -1,7 +1,10 @@
 package deep;
 
+import gpu.FloatMat;
+
 import java.util.ArrayList;
 
+import utils.CpuUtil;
 import deep.units.*;
 
 /**
@@ -12,17 +15,17 @@ public class DeepFactory
 	/**
 	 * @param number of neurons in each layer, 
 	 * from the first hidden layer to output layer (included)
-	 * @param initializers for each layer
+	 * @param initers for each layer
 	 */
-	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer[] initializers)
+	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer[] initers)
 	{
-		if (initializers.length < layerDims.length)
+		if (initers.length < layerDims.length)
 			throw new DeepException("Not enough initializers for each layer");
 		
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerDims.length; i++)
 		{
-			units.add( new LinearUnit("", layerDims[i], initializers[i]) );
+			units.add( new LinearUnit("", layerDims[i], initers[i]) );
 			units.add(new SigmoidUnit(""));
 		}
 		units.add(new SquareErrorUnit("", inlet));
@@ -39,23 +42,32 @@ public class DeepFactory
 	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims)
 	{
 		int layerN = layerDims.length;
-		Initializer[] initializers = new Initializer[layerN];
+		Initializer[] initers = new Initializer[layerN];
 		for (int i = 0; i < layerN; i++)
 		{
 			float L_in = i == 0 ? inlet.dim() : layerDims[i - 1];
 			float L_out = layerDims[i];
 			float symmInitRange = (float) Math.sqrt(6 / (L_in + L_out));
-			initializers[i] = Initializer.uniformRandIniter(symmInitRange);
+			initers[i] = Initializer.uniformRandIniter(symmInitRange);
 		}
-		return simpleSigmoidNet(inlet, layerDims, initializers);
+		return simpleSigmoidNet(inlet, layerDims, initers);
+	}
+	
+	/**
+	 * Use single initer for all layers
+	 */
+	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer initer)
+	{
+		return simpleSigmoidNet(inlet, layerDims, 
+				CpuUtil.repeatedArray(initer, layerDims.length));
 	}
 	
 	public static DeepNet debugLinearLayers(
-			InletUnit inlet, int[] layerDims, Class<? extends TerminalUnit> terminalClass)
+			InletUnit inlet, int[] layerDims, Class<? extends TerminalUnit> terminalClass, Initializer initer)
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerDims.length; i++)
-			units.add( new LinearUnit("", layerDims[i], Initializer.uniformRandIniter(1)) );
+			units.add( new LinearUnit("", layerDims[i], initer) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
 		return 

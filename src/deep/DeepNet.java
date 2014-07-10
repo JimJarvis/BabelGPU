@@ -244,15 +244,16 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	// ******************** DEBUG only ********************/
-	public void runDebug(LearningPlan learningPlan)
+	public void runDebug(LearningPlan learningPlan, boolean hasBias)
 	{
 	 	this.enableDebug();
+	 	this.setBias(hasBias); // all have bias units
 	 	
 		PP.pTitledSectionLine("RUN DEBUG", "=", 25);
 	 	this.setLearningPlan(learningPlan);
 	 	PP.pTitledSectionLine("SETUP");
 	 	this.setup();
-	 	this.printDebug();
+	 	this.printDebug(true);
 		
 		// Handle debug networks that have no params
 		if (terminal.getParams().size() == 0)
@@ -266,23 +267,26 @@ public class DeepNet implements Iterable<ComputeUnit>
 			inlet.nextBatch();
 			PP.pTitledSectionLine("FORWARD");
 			forwprop();
-			printDebug();
+			printDebug(true);
 			PP.pTitledSectionLine("BACKWARD");
 			backprop();
-			printDebug();
+			printDebug(false);
 		}
 		
 		PP.p("\nRESULT =", terminal.lossTotal(), "\n");
 	}
 	
-	public void printDebug()
+	public void printDebug(boolean forward)
 	{
-		for (ComputeUnit unit : this)
+		for (ComputeUnit unit : this.iterable(forward))
 		{
 			PP.p(unit.name);
-			PP.p("input:", unit.input);
+			PP.p("input", unit.input.data.row, "*", unit.input.data.col, ":", unit.input, "\n");
 			if (unit instanceof ParamComputeUnit)
-				PP.p("W:", ((ParamComputeUnit) unit).W);
+			{
+				ParamUnit W = ((ParamComputeUnit) unit).W;
+				PP.p("W", W.data.row, "*", W.data.col, ":", W);
+			}
 			PP.pSectionLine();
 		}
 	}
@@ -293,15 +297,15 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Will only process one batch from inlet
 	 * Perturbation eps constant is auto-selected based on avg abs value of parameters (minimum: 1e-4f)
 	 * @param verbose don't show the actual gradient comparison
+	 * @param hasBias enable bias units on all ComputeUnit
 	 * @return average percentage error (already multiplied by 100)
 	 */
-	public float gradCheck(LearningPlan learningPlan, boolean verbose)
+	public float gradCheck(LearningPlan learningPlan, boolean hasBias, boolean verbose)
 	{
 		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 25);
 		
 	 	this.enableDebug();
-	 	this.setBias(true); // all have bias units
-	 	final boolean hasBias = true;
+	 	this.setBias(hasBias); // all have bias units
 	 	
 	 	this.setLearningPlan(learningPlan);
 		this.setup();
@@ -344,12 +348,12 @@ public class DeepNet implements Iterable<ComputeUnit>
 			mat = new FloatMat(w.gradient);
 			mat.copyFrom(w.gradient);
 			propGrad[i ++] = mat;
-			totalSize += mat.size();
+			totalSize += mat.size() - (hasBias ? mat.row : 0);
 			totalAbsSum += mat.clone().abs().sum();
 		}
 		// Get average abs parameter entry value
 		float avgAbsVal = totalAbsSum / totalSize;
-		final float EPS = Math.max( avgAbsVal / 1e3f, 1e-3f );
+		final float EPS = Math.max( avgAbsVal / 1e2f, 1e-30f );
 		
 		// Do finite-diff forward prop for every entry in every parameter
 		i = 0;
@@ -414,8 +418,14 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	/**
+	 * Default verbose = false, hasBias = true
+	 * @see DeepNet#gradCheck(LearningPlan, true)
+	 */
+	public float gradCheck(LearningPlan plan) {	return this.gradCheck(plan, true, false);	}
+	
+	/**
 	 * Default verbose = true
 	 * @see DeepNet#gradCheck(LearningPlan, true)
 	 */
-	public float gradCheck(LearningPlan plan) {	return this.gradCheck(plan, true);	}
+	public float gradCheck(LearningPlan plan, boolean hasBias) {	return this.gradCheck(plan, hasBias, false);	}
 }

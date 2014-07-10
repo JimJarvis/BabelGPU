@@ -51,9 +51,10 @@ public class FourierProjectUnit extends ComputeUnit
 	@Override
 	public void forward()
 	{
-		GpuBlas.mult(projector.data, input.data, output.data);
+		if (hasBias)
 		// The last row will have all ones
-		
+			input.data.fillRow(1, -1);
+		GpuBlas.mult(projector.data, input.data, output.data);
 	}
 
 	@Override

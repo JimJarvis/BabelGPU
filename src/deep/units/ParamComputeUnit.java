@@ -1,5 +1,6 @@
 package deep.units;
 
+import utils.PP;
 import deep.*;
 
 public abstract class ParamComputeUnit extends ComputeUnit
@@ -15,8 +16,7 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	public ParamComputeUnit(String name, int outDim, boolean hasBias, Initializer initer)
 	{
 		super(name, outDim, hasBias);
-		if (hasBias)
-    		this.initer = Initializer.biasAggregIniter(initer);
+		this.initer = initer;
 	}
 	
 	/**
@@ -45,6 +45,8 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	
 	protected void setupW()
 	{
+		if (hasBias)
+    		this.initer = Initializer.biasAggregIniter(this.initer);
 		this.W = new ParamUnit("W[" + this.name + "]", this);
 		reInit();
 		if (debug)

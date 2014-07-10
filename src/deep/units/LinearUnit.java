@@ -13,6 +13,8 @@ public class LinearUnit extends ParamComputeUnit
 	@Override
 	public void forward()
 	{
+		if (hasBias)
+			input.data.fillRow(1, -1);
 		GpuBlas.mult(W.data, input.data, output.data);
 	}
 
@@ -39,7 +41,7 @@ public class LinearUnit extends ParamComputeUnit
     		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 
     				lr/input.batchSize(), 1 - lr * learningPlan.reg);
     		if (hasBias)
-    			Initializer.setLastRowBias(W.data);
+    			W.data.fillRow(0, -1);
 		}
 	}
 

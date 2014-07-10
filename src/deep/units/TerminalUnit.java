@@ -53,6 +53,8 @@ public abstract class TerminalUnit extends ComputeUnit
 		if (learningPlan.hasReg())
 			updateLossReg();
 		
+		if (hasBias)
+			input.data.fillRow(0, -1);
 		// Will be implemented by subclasses
 		forward_terminal();
 	}
