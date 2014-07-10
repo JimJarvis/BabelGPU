@@ -74,18 +74,4 @@ public class ParamUnit extends DataUnit
 			throw new DeepException("Cannot reinitialize this parameter: parent null");
 		parent.reInit();
 	}
-	
-	/**
-	 * Used for Initializers to partially initialize a parameter
-	 * Partial mat by columns
-	 * @return new ParamUnit with the old partial mat 'data'.
-	 * @see FloatMat#createColOffset(int, int)
-	 * @see Initializer
-	 */
-	public ParamUnit createColOffset(int colStart, int colEnd)
-	{
-		ParamUnit offset = new ParamUnit(this);
-		offset.data = offset.data.createColOffset(colStart, colEnd);
-		return offset;
-	}
 }

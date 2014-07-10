@@ -12,14 +12,19 @@ import jcuda.jcurand.curandGenerator;
  */
 public class GpuRand
 {
-	public static final long seed = 33760737L;
+	/**
+	 * Re-initialization seed
+	 */
+	public static final long SEED = 33760737L;
 	private curandGenerator generator;
+	private static Random rand;
 	
 	/**
 	 * Ctor with seed
 	 */
 	public GpuRand(long seed)
 	{
+		rand = new Random(seed);
 		createGenerator(seed);
 	}
 	
@@ -33,10 +38,9 @@ public class GpuRand
 	/**
 	 * Ctor with random seed
 	 */
-	private static Random rand = new Random();
 	public GpuRand()
 	{
-		this(rand.nextLong());
+		this(System.currentTimeMillis());
 	}
 	
 	/**
