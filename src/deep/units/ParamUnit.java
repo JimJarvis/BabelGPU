@@ -1,6 +1,7 @@
 package deep.units;
 
 import deep.DeepException;
+import deep.Initializer;
 import gpu.FloatMat;
 
 public class ParamUnit extends DataUnit
@@ -37,6 +38,21 @@ public class ParamUnit extends DataUnit
 		this(name, null, row, col);
 	}
 	
+	/**
+	 * Shallow copy
+	 */
+	public ParamUnit(ParamUnit other)
+	{
+		super(other.name, other.data, other.gradient);
+		this.debug = other.debug;
+		this.parent = other.parent;
+	}
+	
+	/**
+	 * Copy ctor: make a partial copy of a submat of 'data'
+	 * @param 
+	 */
+	
 	@Override
 	public final int dim()
 	{
@@ -57,5 +73,19 @@ public class ParamUnit extends DataUnit
 		if (parent == null)
 			throw new DeepException("Cannot reinitialize this parameter: parent null");
 		parent.reInit();
+	}
+	
+	/**
+	 * Used for Initializers to partially initialize a parameter
+	 * Partial mat by columns
+	 * @return new ParamUnit with the old partial mat 'data'.
+	 * @see FloatMat#createColOffset(int, int)
+	 * @see Initializer
+	 */
+	public ParamUnit createColOffset(int colStart, int colEnd)
+	{
+		ParamUnit offset = new ParamUnit(this);
+		offset.data = offset.data.createColOffset(colStart, colEnd);
+		return offset;
 	}
 }

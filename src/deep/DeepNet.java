@@ -356,14 +356,14 @@ public class DeepNet implements Iterable<ComputeUnit>
 					this.reset(); inlet.nextBatch();
     				
             		// Perturb -EPS
-            		w.data.singleIncr(idx, perturb * EPS);
+            		w.data.incrSingle(idx, perturb * EPS);
             		forwprop();
             		float result = terminal.lossTotal();
 
             		if (perturb < 0) negResult = result; else posResult = result;
 				}
 				// Compute symmetric numerical gradient and store to 'mat'
-				mat.singleSet(idx, (posResult - negResult) / (2 * EPS));
+				mat.setSingle(idx, (posResult - negResult) / (2 * EPS));
 			}
 			// Store
 			goldGrad[i ++] = mat;

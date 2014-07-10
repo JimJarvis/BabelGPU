@@ -28,9 +28,9 @@ public class MiscTest
 		PP.p(a.deepTranspose().deepTranspose());
 		PP.p(b.deepTranspose());
 		
-		b.singleIncr(2, 1, 666);
+		b.incrSingle(2, 1, 666);
 		PP.p(b);
-		a.singleSet(2, 0, 666);
+		a.setSingle(2, 0, 666);
 		PP.p(a);
 		
 		PP.p(GpuBlas.dotMult(a, b));
