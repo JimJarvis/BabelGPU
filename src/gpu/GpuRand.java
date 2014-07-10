@@ -12,6 +12,7 @@ import jcuda.jcurand.curandGenerator;
  */
 public class GpuRand
 {
+	public static final long seed = 33760737L;
 	private curandGenerator generator;
 	
 	/**
@@ -47,6 +48,7 @@ public class GpuRand
 	{
 		destroy();
 		createGenerator(seed);
+		rand = new Random(seed);
 	}
 
 	/**
@@ -111,7 +113,14 @@ public class GpuRand
 	 */
 	public FloatMat genNormalFloat(FloatMat A, double mean, double stdev)
 	{
-		curandGenerateNormal(generator, A.toDevice(), A.size(), (float)mean, (float)stdev);
+		// Ugliest hack in the history of programming
+		// WARNING: curandGenNormal doesn't work on array with odd number of elements!!
+		// Force even, then add 1 more at last
+		int size = A.size();
+		boolean odd = size % 2 == 1;
+		curandGenerateNormal(generator, A.toDevice(), odd ? size - 1 : size, (float)mean, (float)stdev);
+		if (odd) // manually set the last unfilled slot with rand normal
+			A.setSingle(-1, (float) (rand.nextGaussian() * stdev + mean));
 		return A;
 	}
 	
@@ -166,7 +175,14 @@ public class GpuRand
 	 */
 	public FloatMat genLogNormalFloat(FloatMat A, double mean, double stdev)
 	{
-		curandGenerateLogNormal(generator, A.toDevice(), A.size(), (float)mean, (float)stdev);
+		// Ugliest hack in the history of programming
+		// WARNING: curandGenLogNormal doesn't work on array with odd number of elements!!
+		// Force even, then add 1 more at last
+		int size = A.size();
+		boolean odd = size % 2 == 1;
+		curandGenerateLogNormal(generator, A.toDevice(), odd ? size - 1 : size, (float)mean, (float)stdev);
+		if (odd) // manually set the last unfilled slot with rand lognormal
+			A.setSingle(-1, (float) Math.exp(rand.nextGaussian() * stdev + mean));
 		return A;
 	}
 	
@@ -214,35 +230,6 @@ public class GpuRand
 		return genLogNormalFloat(n, 1, 0f, 1f);
 	}
 	
-	/**
-	 * Fill a FloatMat (int valued) with Poisson distribution
-	 * @param lambda 
-	 */
-	public FloatMat genPoissonFloat(FloatMat A, double lambda)
-	{
-		curandGeneratePoisson(generator, A.toDevice(), A.size(), lambda);
-		return A;
-	}
-	
-	/**
-	 * Generate a new FloatMat (int valued) with Poisson distribution
-	 * @param lambda 
-	 */
-	public FloatMat genPoissonFloat(int row, int col, double lambda)
-	{
-		return genPoissonFloat(new FloatMat(row, col, false), lambda);
-	}
-	
-	/**
-	 * Generate a FloatMat (vector, int valued) with Poisson distribution
-	 * @param mean 
-	 * @param stdev standard deviation
-	 */
-	public FloatMat genPoissonFloat(int n, double lambda)
-	{
-		return genPoissonFloat(n, 1, lambda);
-	}
-
 	/**
 	 * Generate a FloatMat with standard Laplacian distribution
 	 */

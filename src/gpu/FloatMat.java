@@ -790,9 +790,11 @@ public class FloatMat
 	}
 	/**
 	 * Set a single value to newVal
+	 * @param idx can be negative: python-style wrap-around
 	 */
 	public FloatMat setSingle(int idx, float newVal)
 	{
+		if (idx < 0)	idx += size();
 		Thrust.set_single(this, idx, newVal); return this;
 	}
 	
