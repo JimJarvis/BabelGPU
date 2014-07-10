@@ -1,6 +1,7 @@
 package gpu;
 
 import static gpu.ThrustNative.*;
+import gpu.ThrustStruct.FloatDevicePointer;
 
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
@@ -445,6 +446,7 @@ public class Thrust
    
     // A few duplicates from ThrustNative.java
 	// Force Thrust.java to generate code by JavaCpp
+    public static native @ByVal FloatDevicePointer offset(@ByVal FloatDevicePointer begin, int offset);
     public static native @ByPtr IntPointer copy_device_to_host(@ByPtr IntPointer device, int size);
     /**
      * Copy from device pointer directly to a host array, starting from 'offset'

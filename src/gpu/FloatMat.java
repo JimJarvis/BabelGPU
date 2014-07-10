@@ -400,7 +400,12 @@ public class FloatMat
 	 */
 	public FloatMat createOffset(FloatMat offMat, int offset, int size, int newRow)
 	{
+		if (size % newRow != 0)
+			throw new GpuException("Offset matrix size must be a whole multiple of the new row dim.");
+		
 		offMat.device = this.toDevice().withByteOffset(offset * Sizeof.FLOAT);
+		// ThrustPointer doesn't automatically follow jcuda.Pointer, even if the latter has been offset!!
+		offMat.thrustPtr = this.getThrustPointer().offset(offset);
 		offMat.hostMode = this.hostMode;
 		offMat.initDim(newRow, size/newRow);
 		return offMat;
