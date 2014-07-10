@@ -63,10 +63,10 @@ public class GpuRand
 	 * Fill a FloatMat with random uniform float
 	 * @return input FloatMat A
 	 */
-	public FloatMat genUniformFloat(FloatMat A, float low, float high)
+	public FloatMat genUniformFloat(FloatMat A, double low, double high)
 	{
 		curandGenerateUniform(generator, A.toDevice(), A.size());
-		A.linear((high - low), low);
+		A.linear((float)(high - low), (float)low);
 		return A;
 	}
 	
@@ -91,7 +91,7 @@ public class GpuRand
 	/**
 	 * Generate a new FloatMat with random uniform float
 	 */
-	public FloatMat genUniformFloat(int row, int col, float low, float high)
+	public FloatMat genUniformFloat(int row, int col, double low, double high)
 	{
 		return genUniformFloat(new FloatMat(row, col, false), low, high);
 	}
@@ -109,9 +109,9 @@ public class GpuRand
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
-	public FloatMat genNormalFloat(FloatMat A, float mean, float stdev)
+	public FloatMat genNormalFloat(FloatMat A, double mean, double stdev)
 	{
-		curandGenerateNormal(generator, A.toDevice(), A.size(), mean, stdev);
+		curandGenerateNormal(generator, A.toDevice(), A.size(), (float)mean, (float)stdev);
 		return A;
 	}
 	
@@ -128,7 +128,7 @@ public class GpuRand
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
-	public FloatMat genNormalFloat(int row, int col, float mean, float stdev)
+	public FloatMat genNormalFloat(int row, int col, double mean, double stdev)
 	{
 		return genNormalFloat(new FloatMat(row, col, false), mean, stdev);
 	}
@@ -146,7 +146,7 @@ public class GpuRand
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
-	public FloatMat genNormalFloat(int n, float mean, float stdev)
+	public FloatMat genNormalFloat(int n, double mean, double stdev)
 	{
 		return genNormalFloat(n, 1, mean, stdev);
 	}
@@ -164,9 +164,9 @@ public class GpuRand
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
-	public FloatMat genLogNormalFloat(FloatMat A, float mean, float stdev)
+	public FloatMat genLogNormalFloat(FloatMat A, double mean, double stdev)
 	{
-		curandGenerateLogNormal(generator, A.toDevice(), A.size(), mean, stdev);
+		curandGenerateLogNormal(generator, A.toDevice(), A.size(), (float)mean, (float)stdev);
 		return A;
 	}
 	
@@ -183,7 +183,7 @@ public class GpuRand
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
-	public FloatMat genLogNormalFloat(int row, int col, float mean, float stdev)
+	public FloatMat genLogNormalFloat(int row, int col, double mean, double stdev)
 	{
 		return genLogNormalFloat(new FloatMat(row, col, false), mean, stdev);
 	}
@@ -201,7 +201,7 @@ public class GpuRand
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
-	public FloatMat genLogNormalFloat(int n, float mean, float stdev)
+	public FloatMat genLogNormalFloat(int n, double mean, double stdev)
 	{
 		return genLogNormalFloat(n, 1, mean, stdev);
 	}

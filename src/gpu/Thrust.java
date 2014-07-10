@@ -5,6 +5,8 @@ import static gpu.ThrustNative.*;
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
 
+import deep.DeepException;
+
 /**
  * Wrapper around ThrustNative native methods.
  * Transformation methods are defined in pairs
@@ -270,8 +272,6 @@ public class Thrust
 	 */
 	public static void set_single(FloatMat x, int i, int j, float newVal)
 	{
-		if (i < 0) i += x.row;
-		if (j < 0) j += x.col;
 		set_single(x, x.toIndex(i, j), newVal);
 	}
 	
@@ -287,8 +287,6 @@ public class Thrust
 	 */
 	public static void incr_single(FloatMat x, int i, int j, float incrVal)
 	{
-		if (i < 0) i += x.row;
-		if (j < 0) j += x.col;
 		incr_single(x, x.toIndex(i, j), incrVal);
 	}
 	
@@ -354,6 +352,8 @@ public class Thrust
 	 */
     public static void transpose(FloatMat x, FloatMat out)
     {
+    	if (x == out)
+    		throw new GpuException("Transpose operation cannot have the same 'in' and 'out'");
     	ThrustNative.gpu_transpose_float(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
     }
 	
