@@ -2,7 +2,7 @@ package gpu;
 
 import java.nio.DoubleBuffer;
 
-import gpu.ThrustStruct.DoubleDevicePointer;
+import gpu.NativeStruct.DoubleDevicePointer;
 import utils.CpuUtil.Coord;
 import utils.*;
 import jcuda.Pointer;

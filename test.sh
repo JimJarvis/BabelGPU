@@ -18,7 +18,7 @@ cd bin
 
 # an arbitrary command line arg tells the script to regenerate
 if [[ $# -ne 0 && $1 == "c" ]]; then
-java -jar "E:/Dropbox/Programming/Java/JarvisJava/BabelGPU/native/javacpp.jar" gpu/ThrustNative gpu/Thrust -properties windows-x86_64-cuda #> stderr.log
+java -jar "E:/Dropbox/Programming/Java/JarvisJava/BabelGPU/native/javacpp.jar" gpu/Natives gpu/Thrust -properties windows-x86_64-cuda #> stderr.log
     
     rm -rf ../native/windows-x86_64
     cp -rf gpu/windows-x86_64 ../native/

@@ -1,5 +1,5 @@
 package gpu;
-import gpu.ThrustStruct.*;
+import gpu.NativeStruct.*;
 
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
@@ -9,7 +9,7 @@ import com.googlecode.javacpp.annotation.*;
 /**
  * Interface to Thrust functions in my_gpu.h
  */
-public class ThrustNative
+public class Natives
 {
 	static { Loader.load(); }
 	

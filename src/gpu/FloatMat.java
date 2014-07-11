@@ -2,7 +2,7 @@ package gpu;
 
 import java.nio.FloatBuffer;
 
-import gpu.ThrustStruct.FloatDevicePointer;
+import gpu.NativeStruct.FloatDevicePointer;
 import utils.CpuUtil.Coord;
 import utils.*;
 import jcuda.Pointer;

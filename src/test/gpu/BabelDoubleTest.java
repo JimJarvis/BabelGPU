@@ -54,7 +54,7 @@ public class BabelDoubleTest
 		// augment X with a column of 1
 		DoubleMat X1 = new DoubleMat(SAMPLES, X_DIM + 1, false);
 		X1.copyFrom(X);
-		ThrustNative.gpu_fill_double(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
+		Natives.gpu_fill_double(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
 		double[][] jX1 = addCol1(jX);
 		
 		// Xnew: X_NEW_DIM * SAMPLES

@@ -1,12 +1,10 @@
 package gpu;
 
-import static gpu.ThrustNative.*;
-import gpu.ThrustStruct.FloatDevicePointer;
+import static gpu.Natives.*;
+import gpu.NativeStruct.FloatDevicePointer;
 
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
-
-import deep.DeepException;
 
 /**
  * Wrapper around ThrustNative native methods.
@@ -334,7 +332,7 @@ public class Thrust
      */
     public static void fill_row(FloatMat x, int rowIdx, float val)
     {
-    	ThrustNative.gpu_fill_row_float(x.getThrustPointer(), x.row, x.col, rowIdx, val);
+    	Natives.gpu_fill_row_float(x.getThrustPointer(), x.row, x.col, rowIdx, val);
     }
     /**
      *  Set a specified col of a  column-major matrix to be the same value
@@ -342,7 +340,7 @@ public class Thrust
      */
     public static void fill_col(FloatMat x, int colIdx, float val)
     {
-    	ThrustNative.gpu_fill_col_float(x.getThrustPointer(), x.row, x.col, colIdx, val);
+    	Natives.gpu_fill_col_float(x.getThrustPointer(), x.row, x.col, colIdx, val);
     }
 	
     /**
@@ -355,7 +353,7 @@ public class Thrust
     {
     	if (x == out)
     		throw new GpuException("Transpose operation cannot have the same 'in' and 'out'");
-    	ThrustNative.gpu_transpose_float(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
+    	Natives.gpu_transpose_float(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
     }
 	
 	 // ******************** Babel specific methods ****************** /
@@ -364,12 +362,12 @@ public class Thrust
      */
 	public static void babel_id_minus_softmax(FloatMat x, int id)
 	{
-		ThrustNative.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
+		Natives.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
 	// version 2: more calculation, might be more numerically stable
 	public static void babel_id_minus_softmax_2(FloatMat x, int id)
 	{
-		ThrustNative.babel_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
+		Natives.babel_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
 	}
 	
 	/**
@@ -378,12 +376,12 @@ public class Thrust
 	 */
 	public static void babel_batch_id_minus_softmax(FloatMat x, IntPointer labels)
 	{
-		ThrustNative.babel_batch_id_minus_softmax(x.getThrustPointer(), x.row, x.col, labels);
+		Natives.babel_batch_id_minus_softmax(x.getThrustPointer(), x.row, x.col, labels);
 	}
 	// helper
 	public static IntPointer copy_host_to_device(int[] labels)
 	{
-		return ThrustNative.copy_host_to_device(new IntPointer(labels), labels.length);
+		return Natives.copy_host_to_device(new IntPointer(labels), labels.length);
 	}
     // Set the last row of a matrix to 1
     public static void set_last_row_one(FloatMat x)
@@ -396,7 +394,7 @@ public class Thrust
      */
     public static void babel_batch_softmax(FloatMat x)
     {
-    	ThrustNative.babel_batch_softmax(x.getThrustPointer(), x.row, x.col);
+    	Natives.babel_batch_softmax(x.getThrustPointer(), x.row, x.col);
     }
 
     /**
@@ -406,7 +404,7 @@ public class Thrust
      */
     public static void babel_batch_softmax(FloatMat x, FloatMat out, IntPointer labels)
     {
-    	ThrustNative.babel_batch_softmax(
+    	Natives.babel_batch_softmax(
     			x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), labels);
     }
     
@@ -419,8 +417,8 @@ public class Thrust
     public static void babel_best_label(
     		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset)
 	{
-    	ThrustNative.babel_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
-    	ThrustNative.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.col);
+    	Natives.babel_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
+    	Natives.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.col);
 	}
     
     /**
@@ -429,7 +427,7 @@ public class Thrust
      */
     public static float babel_log_prob(FloatMat x)
     {
-    	return ThrustNative.babel_log_prob(x.getThrustPointer(), x.size());
+    	return Natives.babel_log_prob(x.getThrustPointer(), x.size());
     }
 
     /**
@@ -440,7 +438,7 @@ public class Thrust
     public static float babel_batch_id_minus_softmax_log_prob(
     		FloatMat x, FloatMat outLogProb, IntPointer labels)
     {
-    	return ThrustNative.babel_batch_id_minus_softmax_log_prob(
+    	return Natives.babel_batch_id_minus_softmax_log_prob(
     			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
     }
    
@@ -733,7 +731,7 @@ public class Thrust
      */
 	public static void babel_id_minus_softmax(DoubleMat x, int id)
 	{
-		ThrustNative.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
+		Natives.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
 	
 }

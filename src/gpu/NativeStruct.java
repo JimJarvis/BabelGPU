@@ -9,7 +9,7 @@ import com.googlecode.javacpp.annotation.*;
 /**
  * Natives structures to connect to the Thrust API
  */
-public class ThrustStruct
+public class NativeStruct
 {
 	static { Loader.load(); }
 	
@@ -37,7 +37,7 @@ public class ThrustStruct
         }
         public FloatDevicePointer offset(int n)
         {		
-        	return ThrustNative.offset(this, n);
+        	return Natives.offset(this, n);
         }
         
         private native void allocate(FloatPointer ptr);
@@ -108,7 +108,7 @@ public class ThrustStruct
         }
         public DoubleDevicePointer offset(int n)
         {		
-        	return ThrustNative.offset(this, n);
+        	return Natives.offset(this, n);
         }
         
         private native void allocate(DoublePointer ptr);
