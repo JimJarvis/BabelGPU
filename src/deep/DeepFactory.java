@@ -77,15 +77,16 @@ public class DeepFactory
 	/**
 	 * Stack a couple of pure computing layers together
 	 * Output vector (goldMat) must have the same dim as input vector
+	 * @param scalor scales each ElementComputeUnit output by a constant
 	 */
 	public static DeepNet debugElementComputeLayers(
 			Class<? extends ElementComputeUnit> pureClass, 
-			InletUnit inlet, int layerN, 
+			InletUnit inlet, int layerN, float scalor,
 			Class<? extends TerminalUnit> terminalClass)
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerN; i++)
-			units.add( defaultElementComputeCtor(pureClass) );
+			units.add( defaultElementComputeCtor(pureClass, scalor) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
 		return 
@@ -109,10 +110,10 @@ public class DeepFactory
 	
 	// Helper to construct pure compute layers
 	private static ElementComputeUnit defaultElementComputeCtor(
-			Class<? extends ElementComputeUnit> pureClass)
+			Class<? extends ElementComputeUnit> pureClass, float scalor)
 	{
 		try {
-			return pureClass.getConstructor(String.class).newInstance("");
+			return pureClass.getConstructor(String.class, float.class).newInstance("", scalor);
 		}
 		catch (Exception e)
 		{

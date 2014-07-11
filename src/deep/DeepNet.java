@@ -296,11 +296,12 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Supports both networks with and without parameters (e.g. pure compute layers)
 	 * Will only process one batch from inlet
 	 * Perturbation eps constant is auto-selected based on avg abs value of parameters (minimum: 1e-4f)
-	 * @param verbose don't show the actual gradient comparison
 	 * @param hasBias enable bias units on all ComputeUnit
+	 * @param perturbRatio default = 1e3f. perturb EPS = average_abs_val / perturbRatio
+	 * @param verbose don't show the actual gradient comparison
 	 * @return average percentage error (already multiplied by 100)
 	 */
-	public float gradCheck(LearningPlan learningPlan, boolean hasBias, boolean verbose)
+	public float gradCheck(LearningPlan learningPlan, boolean hasBias, float perturbRatio, boolean verbose)
 	{
 		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 25);
 		
@@ -353,7 +354,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		}
 		// Get average abs parameter entry value
 		float avgAbsVal = totalAbsSum / totalSize;
-		final float EPS = Math.max( avgAbsVal / 1e2f, 1e-30f );
+		final float EPS = Math.max( avgAbsVal / perturbRatio, 1e-3f);
 		
 		// Do finite-diff forward prop for every entry in every parameter
 		i = 0;
@@ -418,14 +419,28 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	/**
-	 * Default verbose = false, hasBias = true
+	 * Default verbose = false, hasBias = true, perturbRatio = 1e3f
 	 * @see DeepNet#gradCheck(LearningPlan, true)
 	 */
-	public float gradCheck(LearningPlan plan) {	return this.gradCheck(plan, true, false);	}
+	public float gradCheck(LearningPlan plan)
+	{	
+		return this.gradCheck(plan, true, 1e3f, false);
+	}
 	
 	/**
-	 * Default verbose = true
+	 * Default verbose = false, perturbRatio = 1e3f
 	 * @see DeepNet#gradCheck(LearningPlan, true)
 	 */
-	public float gradCheck(LearningPlan plan, boolean hasBias) {	return this.gradCheck(plan, hasBias, false);	}
+	public float gradCheck(LearningPlan plan, boolean hasBias)
+	{	
+		return this.gradCheck(plan, hasBias, 1e3f, false);
+	}
+	
+	/**
+	 * Default verbose = false
+	 */
+	public float gradCheck(LearningPlan plan, boolean hasBias, float perturbRatio)
+	{
+		return this.gradCheck(plan, hasBias, perturbRatio, false);
+	}
 }

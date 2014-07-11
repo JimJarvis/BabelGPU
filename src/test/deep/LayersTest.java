@@ -19,6 +19,8 @@ public class LayersTest
 	static int outDim = 9;
 	// Test option: add bias?
 	static boolean hasBias = true;
+	// Scale ElementComputeUnit output
+	static float scalor = 3f;
 	
 	// Regularization
 	static float reg = 1.5f;
@@ -113,9 +115,10 @@ public class LayersTest
 	
 	/**
 	 * @param TOL within tolerance percentage (already multiplied by 100)
+	 * @param perturbRatio @see DeepNet#gradCheck()
 	 * When debugging PureComputeLayers, make sure inDim == outDim
 	 */
-	private void check(DeepNet net, double TOL, boolean verbose)
+	private void check(DeepNet net, double TOL, float perturbRatio, boolean verbose)
 	{
 		if (net.getParams().size() == 0// this is a PureCompute debug network 
 			// the terminal class requires inDim == outDim
@@ -125,10 +128,12 @@ public class LayersTest
 			fail("PureComputeLayer debug test must have inDim == outDim");
 		}
 		
-		float avgPercentErr = net.gradCheck(plan, hasBias, verbose);
+		float avgPercentErr = net.gradCheck(plan, hasBias, perturbRatio, verbose);
 		assertTrue(net.name + " grad check", CpuUtil.withinTol(avgPercentErr, 0, TOL));
 	}
-	private void check(DeepNet net, double TOL) {	check(net, TOL, false);	}
+	private void check(DeepNet net, double TOL, float perturbRatio) {	check(net, TOL, perturbRatio, false);	}
+	private void check(DeepNet net, double TOL, boolean verbose) {	check(net, TOL, 1e3f, verbose);	}
+	private void check(DeepNet net, double TOL) {	check(net, TOL, 1e3f, false);	}
 	
 	@Test
 	@Ignore
@@ -141,7 +146,7 @@ public class LayersTest
 	}
 	
 	@Test
-//	@Ignore
+	@Ignore
 	public void linearLayersSquareErrorTest()
 	{
 		PP.p("LINEAR: SquareError");
@@ -150,11 +155,8 @@ public class LayersTest
 						new int[] {3, 9, 6, 7, outDim}, 
 						SquareErrorUnit.class, 
 						Initializer.uniformRandIniter(1));
-		
-		linearLayers = 
-				DeepFactory.debugLinearLayers(inlet, new int[] {3, 5, 6, 7, outDim}, SquareErrorUnit.class, Initializer.uniformRandIniter(1));
-		linearLayers.runDebug(plan, hasBias);
-		check(linearLayers, 1e-3, true);
+//		linearLayers.runDebug(plan, hasBias);
+		check(linearLayers, 3e-4, 1e2f, false);
 	}
 	
 	@Test
@@ -167,17 +169,17 @@ public class LayersTest
 						new int[] {3, 9, 6, 7, outDim}, 
 						SumUnit.class, 
 						Initializer.uniformRandIniter(0,1));
-//		linearLayers.runDebug(plan);
-		check(linearLayers, 1e-3, true);
+//		linearLayers.runDebug(plan, hasBiase);
+		check(linearLayers, 3e-4, 1e2f, false);
 	}
 
 	@Test
-	@Ignore
+//	@Ignore
 	public void sigmoidLayersTest()
 	{
 		DeepNet sigmoidLayers = 
-				DeepFactory.debugElementComputeLayers(SigmoidUnit.class, inlet, 2, SquareErrorUnit.class);
-//		sigmoidLayers.runDebug(plan);
+				DeepFactory.debugElementComputeLayers(SigmoidUnit.class, uniformInlet(1, 1f), 1, scalor, SquareErrorUnit.class);
+		sigmoidLayers.runDebug(plan, hasBias);
 		check(sigmoidLayers, 0.5, true);
 	}
 	
@@ -186,7 +188,10 @@ public class LayersTest
 	public void cosineLayersTest()
 	{
 		DeepNet cosineLayers = 
-				DeepFactory.debugElementComputeLayers(CosineUnit.class, inlet, 3, SumUnit.class);
-		check(cosineLayers, 0.5);
+				DeepFactory.debugElementComputeLayers(CosineUnit.class, inlet, 3, scalor, SquareErrorUnit.class);
+//		cosineLayers = 
+//				DeepFactory.debugElementComputeLayers(CosineUnit.class, uniformInlet(0.6f, 0.5f), 4, scalor, SumUnit.class);
+		cosineLayers.runDebug(plan, hasBias);
+		check(cosineLayers, 0.1, 1e5f, true);
 	}
 }
