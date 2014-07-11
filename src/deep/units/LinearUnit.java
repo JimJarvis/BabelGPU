@@ -38,8 +38,9 @@ public class LinearUnit extends ParamComputeUnit
     			if (hasBias) W.gradient.fillRow(0, -1);
     		}
 
+    		// division by batchSize should be done in the terminal unit
     		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 
-    				lr/input.batchSize(), 1 - lr * learningPlan.reg);
+                				- lr, 1 - lr * learningPlan.reg);
     		if (hasBias)
     			W.data.fillRow(0, -1);
 		}
