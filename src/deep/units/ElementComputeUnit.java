@@ -68,9 +68,7 @@ public abstract class ElementComputeUnit extends ComputeUnit
 		if (input.hasGradient())
 		{
 			backward_element();
-    		GpuBlas.dotMult(output.gradient, input.gradient);
-    		if (scalor != 1)
-    			input.gradient.linear(scalor, 0);
+    		GpuBlas.dotMult(output.gradient, input.gradient, scalor);
     		if (hasBias)
     			input.gradient.fillRow(0, -1);
 		}

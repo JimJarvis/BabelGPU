@@ -246,19 +246,19 @@ public class Thrust
 	
 	/**
 	 * Element-wise multiplication
-	 * @see GpuBlas#dotMult(FloatMat, FloatMat)
+	 * @see GpuBlas#dotMult(FloatMat, FloatMat, scalor)
 	 */
-	public static void dot_mult(FloatMat x, FloatMat y)
+	public static void dot_mult(FloatMat x, FloatMat y, float scalor)
 	{
-		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer());
+		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer(), scalor);
 	}
 	/**
 	 * Element-wise multiplication
 	 * @see GpuBlas#dotMult(FloatMat, FloatMat, FloatMat)
 	 */
-	public static void dot_mult(FloatMat x, FloatMat y, FloatMat out)
+	public static void dot_mult(FloatMat x, FloatMat y, FloatMat out, float scalor)
 	{
-		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer());
+		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer(), scalor);
 	}
 	
 	/**
@@ -653,17 +653,17 @@ public class Thrust
 	 * Element-wise multiplication
 	 * @see GpuBlas#dotMult(DoubleMat, DoubleMat)
 	 */
-	public static void dot_mult(DoubleMat x, DoubleMat y)
+	public static void dot_mult(DoubleMat x, DoubleMat y, double scalor)
 	{
-		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer());
+		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer(), scalor);
 	}
 	/**
 	 * Element-wise multiplication
 	 * @see GpuBlas#dotMult(DoubleMat, DoubleMat, DoubleMat)
 	 */
-	public static void dot_mult(DoubleMat x, DoubleMat y, DoubleMat out)
+	public static void dot_mult(DoubleMat x, DoubleMat y, DoubleMat out, double scalor)
 	{
-		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer());
+		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer(), scalor);
 	}
 	
 	/**

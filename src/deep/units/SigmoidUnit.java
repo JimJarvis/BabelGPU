@@ -28,7 +28,9 @@ public class SigmoidUnit extends ElementComputeUnit
 	@Override
 	public void backward_element()
 	{
-		Thrust.sigmoid_deriv(output.data, input.gradient);
+		// Because the forward method produces y = scalor * sigmoid
+		// so its gradient is [y' = y/scalor * (1 - y/scalor)] * scalor
+		Thrust.sigmoid_deriv(output.data, input.gradient, 1f/scalor, 0);
 	}
 
 }

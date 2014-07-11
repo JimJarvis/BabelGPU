@@ -262,12 +262,18 @@ namespace MyGpu
 	GEN_sort(float); GEN_sort(double);
 
 #define GEN_dot_mult(Ftype) \
+	struct functor_scale_mult_##Ftype { \
+	const Ftype s; \
+	functor_scale_mult_##Ftype(Ftype _s = 1) : s(_s) {} \
+	__host__ __device__  \
+	Ftype operator()(const Ftype& x, const Ftype& y) const { return s * x * y; } \
+	}; \
 	/* begin2 = begin1 .* begin2 */ \
-	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2) \
-	{ transform(begin1, begin1 + size, begin2, begin2, thrust::multiplies<Ftype>()); } \
+	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2, float scalor = 1) \
+	{ transform(begin1, begin1 + size, begin2, begin2, functor_scale_mult_##Ftype(scalor) ); } \
 	/* out = begin1 .* begin2 */ \
-	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2, device_ptr<Ftype> out) \
-	{ transform(begin1, begin1 + size, begin2, out, thrust::multiplies<Ftype>()); }
+	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2, device_ptr<Ftype> out, float scalor = 1) \
+	{ transform(begin1, begin1 + size, begin2, out, functor_scale_mult_##Ftype(scalor)); }
 
 	GEN_dot_mult(float); GEN_dot_mult(double);
 

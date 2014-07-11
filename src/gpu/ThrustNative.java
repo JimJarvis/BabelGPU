@@ -127,8 +127,8 @@ public class ThrustNative
     /**
      * Element-wise multiplication
      */
-    public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2);
-    public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2, @ByVal FloatDevicePointer out);
+    public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2, float scalor);
+    public static native void gpu_dot_mult_float(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer begin2, @ByVal FloatDevicePointer out, float scalor);
     
     /**
      * Set a single value 
@@ -327,8 +327,8 @@ public class ThrustNative
     /**
      * Element-wise multiplication
      */
-    public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2);
-    public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2, @ByVal DoubleDevicePointer out);
+    public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2, double scalor);
+    public static native void gpu_dot_mult_double(@ByVal DoubleDevicePointer begin, int size, @ByVal DoubleDevicePointer begin2, @ByVal DoubleDevicePointer out, double scalor);
     
     /**
      * Set a single value 

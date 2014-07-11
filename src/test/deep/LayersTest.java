@@ -178,9 +178,9 @@ public class LayersTest
 	public void sigmoidLayersTest()
 	{
 		DeepNet sigmoidLayers = 
-				DeepFactory.debugElementComputeLayers(SigmoidUnit.class, uniformInlet(1, 1f), 1, scalor, SquareErrorUnit.class);
-		sigmoidLayers.runDebug(plan, hasBias);
-		check(sigmoidLayers, 0.5, true);
+				DeepFactory.debugElementComputeLayers(SigmoidUnit.class, uniformInlet(1, 3), 2, scalor, SquareErrorUnit.class);
+//		sigmoidLayers.runDebug(plan, hasBias);
+		check(sigmoidLayers, 5e-1f, 1e1f, true);
 	}
 	
 	@Test
