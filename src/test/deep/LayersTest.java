@@ -24,12 +24,10 @@ public class LayersTest
 	
 	// Regularization
 	static float reg = 1.5f;
-	static LearningPlan plan;
-	
-	static InletUnit inlet;
+	static LearningPlan plan = new LearningPlan(2, reg, 0, batchSize);
 	
 	@BeforeClass
-	public static void system()
+	public static void setUp() throws Exception
 	{
 		GpuBlas.init();
 		GpuUtil.enableExceptions();
@@ -40,23 +38,16 @@ public class LayersTest
 		return hasBias ? dim + 1 : dim;
 	}
 
-	@BeforeClass
-	public static void setUp() throws Exception
+	public InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh)
 	{
-		// for random input/gold gen
-		float symmRange = 2;
-		
 		// inDim and outDim + 1 because of bias units
 		final float[][] dummyInput = 
-    		CpuUtil.randFloatMat(inDim + 1, batchSize, -symmRange, symmRange);
+				CpuUtil.randFloatMat(inDim + 1, batchSize, inputLow, inputHigh);
 
 		final float[][] dummyGold = 
-    		CpuUtil.randFloatMat(outDim + 1, batchSize, 0, 1);
-		
-		// totalTrainSize = colDim(input)
-		plan = new LearningPlan(2, reg, 0, batchSize);
+				CpuUtil.randFloatMat(outDim + 1, batchSize, goldLow, goldHigh);
 
-		inlet = new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize)
+		return new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize)
 		{
 			boolean hasNext = true;
 			{
@@ -82,6 +73,15 @@ public class LayersTest
 			@Override
 			public void reset() { hasNext = true; }
 		};
+	}
+	
+	/**
+	 * inputLow, High = +/- inputSymm
+	 * goldLow, High = +/- goldSymm
+	 */
+	public InletUnit uniRandInlet(float inputSymm, float goldSymm)
+	{
+		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm);
 	}
 	
 	// Produce an artificial Inlet with uniform input and gold
@@ -136,23 +136,26 @@ public class LayersTest
 	private void check(DeepNet net, double TOL) {	check(net, TOL, 1e3f, false);	}
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void simpleSigmoidNetTest()
 	{
-		DeepNet sigmoidNet = DeepFactory.simpleSigmoidNet(inlet, new int[] {5, 10, 3, 6, outDim});
+		DeepNet sigmoidNet = 
+				DeepFactory.simpleSigmoidNet(
+						uniRandInlet(-2, 2, 0, 1), 
+						new int[] {5, 10, 3, 6, outDim});
 //		sigmoidNet.runDebug(plan);
-		sigmoidNet = DeepFactory.simpleSigmoidNet(uniformInlet(2, 3), new int[] {300, outDim}, Initializer.fillIniter(.5f));
-		check(sigmoidNet, 0.2, true);
+		check(sigmoidNet, 1e-1f, 1e2f, false);
 	}
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void linearLayersSquareErrorTest()
 	{
 		PP.p("LINEAR: SquareError");
 		DeepNet linearLayers = 
-				DeepFactory.debugLinearLayers(inlet, 
-						new int[] {3, 9, 6, 7, outDim}, 
+				DeepFactory.debugLinearLayers(
+						uniRandInlet(2, 2), 
+						new int[] {3, 10, 6, 5, outDim}, 
 						SquareErrorUnit.class, 
 						Initializer.uniformRandIniter(1));
 //		linearLayers.runDebug(plan, hasBias);
@@ -160,17 +163,18 @@ public class LayersTest
 	}
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void linearLayersSumTest()
 	{
 		PP.p("LINEAR: Sum");
 		DeepNet linearLayers = 
-				DeepFactory.debugLinearLayers(inlet, 
-						new int[] {3, 9, 6, 7, outDim}, 
+				DeepFactory.debugLinearLayers(
+						uniRandInlet(2, 2), 
+						new int[] {3, 10, 6, 5, outDim}, 
 						SumUnit.class, 
 						Initializer.uniformRandIniter(0,1));
 //		linearLayers.runDebug(plan, hasBiase);
-		check(linearLayers, 3e-4, 1e2f, false);
+		check(linearLayers, 5e-4, 1e2f, false);
 	}
 
 	@Test
@@ -178,20 +182,28 @@ public class LayersTest
 	public void sigmoidLayersTest()
 	{
 		DeepNet sigmoidLayers = 
-				DeepFactory.debugElementComputeLayers(SigmoidUnit.class, uniformInlet(1, 3), 2, scalor, SquareErrorUnit.class);
+				DeepFactory.debugElementComputeLayers(
+						SigmoidUnit.class, 
+						uniRandInlet(2, 2), 
+						2, scalor, 
+						SquareErrorUnit.class);
 //		sigmoidLayers.runDebug(plan, hasBias);
-		check(sigmoidLayers, 5e-1f, 1e1f, true);
+		check(sigmoidLayers, 1e-1f, 1e1f, false);
 	}
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void cosineLayersTest()
 	{
 		DeepNet cosineLayers = 
-				DeepFactory.debugElementComputeLayers(CosineUnit.class, inlet, 3, scalor, SquareErrorUnit.class);
+				DeepFactory.debugElementComputeLayers(
+						CosineUnit.class, 
+						uniRandInlet(1, 1), 
+						3, scalor, 
+						SquareErrorUnit.class);
 //		cosineLayers = 
 //				DeepFactory.debugElementComputeLayers(CosineUnit.class, uniformInlet(0.6f, 0.5f), 4, scalor, SumUnit.class);
-		cosineLayers.runDebug(plan, hasBias);
-		check(cosineLayers, 0.1, 1e5f, true);
+//		cosineLayers.runDebug(plan, hasBias);
+		check(cosineLayers, 1e-1f, 1e5f, false);
 	}
 }
