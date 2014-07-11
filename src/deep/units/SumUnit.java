@@ -31,7 +31,7 @@ public class SumUnit extends TerminalUnit
 	@Override
 	public void backward()
 	{
-		Thrust.fill(input.gradient, 1f / input.batchSize());
+		Thrust.fill(input.gradient, super.batchNormalizer());
 	}
 
 }

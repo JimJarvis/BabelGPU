@@ -85,6 +85,11 @@ public abstract class TerminalUnit extends ComputeUnit
 		return wList;
 	}
 	
+	/**
+	 * If there's a summation, then the backward gradient should be dividied by batchSize
+	 */
+	protected float batchNormalizer() {	return 1f / input.batchSize();	}
+	
 	public float lossTotal() { return lossPure() + lossReg() ;	}
 	
 	/**
@@ -95,17 +100,28 @@ public abstract class TerminalUnit extends ComputeUnit
 		return this.lossPure / learningPlan.curTrainSize;
 	}
 	
+	/**
+	 * Loss due to regularization
+	 */
 	public float lossReg() {	return this.lossReg;	}
+
+	/**
+	 * Reset both lossPure and lossReg
+	 */
+	public void clearLoss()
+	{ 
+		this.lossPure = 0;
+		this.lossReg = 0;
+	}
 	
-	
-	public float updateLossPure(float update)
+	protected float updateLossPure(float update)
 	{
 		this.learningPlan.curTrainSize += input.batchSize();
 		return this.lossPure += update;
 	}
 	
 	private FloatMat tmp_data_sqs[];  // hold temp squared values
-	public void updateLossReg()
+	protected void updateLossReg()
 	{
 		// init once
 		if (tmp_data_sqs == null)
@@ -125,9 +141,5 @@ public abstract class TerminalUnit extends ComputeUnit
 		this.lossReg += 0.5 * loss * learningPlan.reg;
 	}
 	
-	public void clearLoss()
-	{ 
-		this.lossPure = 0;
-		this.lossReg = 0;
-	}
+	
 }
