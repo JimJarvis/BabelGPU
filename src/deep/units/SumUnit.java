@@ -23,9 +23,9 @@ public class SumUnit extends TerminalUnit
 	}
 
 	@Override
-	protected void forward_terminal()
+	protected float forward_terminal()
 	{
-		updateLossPure(input.data.sum());
+		return input.data.sum();
 	}
 
 	@Override

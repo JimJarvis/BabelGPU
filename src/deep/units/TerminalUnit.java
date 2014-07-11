@@ -55,13 +55,16 @@ public abstract class TerminalUnit extends ComputeUnit
 		
 		if (hasBias)
 			input.data.fillRow(0, -1);
+
 		// Will be implemented by subclasses
-		forward_terminal();
+		updateLossPure(forward_terminal());
 	}
+
 	/**
-	 * Hack: ensure that you call super.forward() first
+	 * Ensure that you call super.forward() first
+	 * @return total pure loss to be updated (should NOT be normalized by batchSize)
 	 */
-	protected abstract void forward_terminal();
+	protected abstract float forward_terminal();
 	
 	/**
 	 * @return all paramUnit from previous ParamComputeUnit, in forward order

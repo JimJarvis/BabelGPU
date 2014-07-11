@@ -5,15 +5,15 @@ import gpu.*;
 // terminal unit
 public class SquareErrorUnit extends TerminalUnit
 {
-	private FloatMat tmp_y_minus_input_sq = null; // temp cache
-
 	public SquareErrorUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);
 	}
 
+	private FloatMat tmp_y_minus_input_sq = null; // temp cache
+
 	@Override
-	public void forward_terminal()
+	public float forward_terminal()
 	{
 		if (tmp_y_minus_input_sq == null)
 			tmp_y_minus_input_sq = new FloatMat(input.data);
@@ -24,7 +24,8 @@ public class SquareErrorUnit extends TerminalUnit
 		Thrust.square(input.gradient, tmp_y_minus_input_sq);
 		
         // we give back what we divide too much
-		updateLossPure(tmp_y_minus_input_sq.sum() / (2 * norm * norm));
+		// This amount will be used to update lossPure
+		return tmp_y_minus_input_sq.sum() / (2 * norm * norm);
 	}
 
 	@Override

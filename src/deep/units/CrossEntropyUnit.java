@@ -13,7 +13,7 @@ public class CrossEntropyUnit extends TerminalUnit
 	}
 
 	@Override
-	protected void forward_terminal()
+	protected float forward_terminal()
 	{
 		
 	}
