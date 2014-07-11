@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="babel_gpu.h" />
     <ClInclude Include="my_gpu.h" />
+    <ClInclude Include="my_kernel.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="main.cu" />

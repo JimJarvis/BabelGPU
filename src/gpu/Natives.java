@@ -4,7 +4,7 @@ import gpu.NativeStruct.*;
 import com.googlecode.javacpp.*;
 import com.googlecode.javacpp.annotation.*;
 
-@Platform(include={"\"my_gpu.h\"", "\"babel_gpu.h\""})
+@Platform(include={"\"my_gpu.h\"", "\"my_kernel.h\""})
 @Namespace("MyGpu")
 /**
  * Interface to Thrust functions in my_gpu.h

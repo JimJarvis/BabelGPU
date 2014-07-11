@@ -1,5 +1,5 @@
 #include "my_gpu.h"
-#include "babel_gpu.h"
+#include "my_kernel.h"
 #include <iostream>
 #define PI 3.14159265358979
 #define range &D[0],D.size()

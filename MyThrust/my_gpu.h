@@ -2,8 +2,8 @@
 * Port the Thrust library to Java with JavaCpp tool. 
 */
 
-#ifndef try_h__
-#define try_h__
+#ifndef my_thrust__
+#define my_thrust__
 
 #include "cuda.h"
 #include "cuda_runtime.h"
@@ -359,103 +359,60 @@ namespace MyGpu
 	GEN_raw_pointer_func(double);
 
 
-	// Utility for setting blockDim and gridDim (1D). A block cannot have more than 1024 threads
-	// number of threads needed, 2 output params
-	inline void setKernelDim1D(int threads, dim3& gridDim, dim3& blockDim)
-	{
-		if (threads > 1024) // we don't have enough threads on a single block
-		{
-			gridDim.x = threads / 1024 + 1;
-			blockDim.x = 1024;
-		}
-		else // try to make block dim a multiple of 32 to conform with 'warp'
-		{
-			if (threads % 32 == 0) blockDim.x = threads;
-			else blockDim.x = (threads / 32 + 1) * 32;
-		}
+/**********************************************/
+/* More sophisticated functions for machine learning  */
+/**********************************************/
+#define GEN_babel_softmax(Ftype) \
+	/* I [y==j] - softmax(alpha_vec) */ \
+	inline void babel_id_minus_softmax(device_ptr<Ftype> begin, int size, int label) \
+	{ \
+		Ftype mx = gpu_max_##Ftype(begin, size); \
+		gpu_exp_##Ftype(begin, size, 1, -mx); \
+		Ftype s = gpu_sum_##Ftype(begin, size); \
+		gpu__##Ftype(begin, size, -1.0 / s, 0); \
+		++ *(begin + label);  /* when at id, x = 1 - x */ \
+	} \
+	/* softmax(alpha_vec) */ \
+	inline void babel_softmax(device_ptr<Ftype> begin, int size) \
+	{ \
+		Ftype mx = gpu_max_##Ftype(begin, size); \
+		gpu_exp_##Ftype(begin, size, 1, -mx); \
+		Ftype s = gpu_sum_##Ftype(begin, size); \
+		gpu__##Ftype(begin, size, 1.0 / s, 0); \
+	} \
+	/* softmax(alpha_vec) at only the correct label. 'out' is a 1 float device_ptr */ \
+	inline void babel_softmax(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> out) \
+	{ \
+		Ftype mx = gpu_max_##Ftype(begin, size); \
+		Ftype expSum = thrust::transform_reduce(begin, begin + size, \
+		functor_exp_##Ftype##_1(-mx), 0.0, thrust::plus<Ftype>()); \
+		out[0] = exp(begin[label] - mx) / expSum; \
 	}
 
-// Should be used inside kernel functions only
-#define ThreadIndex1D(idx, limit) \
-	int idx = blockIdx.x * blockDim.x + threadIdx.x; \
-	if (idx >= limit) return; // out of bound
-
-// because kernel<<<>>> doesn't return anything, we need another way to get the error code
-#define DebugKernel \
-	cudaDeviceSynchronize(); \
-	printf("Kernel launch: %s\n", cudaGetErrorString(cudaGetLastError()));
+	GEN_babel_softmax(float);
+	GEN_babel_softmax(double);
 
 
-	// The specified col will be set to a specific value
-	// negative 'colIdx' means counting from the last col (-n => col - n)
-	inline void gpu_fill_col_float(device_ptr<float> begin, int row, int col, int colIdx, float val)
+	///// Second way to implement (id - softmax()), exactly the same numerical result. 
+	struct functor_id_minus_softmax_2
 	{
-		if (colIdx < 0)  colIdx += col;
-		thrust::fill_n(begin + row * colIdx, row, val);
-	}
+		const float b;
+		functor_id_minus_softmax_2(float _b = 0) : b(_b) {}
+		__host__ __device__ float operator()(const float& x) const { return -exp(x - b); }
+	};
 
-	// Change a specific row of a column major matrix to a specific value
-	// negative 'rowIdx' means counting from the last row (-n => row - n)
-	__global__
-	void gpu_fill_row_float_kernel(float *begin, int row, int col, int rowIdx, float val)
+	// I [y==j] - softmax(alpha_vec)
+	// A = exp(A - (mx + log(sum(exp(A - mx))))
+	inline void babel_id_minus_softmax_2(device_ptr<float> begin, int size, int id)
 	{
-		ThreadIndex1D(idx, col);
+		float mx = gpu_max_float(begin, size);
 
-		begin += row * idx + rowIdx; // end of a column
-		*begin = val; // set the value
-	}
+		float logsum = log(
+			thrust::transform_reduce(begin, begin + size,
+			functor_exp_float_1(-mx), 0.0, thrust::plus<float>()));
 
-	// The specified row will be set to a specific value
-	// negative 'rowIdx' means counting from the last row (-n => row - n)
-	inline void gpu_fill_row_float(device_ptr<float> begin, int row, int col, int rowIdx, float val)
-	{
-		dim3 gridDim, blockDim;
-		setKernelDim1D(col, gridDim, blockDim);
-
-		if (rowIdx < 0) rowIdx += row;
-
-		gpu_fill_row_float_kernel<<<gridDim, blockDim>>>(
-			thrust::raw_pointer_cast(begin), row, col, rowIdx, val);
-	}
-
-
-// Matrix transposition
-// Code from http://www.evl.uic.edu/aej/525/code/transpose_kernel.cu
-// http://www.evl.uic.edu/aej/525/code/transpose.cu
-#define BLOCK_DIM 16
-	__global__ void gpu_transpose_float_kernel(float *in, int width, int height, float *out)
-	{
-		__shared__ float block[BLOCK_DIM][BLOCK_DIM + 1];
-
-		// read the matrix tile into shared memory
-		unsigned int xIndex = blockIdx.x * BLOCK_DIM + threadIdx.x;
-		unsigned int yIndex = blockIdx.y * BLOCK_DIM + threadIdx.y;
-		if ((xIndex < width) && (yIndex < height))
-		{
-			unsigned int index_in = yIndex * width + xIndex;
-			block[threadIdx.y][threadIdx.x] = in[index_in];
-		}
-
-		__syncthreads();
-
-		// write the transposed matrix tile to global memory
-		xIndex = blockIdx.y * BLOCK_DIM + threadIdx.x;
-		yIndex = blockIdx.x * BLOCK_DIM + threadIdx.y;
-		if ((xIndex < height) && (yIndex < width))
-		{
-			unsigned int index_out = yIndex * height + xIndex;
-			out[index_out] = block[threadIdx.x][threadIdx.y];
-		}
-	}
-
-	// Transposes 'in' and fills 'out'
-	inline void gpu_transpose_float(device_ptr<float> in, int row, int col, device_ptr<float> out)
-	{
-		dim3 gridDim(std::ceil(1.0 *row / BLOCK_DIM), std::ceil(1.0 * col / BLOCK_DIM)), 
-			blockDim(BLOCK_DIM, BLOCK_DIM);
-
-		gpu_transpose_float_kernel<<<gridDim, blockDim >>>(
-			thrust::raw_pointer_cast(in), row, col, thrust::raw_pointer_cast(out));
+		thrust::transform(begin, begin + size, begin, functor_id_minus_softmax_2(mx + logsum));
+		++ *(begin + id);  // when at id, x = 1 - x
 	}
 }
-#endif // try_h__
+#endif // my_thrust__

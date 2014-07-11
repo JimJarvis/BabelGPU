@@ -13,7 +13,7 @@ import com.googlecode.javacpp.annotation.*;
  * exp(x, out): x immutable and store the result in out. Return the output parameter
  * a * x + b, default a = 1 and b = 0
  */
-@Platform(include={"\"my_gpu.h\"", "\"babel_gpu.h\""})
+@Platform(include={"\"my_gpu.h\"", "\"my_kernel.h\""})
 @Namespace("MyGpu")
 public class Thrust
 {
