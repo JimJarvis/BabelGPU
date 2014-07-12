@@ -11,7 +11,7 @@ main="gpu/MiscTest"
 units="test.deep.SimpleSigmoidNetTest test.deep.ElementComputeLayersTest"
 
 
-cp MyThrust/*.h bin/gpu/
+cp gpu_src/*.h bin/gpu/
 cp matlab/*.txt bin/
 
 cd bin
