@@ -34,7 +34,7 @@ public class SoftmaxTest
 		/*
 		 * softmax(X) in full
 		 */
-		Thrust.babel_batch_softmax(X);
+		Thrust.batch_softmax(X);
 		GpuUtil.checkGold(X, "gold_softmax", "softmax(full)", TOL);
 		X.destroy();
 		
@@ -43,11 +43,11 @@ public class SoftmaxTest
 		 */
 		X = rereadX();
 		FloatMat maxProbs = new FloatMat(1, COL, false);
-		Thrust.babel_batch_softmax(X, maxProbs, labelsDevice);
+		Thrust.batch_softmax(X, maxProbs, labelsDevice);
 		GpuUtil.checkGold(maxProbs, "gold_softmax_labeled", "softmax(correct label)", TOL);
 		
 		// compute sum of log likelihood
-		float logProb = Thrust.babel_log_prob(maxProbs);
+		float logProb = Thrust.log_sum(maxProbs);
 		float goldLogProb = new CsvReader("gold_log_prob.txt").readFloatVec(true)[0];
 		
 		PP.p("[log likelihood] " + 
@@ -62,7 +62,7 @@ public class SoftmaxTest
 		IntPointer reusedPtr = Thrust.malloc_device_int(COL);
 		final int dummyOffset = 766;
 		int outLabels[] = new int[COL + dummyOffset]; // 66 dummy offset
-		Thrust.babel_best_label(X, reusedPtr, outLabels, dummyOffset);
+		Thrust.best_label(X, reusedPtr, outLabels, dummyOffset);
 		int[] goldLabels = new CsvReader("gold_best_labels.txt").readIntVec(true);
 		// checkGold
 		int fault = -1; // if stays -1, then test passes

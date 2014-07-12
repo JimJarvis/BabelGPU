@@ -362,9 +362,9 @@ namespace MyGpu
 /**********************************************/
 /* More sophisticated functions for machine learning  */
 /**********************************************/
-#define GEN_babel_softmax(Ftype) \
+#define GEN_gpu_softmax(Ftype) \
 	/* I [y==j] - softmax(alpha_vec) */ \
-	inline void babel_id_minus_softmax(device_ptr<Ftype> begin, int size, int label) \
+	inline void gpu_id_minus_softmax(device_ptr<Ftype> begin, int size, int label) \
 	{ \
 		Ftype mx = gpu_max_##Ftype(begin, size); \
 		gpu_exp_##Ftype(begin, size, 1, -mx); \
@@ -373,7 +373,7 @@ namespace MyGpu
 		++ *(begin + label);  /* when at id, x = 1 - x */ \
 	} \
 	/* softmax(alpha_vec) */ \
-	inline void babel_softmax(device_ptr<Ftype> begin, int size) \
+	inline void gpu_softmax(device_ptr<Ftype> begin, int size) \
 	{ \
 		Ftype mx = gpu_max_##Ftype(begin, size); \
 		gpu_exp_##Ftype(begin, size, 1, -mx); \
@@ -381,7 +381,7 @@ namespace MyGpu
 		gpu__##Ftype(begin, size, 1.0 / s, 0); \
 	} \
 	/* softmax(alpha_vec) at only the correct label. 'out' is a 1 float device_ptr */ \
-	inline void babel_softmax(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> out) \
+	inline void gpu_softmax(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> out) \
 	{ \
 		Ftype mx = gpu_max_##Ftype(begin, size); \
 		Ftype expSum = thrust::transform_reduce(begin, begin + size, \
@@ -389,9 +389,17 @@ namespace MyGpu
 		out[0] = exp(begin[label] - mx) / expSum; \
 	}
 
-	GEN_babel_softmax(float);
-	GEN_babel_softmax(double);
+	GEN_gpu_softmax(float);
+	GEN_gpu_softmax(double);
 
+
+	// Sum of log of correct label probability
+	// input: a float array computed by softmax()
+	inline float gpu_log_sum(device_ptr<float> begin, int size)
+	{
+		return thrust::transform_reduce(begin, begin + size,
+										functor_log_float(), 0.0, thrust::plus<float>());
+	}
 
 	///// Second way to implement (id - softmax()), exactly the same numerical result. 
 	struct functor_id_minus_softmax_2
@@ -403,7 +411,7 @@ namespace MyGpu
 
 	// I [y==j] - softmax(alpha_vec)
 	// A = exp(A - (mx + log(sum(exp(A - mx))))
-	inline void babel_id_minus_softmax_2(device_ptr<float> begin, int size, int id)
+	inline void gpu_id_minus_softmax_2(device_ptr<float> begin, int size, int id)
 	{
 		float mx = gpu_max_float(begin, size);
 

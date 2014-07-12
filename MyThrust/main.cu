@@ -231,7 +231,7 @@ void test_id_minus_softmax()
 	pr(gpu_product_float(range));
 	pr(gpu_min_float(range));
 
-	babel_id_minus_softmax(range, 3);
+	gpu_id_minus_softmax(range, 3);
 	printD(D);
 }
 
@@ -245,13 +245,13 @@ void test_id_minus_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	lp = offset(lp, 2);
 
-	babel_batch_id_minus_softmax(&D[0], 4, 3, lp);
+	gpu_batch_id_minus_softmax(&D[0], 4, 3, lp);
 	printD(D, 4);
 
 	D = getDf(x, 12);
 	device_vector<float> outLogProb(3);
 	float sumLogProb =
-		babel_batch_id_minus_softmax_log_prob(
+		gpu_batch_id_minus_softmax_log_prob(
 			&D[0], 4, 3, &outLogProb[0], lp);
 	printD(D, 4);
 	printD(outLogProb, 1);
@@ -266,7 +266,7 @@ void test_softmax_batch()
 	device_vector<float> D = getDf(x, 12);
 
 	printf("Unlabeled softmax\n");
-	babel_batch_softmax(&D[0], 4, 3);
+	gpu_batch_softmax(&D[0], 4, 3);
 	printD(D, 4);
 
 	printf("Labeled softmax\n");
@@ -275,22 +275,22 @@ void test_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	D = getDf(x, 12);
 	device_vector<float> out(4);
-	babel_batch_softmax(&D[0], 3, 4, &out[0], lp);
+	gpu_batch_softmax(&D[0], 3, 4, &out[0], lp);
 	printD(out, 1);
 	printf("Log likelihood sum: %f\n", 
-		   babel_log_prob(&out[0], out.size()));
+		   gpu_log_sum(&out[0], out.size()));
 
 	const int SIZE = 1946;
 	float y[SIZE];
 	for (int i = 0; i < SIZE; y[i] = float(rand()) / RAND_MAX, i++);
 	D = getDf(y, SIZE);
-	babel_batch_softmax(&D[0], 2, SIZE/2);
+	gpu_batch_softmax(&D[0], 2, SIZE/2);
 
 	device_vector<int> outLabels(4);
 	float p[12] = {2, 5, 1, 3, -4, -2, 1, 0, 9, 3, -5, 6};
 	D = getDf(p, 12);
 	lp = thrust::raw_pointer_cast(&outLabels[0]);
-	babel_best_label(&D[0], 4, 3, lp);
+	gpu_best_label(&D[0], 4, 3, lp);
 	printD(outLabels, 1);
 
 	int outLabelHost[10];
@@ -347,15 +347,15 @@ void test_tranpose()
 int main()
 {
 	test_tranpose();
-	//test_sigmoid();
-	//test_id_minus_softmax_batch();
-	//test_softmax_batch();
-	//test_set_row_col();
-	//test_exp_double();
-	//test_sort_copy_swap_double();
-	//test_exp();
-	//test_exp_out_pointer();
-	//test_sort_copy_swap();
+	test_sigmoid();
+	test_id_minus_softmax_batch();
+	test_softmax_batch();
+	test_set_row_col();
+	test_exp_double();
+	test_sort_copy_swap_double();
+	test_exp();
+	test_exp_out_pointer();
+	test_sort_copy_swap();
 
 	return 0;
 }

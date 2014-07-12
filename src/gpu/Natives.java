@@ -187,31 +187,31 @@ public class Natives
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-    public static native void babel_id_minus_softmax(@ByVal FloatDevicePointer begin, int size, int id);
+    public static native void gpu_id_minus_softmax(@ByVal FloatDevicePointer begin, int size, int id);
     // version 2: more calculation, might be more numerically stable
-    public static native void babel_id_minus_softmax_2(@ByVal FloatDevicePointer begin, int size, int id);
+    public static native void gpu_id_minus_softmax_2(@ByVal FloatDevicePointer begin, int size, int id);
     
     // For minibatch
-    public static native void babel_batch_id_minus_softmax(
+    public static native void gpu_batch_id_minus_softmax(
     		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);
     
     // To calculate softmax() only, no subtraction from id[]
-    public static native void babel_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col);
+    public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col);
 
     // Only the probability at the correct label
-    public static native void babel_batch_softmax(
+    public static native void gpu_batch_softmax(
     				@ByVal FloatDevicePointer begin, int row, int col, 
     				@ByVal FloatDevicePointer out, @ByPtr IntPointer labels);
 
     // The best labels
-    public static native void babel_best_label(
+    public static native void gpu_best_label(
     		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer outLabels);
     
     // Sum of log probability from the correct label
-    public static native float babel_log_prob(@ByVal FloatDevicePointer begin, int size);
+    public static native float gpu_log_sum(@ByVal FloatDevicePointer begin, int size);
     
     // combine babel_batch_id_minus_softmax with babel_log_prob
-    public static native float babel_batch_id_minus_softmax_log_prob(
+    public static native float gpu_batch_id_minus_softmax_log_prob(
     		@ByVal FloatDevicePointer begin, int row, int col, 
     		@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
     
@@ -369,5 +369,5 @@ public class Natives
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-    public static native void babel_id_minus_softmax(@ByVal DoubleDevicePointer begin, int size, int id);
+    public static native void gpu_id_minus_softmax(@ByVal DoubleDevicePointer begin, int size, int id);
 }

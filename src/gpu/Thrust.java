@@ -360,23 +360,23 @@ public class Thrust
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-	public static void babel_id_minus_softmax(FloatMat x, int id)
+	public static void id_minus_softmax(FloatMat x, int id)
 	{
-		Natives.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
+		Natives.gpu_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
 	// version 2: more calculation, might be more numerically stable
-	public static void babel_id_minus_softmax_2(FloatMat x, int id)
+	public static void id_minus_softmax_2(FloatMat x, int id)
 	{
-		Natives.babel_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
+		Natives.gpu_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
 	}
 	
 	/**
 	 * Minibatch: I[y == j] - softmax(alpha_vec)
 	 * @param labels must be already on GPU. Call copy_host_to_device().
 	 */
-	public static void babel_batch_id_minus_softmax(FloatMat x, IntPointer labels)
+	public static void batch_id_minus_softmax(FloatMat x, IntPointer labels)
 	{
-		Natives.babel_batch_id_minus_softmax(x.getThrustPointer(), x.row, x.col, labels);
+		Natives.gpu_batch_id_minus_softmax(x.getThrustPointer(), x.row, x.col, labels);
 	}
 	// helper
 	public static IntPointer copy_host_to_device(int[] labels)
@@ -392,9 +392,9 @@ public class Thrust
     /**
      * Minibatch: softmax(alpha_vec)
      */
-    public static void babel_batch_softmax(FloatMat x)
+    public static void batch_softmax(FloatMat x)
     {
-    	Natives.babel_batch_softmax(x.getThrustPointer(), x.row, x.col);
+    	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col);
     }
 
     /**
@@ -402,9 +402,9 @@ public class Thrust
      * @param out writes to 'out' with probability only at the correct label of a column
 	 * @param labels must be already on GPU. Call copy_host_to_device().
      */
-    public static void babel_batch_softmax(FloatMat x, FloatMat out, IntPointer labels)
+    public static void batch_softmax(FloatMat x, FloatMat out, IntPointer labels)
     {
-    	Natives.babel_batch_softmax(
+    	Natives.gpu_batch_softmax(
     			x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), labels);
     }
     
@@ -414,10 +414,10 @@ public class Thrust
      * @param outLabels collects the maximum labels, 
      * 				writing from 'offset', write number of labels == label of columns
      */
-    public static void babel_best_label(
+    public static void best_label(
     		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset)
 	{
-    	Natives.babel_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
+    	Natives.gpu_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
     	Natives.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.col);
 	}
     
@@ -425,9 +425,9 @@ public class Thrust
      * @param x an array of softmax() of the correct labels
      * @return sum of the log probability
      */
-    public static float babel_log_prob(FloatMat x)
+    public static float log_sum(FloatMat x)
     {
-    	return Natives.babel_log_prob(x.getThrustPointer(), x.size());
+    	return Natives.gpu_log_sum(x.getThrustPointer(), x.size());
     }
 
     /**
@@ -435,10 +435,10 @@ public class Thrust
      * @param outLogProb records log probability at the correct label of each column
      * 			can be used as temporary storage.
      */
-    public static float babel_batch_id_minus_softmax_log_prob(
+    public static float batch_id_minus_softmax_log_prob(
     		FloatMat x, FloatMat outLogProb, IntPointer labels)
     {
-    	return Natives.babel_batch_id_minus_softmax_log_prob(
+    	return Natives.gpu_batch_id_minus_softmax_log_prob(
     			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
     }
    
@@ -729,9 +729,9 @@ public class Thrust
     /**
      * I[y == j] - softmax(alpha_vec)
      */
-	public static void babel_id_minus_softmax(DoubleMat x, int id)
+	public static void id_minus_softmax(DoubleMat x, int id)
 	{
-		Natives.babel_id_minus_softmax(x.getThrustPointer(), x.size(), id);
+		Natives.gpu_id_minus_softmax(x.getThrustPointer(), x.size(), id);
 	}
 	
 }
