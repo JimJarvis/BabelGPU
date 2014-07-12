@@ -204,11 +204,12 @@ namespace MyGpu
 
     ///// mini-batch softmax(alpha_vec)
     __global__
-	void gpu_batch_softmax_kernel(float *begin, int row, int col)
+	void gpu_batch_softmax_kernel(float *begin, int row, int col, float *out)
 	{
 		ThreadIndex1D(idx, col);
 
 		begin += idx * row; // beginning of a column
+		if (out != begin) out += idx * row;
 
 		// find max
 		float mx = max_kernel(begin, row);
@@ -217,17 +218,17 @@ namespace MyGpu
 		float sum = 0;
 		for (int i = 0; i < row; i++)
 		{
-			begin[i] = exp(begin[i] - mx);
-			sum += begin[i];
+			out[i] = exp(begin[i] - mx);
+			sum += out[i];
 		}
-		// -exp(..)/sum
+		// exp(..)/sum
 		for (int i = 0; i < row; i++)
-			begin[i] /= sum;
+			out[i] /= sum;
 	}
 
     // Computes the mini-batch softmax probability distribution for the full matrix
     inline void gpu_batch_softmax(
-            device_ptr<float> begin, int row, int col)
+            device_ptr<float> begin, int row, int col, device_ptr<float> out)
     {
         if (col == 1) // use the thrust version
             gpu_softmax(begin, row);
@@ -237,14 +238,20 @@ namespace MyGpu
             setKernelDim1D(col, gridDim, blockDim);
 
             gpu_batch_softmax_kernel << <gridDim, blockDim >> >(
-                    thrust::raw_pointer_cast(begin), row, col);
+                    thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out));
         }
     }
+
+	inline void gpu_batch_softmax(
+		device_ptr<float> begin, int row, int col)
+	{
+		gpu_batch_softmax(begin, row, col, begin);
+	}
 
     ///// mini-batch softmax(alpha_vec) that writes to 'out' only the probability at the correct label
     __global__
 	void gpu_batch_softmax_kernel(
-			float *begin, int row, int col, float *out, int *labels)
+			float *begin, int row, int col, float *outProb, int *labels)
 	{
 		ThreadIndex1D(idx, col);
 
@@ -263,7 +270,7 @@ namespace MyGpu
 			if (i == label) numerator = tmp;
 			sum += tmp;
 		}
-		out[idx] = numerator / sum;
+		outProb[idx] = numerator / sum;
 	}
 
     // Computes the mini-batch softmax probability distribution for the full matrix

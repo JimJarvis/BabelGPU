@@ -1,6 +1,5 @@
 package test.gpu;
 
-import deep.units.*;
 import gpu.*;
 import utils.*;
 
@@ -15,23 +14,16 @@ public class MiscTest
 												{3, 30, -7},
 												{4, 40, -10}};
 		
-		PP.po(FloatMat.deflatten(A, 3));
-		PP.po(FloatMat.flatten(B));
-		
-		FloatMat m = new FloatMat(4, 3);
-		PP.p(m.toCoord(10));
-		PP.p(m.toIndex(3, 2));
-		
 		FloatMat b = new FloatMat(B.clone());
+		FloatMat m = new FloatMat(b);
 		FloatMat a = new FloatMat(A.clone());
 		
-		PP.p(a.deepTranspose().deepTranspose());
-		PP.p(b.deepTranspose());
+		Thrust.batch_softmax(b, m);
 		
-		b.incrSingle(2, 1, 666);
 		PP.p(b);
-		a.setSingle(2, 0, 666);
-		PP.p(a);
+		PP.p(m);
+		
+		System.exit(0);
 		
 		PP.p(GpuBlas.dotMult(a, b));
 		PP.p(b.reciprocal());

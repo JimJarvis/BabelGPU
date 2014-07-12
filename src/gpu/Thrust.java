@@ -397,6 +397,11 @@ public class Thrust
     	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col);
     }
 
+   public static void batch_softmax(FloatMat x, FloatMat out)
+    {
+    	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
+    }
+
     /**
      * Minibatch: softmax(alpha_vec)
      * @param out writes to 'out' with probability only at the correct label of a column
@@ -547,7 +552,7 @@ public class Thrust
 		gpu_pow_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
 	}
 	public static void pow(DoubleMat x, double p) {  pow(x, p, 1, 0); }
-	public static void pow(DoubleMat x, DoubleMat out, double p) {  pow(x, out, p, 1, 0); }
+	public static void pow(DoubleMat x, DoubleMat out, double p) {  pow(x, out, p, 0, 0); }
 	
 	/**
 	 * (a * x + b)

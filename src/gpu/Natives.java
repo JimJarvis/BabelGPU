@@ -183,7 +183,7 @@ public class Natives
     		@ByVal FloatDevicePointer in, int row, int col, @ByVal FloatDevicePointer out);
     
     
-    // ******************** Babel specific methods ****************** /
+    // ******************** Softmax/labeling specific methods ****************** /
     /**
      * I[y == j] - softmax(alpha_vec)
      */
@@ -197,6 +197,8 @@ public class Natives
     
     // To calculate softmax() only, no subtraction from id[]
     public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col);
+
+    public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out);
 
     // Only the probability at the correct label
     public static native void gpu_batch_softmax(
