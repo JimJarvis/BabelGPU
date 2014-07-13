@@ -178,13 +178,13 @@ public class GpuUtil
 
 	/**
 	 * Check the gold standard generated from Matlab
-	 * Assume the goldFile has extension ".txt"
+	 * Assume the goldFile has extension ".txt" and reside in bin/matlab_test
 	 * @param testName
 	 * @param tol tolerance of error
 	 */
 	public static void checkGold(FloatMat gpu, String goldFile, String testName, float tol)
 	{
-		CsvReader csv = new CsvReader(goldFile + ".txt");
+		CsvReader csv = new CsvReader("matlab_test/" + goldFile + ".txt");
 		float[][] Gold = csv.readFloatMat();
 		float[][] Host = gpu.deflatten();
 		

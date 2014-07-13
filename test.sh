@@ -4,15 +4,15 @@
 
 main="gpu/RandTest"
 main="deep/IniterTest"
-main="gpu/SoftmaxTest"
-main="gpu/MinibatchTest"
 main="gpu/MiscTest"
+main="gpu/MinibatchTest"
+main="gpu/SoftmaxTest"
 
 units="test.deep.SimpleSigmoidNetTest test.deep.ElementComputeLayersTest"
 
 
 cp gpu_src/*.h bin/gpu/
-cp matlab/*.txt bin/
+cp matlab/test/*.txt bin/matlab_test/
 
 cd bin
 

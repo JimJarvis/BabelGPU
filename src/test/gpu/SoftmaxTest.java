@@ -21,7 +21,7 @@ public class SoftmaxTest
 		/*
 		 * Dimensions
 		 */
-		CsvReader csv = new CsvReader("input_dim.txt");
+		CsvReader csv = new CsvReader("matlab_test/Softmax_input_dim.txt");
 		int[] dims = csv.readIntVec(true);
 		ROW = dims[0]; COL = dims[1];
 		

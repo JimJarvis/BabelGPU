@@ -3,7 +3,8 @@
 % - softmax() only the probability at the correct label
 % - Return the label where the maximum probability occurs in alpha_vec
 %
-loc = @(name) [name '.txt'];
+TEST = 'Softmax';
+loc = @(name) ['test/' TEST '_' name '.txt'];
 dlm = @(val, str) dlmwrite(loc(str), val, 'precision', '%.16f');
 
 %% DIMS
