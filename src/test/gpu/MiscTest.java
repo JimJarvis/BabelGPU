@@ -23,8 +23,6 @@ public class MiscTest
 		PP.p(b);
 		PP.p(m);
 		
-		System.exit(0);
-		
 		PP.p(GpuBlas.dotMult(a, b));
 		PP.p(b.reciprocal());
 		PP.p(b.reciprocal().square());

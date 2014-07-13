@@ -194,7 +194,7 @@ namespace MyGpu
 		begin += idx * row; // beginning of a column
 
 		// find max
-		T mx = device_max(begin, row);
+		T mx = device_max<T>(begin, row);
 		// subtract max from each and do exp
 		// also compute sum of these exp
 		T sum = 0;
@@ -241,7 +241,7 @@ namespace MyGpu
 		begin += idx * row; // beginning of a column
 		if (out != begin) out += idx * row;
 
-		device_softmax(begin, row, col, out);
+		device_softmax<T>(begin, row, col, out);
 
 		// Add 1 to the identity function
 		T probCorrect = out[labels[idx]];

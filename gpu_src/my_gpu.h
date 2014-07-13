@@ -288,6 +288,10 @@ namespace MyGpu
 	inline void gpu_set_single(device_ptr<T> begin, int offset, T newVal) 
 	{ begin[offset] = newVal; } 
 
+	template <typename T>
+	inline void gpu_incr_single(device_ptr<T> begin, int offset, T incrVal) \
+	{ begin[offset] += incrVal; }
+
 	///////***** Deal with int, float, and double raw GPU pointers  *****///////
 	template <typename T>
 	inline T* offset(T *begin, int offset) { return begin + offset; } 

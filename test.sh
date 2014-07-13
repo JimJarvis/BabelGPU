@@ -3,12 +3,12 @@
 # To do JUnit testing, ./test.sh blabla  (whatever string not 'c')
 
 main="gpu/RandTest"
+main="gpu/MinibatchTest"
 main="deep/IniterTest"
 main="gpu/MiscTest"
-main="gpu/MinibatchTest"
 
-units="test.gpu.SoftmaxTest"
 units="test.deep.SimpleSigmoidNetTest test.deep.ElementComputeLayersTest"
+units="test.gpu.SoftmaxTest"
 
 
 cp gpu_src/*.h bin/gpu/

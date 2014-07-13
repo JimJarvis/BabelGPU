@@ -23,11 +23,11 @@ public class Thrust
 	 */
 	public static void exp(FloatMat x, float a, float b)
 	{
-		gpu_exp_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_exp(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void exp(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_exp_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_exp(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void exp(FloatMat x) {  exp(x, 1, 0); }
 	public static void exp(FloatMat x, FloatMat out) {  exp(x, out, 1, 0); }
@@ -37,11 +37,11 @@ public class Thrust
 	 */
 	public static void log(FloatMat x, float a, float b)
 	{
-		gpu_log_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_log(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void log(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_log_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_log(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void log(FloatMat x) {  log(x, 1, 0); }
 	public static void log(FloatMat x, FloatMat out) {  log(x, out, 1, 0); }
@@ -51,11 +51,11 @@ public class Thrust
 	 */
 	public static void cos(FloatMat x, float a, float b)
 	{
-		gpu_cos_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_cos(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void cos(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_cos_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_cos(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void cos(FloatMat x) {  cos(x, 1, 0); }
 	public static void cos(FloatMat x, FloatMat out) {  cos(x, out, 1, 0); }
@@ -65,11 +65,11 @@ public class Thrust
 	 */
 	public static void sin(FloatMat x, float a, float b)
 	{
-		gpu_sin_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_sin(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sin(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_sin_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sin(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sin(FloatMat x) {  sin(x, 1, 0); }
 	public static void sin(FloatMat x, FloatMat out) {  sin(x, out, 1, 0); }
@@ -79,11 +79,11 @@ public class Thrust
 	 */
 	public static void sqrt(FloatMat x, float a, float b)
 	{
-		gpu_sqrt_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_sqrt(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sqrt(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_sqrt_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sqrt(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sqrt(FloatMat x) {  sqrt(x, 1, 0); }
 	public static void sqrt(FloatMat x, FloatMat out) {  sqrt(x, out, 1, 0); }
@@ -93,11 +93,11 @@ public class Thrust
 	 */
 	public static void pow(FloatMat x, float p, float a, float b)
 	{
-		gpu_pow_float(x.getThrustPointer(), x.size(), p, a, b);
+		gpu_pow(x.getThrustPointer(), x.size(), p, a, b);
 	}
 	public static void pow(FloatMat x,  FloatMat out, float p, float a, float b)
 	{
-		gpu_pow_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
+		gpu_pow(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
 	}
 	public static void pow(FloatMat x, float p) {  pow(x, p, 1, 0); }
 	public static void pow(FloatMat x, FloatMat out, float p) {  pow(x, out, p, 1, 0); }
@@ -107,11 +107,11 @@ public class Thrust
 	 */
 	public static void square(FloatMat x, float a, float b)
 	{
-		gpu_square_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_square(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void square(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_square_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_square(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void square(FloatMat x) {  square(x, 1, 0); }
 	public static void square(FloatMat x, FloatMat out) {  square(x, out, 1, 0); }
@@ -121,11 +121,11 @@ public class Thrust
 	 */
 	public static void cube(FloatMat x, float a, float b)
 	{
-		gpu_cube_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_cube(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void cube(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_cube_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_cube(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void cube(FloatMat x) {  cube(x, 1, 0); }
 	public static void cube(FloatMat x, FloatMat out) {  cube(x, out, 1, 0); }
@@ -135,11 +135,11 @@ public class Thrust
 	 */
 	public static void reciprocal(FloatMat x, float a, float b)
 	{
-		gpu_reciprocal_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_reciprocal(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void reciprocal(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_reciprocal_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_reciprocal(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void reciprocal(FloatMat x) {  reciprocal(x, 1, 0); }
 	public static void reciprocal(FloatMat x, FloatMat out) {  reciprocal(x, out, 1, 0); }
@@ -149,11 +149,11 @@ public class Thrust
 	 */
 	public static void linear(FloatMat x, float a, float b)
 	{
-		gpu__float(x.getThrustPointer(), x.size(), a, b);
+		gpu_(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void linear(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu__float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	
 	/**
@@ -161,11 +161,11 @@ public class Thrust
 	 */
 	public static void abs(FloatMat x, float a, float b)
 	{
-		gpu_fabs_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_fabs(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void abs(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_fabs_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_fabs(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void abs(FloatMat x) {  abs(x, 1, 0); }
 	public static void abs(FloatMat x, FloatMat out) {  abs(x, out, 1, 0); }
@@ -175,11 +175,11 @@ public class Thrust
 	 */
 	public static void sigmoid(FloatMat x, float a, float b)
 	{
-		gpu_sigmoid_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_sigmoid(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sigmoid(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_sigmoid_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sigmoid(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sigmoid(FloatMat x) {  sigmoid(x, 1, 0); }
 	public static void sigmoid(FloatMat x, FloatMat out) {  sigmoid(x, out, 1, 0); }
@@ -189,11 +189,11 @@ public class Thrust
 	 */
 	public static void sigmoid_deriv(FloatMat x, float a, float b)
 	{
-		gpu_sigmoid_deriv_float(x.getThrustPointer(), x.size(), a, b);
+		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sigmoid_deriv(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_sigmoid_deriv_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sigmoid_deriv(FloatMat x) {  sigmoid_deriv(x, 1, 0); }
 	public static void sigmoid_deriv(FloatMat x, FloatMat out) {  sigmoid_deriv(x, out, 1, 0); }
@@ -203,11 +203,11 @@ public class Thrust
 	 */
 	public static void laplacian(FloatMat x)
 	{
-		gpu_laplacian_float(x.getThrustPointer(), x.size(), 1, 0);
+		gpu_laplacian(x.getThrustPointer(), x.size(), 1, 0);
 	}
 	public static void laplacian(FloatMat x, FloatMat out)
 	{
-		gpu_laplacian_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+		gpu_laplacian(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
 	}
 	
 	/**
@@ -215,31 +215,31 @@ public class Thrust
 	 */
 	public static void cauchy(FloatMat x)
 	{
-		gpu_cauchy_float(x.getThrustPointer(), x.size(), 1, 0);
+		gpu_cauchy(x.getThrustPointer(), x.size(), 1, 0);
 	}
 	public static void cauchy(FloatMat x, FloatMat out)
 	{
-		gpu_cauchy_float(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+		gpu_cauchy(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
 	}
 	
 	public static float sum(FloatMat x)
 	{
-		return gpu_sum_float(x.getThrustPointer(), x.size());
+		return gpu_sum(x.getThrustPointer(), x.size());
 	}
 	
 	public static float product(FloatMat x)
 	{
-		return gpu_product_float(x.getThrustPointer(), x.size());
+		return gpu_product(x.getThrustPointer(), x.size());
 	}
 	
 	public static float max(FloatMat x)
 	{
-		return gpu_max_float(x.getThrustPointer(), x.size());
+		return gpu_max(x.getThrustPointer(), x.size());
 	}
 	
 	public static float min(FloatMat x)
 	{
-		return gpu_min_float(x.getThrustPointer(), x.size());
+		return gpu_min(x.getThrustPointer(), x.size());
 	}
 	  
     /**
@@ -256,7 +256,7 @@ public class Thrust
 	 */
 	public static void dot_mult(FloatMat x, FloatMat y, float scalor)
 	{
-		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer(), scalor);
+		gpu_dot_mult(x.getThrustPointer(), x.size(), y.getThrustPointer(), scalor);
 	}
 	/**
 	 * Element-wise multiplication
@@ -264,7 +264,7 @@ public class Thrust
 	 */
 	public static void dot_mult(FloatMat x, FloatMat y, FloatMat out, float scalor)
 	{
-		gpu_dot_mult_float(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer(), scalor);
+		gpu_dot_mult(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer(), scalor);
 	}
 	
 	/**
@@ -272,7 +272,7 @@ public class Thrust
 	 */
 	public static void set_single(FloatMat x, int idx, float newVal)
 	{
-		gpu_set_single_float(x.getThrustPointer(), idx, newVal);
+		gpu_set_single(x.getThrustPointer(), idx, newVal);
 	}
 	/**
 	 * @param ij can be negative: python wrap-around
@@ -287,7 +287,7 @@ public class Thrust
 	 */
 	public static void incr_single(FloatMat x, int idx, float incrVal)
 	{
-		gpu_incr_single_float(x.getThrustPointer(), idx, incrVal);
+		gpu_incr_single(x.getThrustPointer(), idx, incrVal);
 	}
 	/**
 	 * @param ij can be negative: python wrap-around
@@ -303,7 +303,7 @@ public class Thrust
 	 */
 	public static void sort(FloatMat x, int dir)
 	{
-		gpu_sort_float(x.getThrustPointer(), x.size(), dir);
+		gpu_sort(x.getThrustPointer(), x.size(), dir);
 	}
 	/**
 	 * Ascending sort
@@ -315,7 +315,7 @@ public class Thrust
 	 */
 	public static void copy(FloatMat x, FloatMat out)
 	{
-		gpu_copy_float(x.getThrustPointer(), x.size(), out.getThrustPointer());
+		gpu_copy(x.getThrustPointer(), x.size(), out.getThrustPointer());
 	}
 	
 	/**
@@ -323,7 +323,7 @@ public class Thrust
 	 */
 	public static void swap(FloatMat x, FloatMat y)
 	{
-		gpu_swap_float(x.getThrustPointer(), x.size(), y.getThrustPointer());
+		gpu_swap(x.getThrustPointer(), x.size(), y.getThrustPointer());
 	}
 	
 	/**
@@ -331,7 +331,7 @@ public class Thrust
 	 */
 	public static void fill(FloatMat x, float val)
 	{
-		gpu_fill_float(x.getThrustPointer(), x.size(), val);
+		gpu_fill(x.getThrustPointer(), x.size(), val);
 	}
 	
 	 /**
@@ -340,7 +340,7 @@ public class Thrust
      */
     public static void fill_row(FloatMat x, int rowIdx, float val)
     {
-    	Natives.gpu_fill_row_float(x.getThrustPointer(), x.row, x.col, rowIdx, val);
+    	Natives.gpu_fill_row(x.getThrustPointer(), x.row, x.col, rowIdx, val);
     }
     /**
      *  Set a specified col of a  column-major matrix to be the same value
@@ -348,7 +348,7 @@ public class Thrust
      */
     public static void fill_col(FloatMat x, int colIdx, float val)
     {
-    	Natives.gpu_fill_col_float(x.getThrustPointer(), x.row, x.col, colIdx, val);
+    	Natives.gpu_fill_col(x.getThrustPointer(), x.row, x.col, colIdx, val);
     }
 	
     /**
@@ -361,7 +361,7 @@ public class Thrust
     {
     	if (x == out)
     		throw new GpuException("Transpose operation cannot have the same 'in' and 'out'");
-    	Natives.gpu_transpose_float(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
+    	Natives.gpu_transpose(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
     }
 
     // ******************** Softmax/labeling methods ****************** /
@@ -465,11 +465,11 @@ public class Thrust
 	 */
 	public static void exp(DoubleMat x, double a, double b)
 	{
-		gpu_exp_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_exp(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void exp(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_exp_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_exp(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void exp(DoubleMat x) {  exp(x, 1, 0); }
 	public static void exp(DoubleMat x, DoubleMat out) {  exp(x, out, 1, 0); }
@@ -479,11 +479,11 @@ public class Thrust
 	 */
 	public static void log(DoubleMat x, double a, double b)
 	{
-		gpu_log_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_log(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void log(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_log_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_log(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void log(DoubleMat x) {  log(x, 1, 0); }
 	public static void log(DoubleMat x, DoubleMat out) {  log(x, out, 1, 0); }
@@ -493,11 +493,11 @@ public class Thrust
 	 */
 	public static void cos(DoubleMat x, double a, double b)
 	{
-		gpu_cos_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_cos(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void cos(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_cos_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_cos(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void cos(DoubleMat x) {  cos(x, 1, 0); }
 	public static void cos(DoubleMat x, DoubleMat out) {  cos(x, out, 1, 0); }
@@ -507,11 +507,11 @@ public class Thrust
 	 */
 	public static void sin(DoubleMat x, double a, double b)
 	{
-		gpu_sin_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_sin(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sin(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_sin_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sin(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sin(DoubleMat x) {  sin(x, 1, 0); }
 	public static void sin(DoubleMat x, DoubleMat out) {  sin(x, out, 1, 0); }
@@ -521,11 +521,11 @@ public class Thrust
 	 */
 	public static void sqrt(DoubleMat x, double a, double b)
 	{
-		gpu_sqrt_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_sqrt(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sqrt(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_sqrt_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sqrt(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sqrt(DoubleMat x) {  sqrt(x, 1, 0); }
 	public static void sqrt(DoubleMat x, DoubleMat out) {  sqrt(x, out, 1, 0); }
@@ -535,11 +535,11 @@ public class Thrust
 	 */
 	public static void pow(DoubleMat x, double p, double a, double b)
 	{
-		gpu_pow_double(x.getThrustPointer(), x.size(), p, a, b);
+		gpu_pow(x.getThrustPointer(), x.size(), p, a, b);
 	}
 	public static void pow(DoubleMat x,  DoubleMat out, double p, double a, double b)
 	{
-		gpu_pow_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
+		gpu_pow(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
 	}
 	public static void pow(DoubleMat x, double p) {  pow(x, p, 1, 0); }
 	public static void pow(DoubleMat x, DoubleMat out, double p) {  pow(x, out, p, 0, 0); }
@@ -549,11 +549,11 @@ public class Thrust
 	 */
 	public static void linear(DoubleMat x, double a, double b)
 	{
-		gpu__double(x.getThrustPointer(), x.size(), a, b);
+		gpu_(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void linear(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu__double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	
 	/**
@@ -561,11 +561,11 @@ public class Thrust
 	 */
 	public static void abs(DoubleMat x, double a, double b)
 	{
-		gpu_fabs_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_fabs(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void abs(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_fabs_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_fabs(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void abs(DoubleMat x) {  abs(x, 1, 0); }
 	public static void abs(DoubleMat x, DoubleMat out) {  abs(x, out, 1, 0); }
@@ -575,11 +575,11 @@ public class Thrust
 	 */
 	public static void sigmoid(DoubleMat x, double a, double b)
 	{
-		gpu_sigmoid_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_sigmoid(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sigmoid(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_sigmoid_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sigmoid(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sigmoid(DoubleMat x) {  sigmoid(x, 1, 0); }
 	public static void sigmoid(DoubleMat x, DoubleMat out) {  sigmoid(x, out, 1, 0); }
@@ -589,11 +589,11 @@ public class Thrust
 	 */
 	public static void sigmoid_deriv(DoubleMat x, double a, double b)
 	{
-		gpu_sigmoid_deriv_double(x.getThrustPointer(), x.size(), a, b);
+		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), a, b);
 	}
 	public static void sigmoid_deriv(DoubleMat x,  DoubleMat out, double a, double b)
 	{
-		gpu_sigmoid_deriv_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	public static void sigmoid_deriv(DoubleMat x) {  sigmoid_deriv(x, 1, 0); }
 	public static void sigmoid_deriv(DoubleMat x, DoubleMat out) {  sigmoid_deriv(x, out, 1, 0); }
@@ -603,11 +603,11 @@ public class Thrust
 	 */
 	public static void laplacian(DoubleMat x)
 	{
-		gpu_laplacian_double(x.getThrustPointer(), x.size(), 1, 0);
+		gpu_laplacian(x.getThrustPointer(), x.size(), 1, 0);
 	}
 	public static void laplacian(DoubleMat x, DoubleMat out)
 	{
-		gpu_laplacian_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+		gpu_laplacian(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
 	}
 	
 	/**
@@ -615,31 +615,31 @@ public class Thrust
 	 */
 	public static void cauchy(DoubleMat x)
 	{
-		gpu_cauchy_double(x.getThrustPointer(), x.size(), 1, 0);
+		gpu_cauchy(x.getThrustPointer(), x.size(), 1, 0);
 	}
 	public static void cauchy(DoubleMat x, DoubleMat out)
 	{
-		gpu_cauchy_double(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+		gpu_cauchy(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
 	}
 	
 	public static double sum(DoubleMat x)
 	{
-		return gpu_sum_double(x.getThrustPointer(), x.size());
+		return gpu_sum(x.getThrustPointer(), x.size());
 	}
 	
 	public static double product(DoubleMat x)
 	{
-		return gpu_product_double(x.getThrustPointer(), x.size());
+		return gpu_product(x.getThrustPointer(), x.size());
 	}
 	
 	public static double max(DoubleMat x)
 	{
-		return gpu_max_double(x.getThrustPointer(), x.size());
+		return gpu_max(x.getThrustPointer(), x.size());
 	}
 	
 	public static double min(DoubleMat x)
 	{
-		return gpu_min_double(x.getThrustPointer(), x.size());
+		return gpu_min(x.getThrustPointer(), x.size());
 	}
 	
 	/**
@@ -648,7 +648,7 @@ public class Thrust
 	 */
 	public static void dot_mult(DoubleMat x, DoubleMat y, double scalor)
 	{
-		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer(), scalor);
+		gpu_dot_mult(x.getThrustPointer(), x.size(), y.getThrustPointer(), scalor);
 	}
 	/**
 	 * Element-wise multiplication
@@ -656,7 +656,7 @@ public class Thrust
 	 */
 	public static void dot_mult(DoubleMat x, DoubleMat y, DoubleMat out, double scalor)
 	{
-		gpu_dot_mult_double(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer(), scalor);
+		gpu_dot_mult(x.getThrustPointer(), x.size(), y.getThrustPointer(), out.getThrustPointer(), scalor);
 	}
 	
 	/**
@@ -664,7 +664,7 @@ public class Thrust
 	 */
 	public static void single_set(DoubleMat x, int idx, double newVal)
 	{
-		gpu_set_single_double(x.getThrustPointer(), idx, newVal);
+		gpu_set_single(x.getThrustPointer(), idx, newVal);
 	}
 	public static void single_set(DoubleMat x, int i, int j, double newVal)
 	{
@@ -676,7 +676,7 @@ public class Thrust
 	 */
 	public static void single_incr(DoubleMat x, int idx, double incrVal)
 	{
-		gpu_incr_single_double(x.getThrustPointer(), idx, incrVal);
+		gpu_incr_single(x.getThrustPointer(), idx, incrVal);
 	}
 	public static void single_incr(DoubleMat x, int i, int j, double incrVal)
 	{
@@ -689,7 +689,7 @@ public class Thrust
 	 */
 	public static void sort(DoubleMat x, int dir)
 	{
-		gpu_sort_double(x.getThrustPointer(), x.size(), dir);
+		gpu_sort(x.getThrustPointer(), x.size(), dir);
 	}
 	/**
 	 * Ascending sort
@@ -701,7 +701,7 @@ public class Thrust
 	 */
 	public static void copy(DoubleMat x, DoubleMat out)
 	{
-		gpu_copy_double(x.getThrustPointer(), x.size(), out.getThrustPointer());
+		gpu_copy(x.getThrustPointer(), x.size(), out.getThrustPointer());
 	}
 	
 	/**
@@ -709,7 +709,7 @@ public class Thrust
 	 */
 	public static void swap(DoubleMat x, DoubleMat y)
 	{
-		gpu_swap_double(x.getThrustPointer(), x.size(), y.getThrustPointer());
+		gpu_swap(x.getThrustPointer(), x.size(), y.getThrustPointer());
 	}
 	
 	/**
@@ -717,6 +717,6 @@ public class Thrust
 	 */
 	public static void fill(DoubleMat x, double val)
 	{
-		gpu_fill_double(x.getThrustPointer(), x.size(), val);
+		gpu_fill(x.getThrustPointer(), x.size(), val);
 	}
 }
