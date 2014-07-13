@@ -1,69 +1,90 @@
 package test.gpu;
 
+import static test.gpu.GpuTestKit.*;
+import org.junit.*;
 import utils.*;
 import gpu.*;
-
 import com.googlecode.javacpp.*;
 
 public class SoftmaxTest
 {
-	private static final float TOL = 1e-9f;
+	private int ROW;
+	private int COL;
+	private static GpuTestKit kit;
 	
-	private static int ROW;
-	private static int COL;
-	public static void main(String[] args)
+	@BeforeClass
+	public static void setUp()
+	{ 
+		systemInit();
+		kit = new GpuTestKit("Softmax");
+	}
+	
+	@Test
+	public void test()
 	{
-		GpuUtil.enableExceptions();
+		kit.printSessionTitle();
 		
-		PP.p("Softmax test");
-		PP.setPrecision(3);
-		
-		/*
-		 * Dimensions
-		 */
-		CsvReader csv = new CsvReader("matlab_test/Softmax_input_dim.txt");
-		int[] dims = csv.readIntVec(true);
+		int[] dims = kit.loadInts("input_dim");
 		ROW = dims[0]; COL = dims[1];
 		
-		// Read in dummy data
-		FloatMat X = rereadX();
-		csv = new CsvReader("input_Y.txt");
-		int[] labels = csv.readIntVec(true);
-		IntPointer labelsDevice = Thrust.copy_host_to_device(labels);
+		// X shouldn't be changed
+		FloatMat X_backup = kit.loadFloatMat("input_X", ROW, COL);
+		FloatMat X = X_backup.clone();
 		
+		IntPointer labelsDevice = kit.loadIntGpu("input_Labels");
+
 		/*
 		 * softmax(X) in full
 		 */
 		Thrust.batch_softmax(X);
-		GpuUtil.checkGold(X, "gold_softmax", "softmax(full)", TOL);
-		X.destroy();
+		kit.checkGold(X, "gold_batch_softmax");
+
+		/*
+		 * softmax(X) in full
+		 */
+		X.copyFrom(X_backup);
+		FloatMat X_out = new FloatMat(X);
+		Thrust.batch_softmax(X, X_out);
+		kit.checkGold(X_out, "gold_batch_softmax");
+		kit.checkGold(X, X_backup, "input X shouldn't be changed");
 		
-		/**
+		/*
+		 * Softmax(X) - id
+		 */
+		X.copyFrom(X_backup);
+		Thrust.batch_softmax_minus_id(X, labelsDevice);
+		kit.checkGold(X, "gold_batch_softmax_minus_id");
+
+		/*
+		 * Softmax(X) - id
+		 */
+		X.copyFrom(X_backup);
+		Thrust.batch_softmax_minus_id(X, X_out, labelsDevice);
+		kit.checkGold(X_out, "gold_batch_softmax_minus_id");
+		kit.checkGold(X, X_backup, "input X shouldn't be changed");
+
+		/*
 		 * softmax(X) return only the probability at the correct label of each column
 		 */
-		X = rereadX();
+		X.copyFrom(X_backup);
 		FloatMat maxProbs = new FloatMat(1, COL, false);
 		Thrust.batch_softmax_at_label(X, maxProbs, labelsDevice);
-		GpuUtil.checkGold(maxProbs, "gold_softmax_labeled", "softmax(correct label)", TOL);
+		kit.checkGold(maxProbs, "gold_batch_softmax_at_label");
+		kit.checkGold(X, X_backup, "input X shouldn't be changed");
 		
 		// compute sum of log likelihood
-		float logProb = Thrust.log_sum(maxProbs);
-		float goldLogProb = new CsvReader("gold_log_prob.txt").readFloatVec(true)[0];
+		kit.checkGold(Thrust.log_sum(maxProbs), "gold_log_prob", "Sum of log probs");
 		
-		PP.p("[log likelihood] " + 
-				(Math.abs(goldLogProb - logProb) < TOL ? "PASS" : "FAIL"));
-		
-		X.destroy();	maxProbs.destroy();
-
-		/**
+		/*
 		 * Label where the maximum probability occurs
 		 */
-		X = rereadX();
+		X.copyFrom(X_backup);
 		IntPointer reusedPtr = Thrust.malloc_device_int(COL);
 		final int dummyOffset = 766;
 		int outLabels[] = new int[COL + dummyOffset]; // 66 dummy offset
 		Thrust.best_label(X, reusedPtr, outLabels, dummyOffset);
-		int[] goldLabels = new CsvReader("gold_best_labels.txt").readIntVec(true);
+		int[] goldLabels = kit.loadInts("gold_best_labels");
+		
 		// checkGold
 		int fault = -1; // if stays -1, then test passes
 		for (int i = 0; i < COL; i ++)
@@ -76,16 +97,5 @@ public class SoftmaxTest
 			PP.p("[best label]: FAIL", fault);
 		else
 			PP.p("[best label]: PASS");
-			
-		
-		Thrust.free_device(labelsDevice);
-		Thrust.free_device(reusedPtr);
-		X.destroy();;
-	}
-	
-	private static FloatMat rereadX()
-	{
-		CsvReader csv = new CsvReader("input_X.txt");
-		return new FloatMat(csv.readFloatVec(true), ROW, COL);
 	}
 }

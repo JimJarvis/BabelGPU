@@ -423,7 +423,7 @@ public class Thrust
     }
 
     /**
-     * Combines babel_batch_id_minus_softmax with babel_log_prob
+     * Combines batch_softmax_minus_id with log_sum
 	 * @param x intrusive: x will be changed unless 'out' is specified
      * @param outLogProb records log probability at the correct label of each column
      * 			can be used as temporary storage.

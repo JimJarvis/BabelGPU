@@ -21,17 +21,21 @@ dlmwrite(loc('input_Labels'), Labels);
 
 % softmax() full
 res = batch_softmax(X, row, col);
-dlm(res, 'gold_softmax_full');
+dlm(res, 'gold_batch_softmax');
+
+% softmax() - id
+res = - batch_id_softmax(X, row, col, Labels);
+dlm(res, 'gold_batch_softmax_minus_id');
 
 % softmax() for only the correct label
 res = batch_softmax(X, row, col, Labels);
-dlm(res, 'gold_softmax_labeled');
+dlm(res, 'gold_batch_softmax_at_label');
 
 % sum of log likelihood
 dlm(sum(log(res)), 'gold_log_prob');
 
 % The best labels from X
-[~, labelIdx] = max(reshape(Labels, row, col), [], 1);
+[~, labelIdx] = max(reshape(X, row, col), [], 1);
 labelIdx = labelIdx - 1;
 dlmwrite(loc('gold_best_labels'), labelIdx);
 

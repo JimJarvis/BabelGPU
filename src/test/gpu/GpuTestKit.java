@@ -1,27 +1,124 @@
 package test.gpu;
 
+import static org.junit.Assert.*;
+import com.googlecode.javacpp.IntPointer;
 import gpu.*;
 import utils.*;
 
 public class GpuTestKit
 {
+	private String sessionName;
+	public static float TOL = 1e-9f;
+	private CsvReader csv;
+	
+	public GpuTestKit(String sessionName)
+	{
+		this.sessionName = sessionName;
+	}
+
+	public static void systemInit()
+	{
+		GpuBlas.init();
+		GpuUtil.enableExceptions();
+		PP.setPrecision(3);
+		PP.setScientific(true);
+	}
+	
+	/**
+	 * Always in the folder 'matlab_test/' which locates in 'bin/'
+	 */
+	private void newReader(String file)
+	{
+		csv = new CsvReader("matlab_test/" + sessionName + "_" + file + ".txt");
+	}
+
+	public int[] loadInts(String file)
+	{
+		newReader(file);
+		return csv.readIntVec(true);
+	}
+	
+	/**
+	 * Load int array, say 'labels', directly to GPU
+	 */
+	public IntPointer loadIntGpu(String file)
+	{
+		return Thrust.copy_host_to_device(loadInts(file));
+	}
+	
+	public FloatMat loadFloatMat(String file, int row, int col)
+	{
+		newReader(file);
+		FloatMat x = new FloatMat(csv.readFloatVec(true), row, col);
+		x.toDevice(true);
+		return x;
+	}
+	
+	public float[] loadFloats(String file)
+	{
+		newReader(file);
+		return csv.readFloatVec(true);
+	}
+	
+	/**
+	 * Malloc an int array on GPU
+	 */
+	public static IntPointer createIntGpu(int size)
+	{
+		return Thrust.malloc_device_int(size);
+	}
 
 	/**
 	 * Check the gold standard generated from Matlab
 	 * Assume the goldFile has extension ".txt" and reside in bin/matlab_test
-	 * @param testName
+	 * @param goldFile must be prefixed with 'gold_'
 	 * @param tol tolerance of error
 	 */
-	public static void checkGold(FloatMat gpu, String goldFile, String testName, float tol)
+	public void checkGold(FloatMat gpu, String goldFile, String description)
 	{
-		CsvReader csv = new CsvReader("matlab_test/" + goldFile + ".txt");
+		newReader(goldFile);
 		float[][] Gold = csv.readFloatMat();
 		float[][] Host = gpu.deflatten();
 		
 		float diff = CpuUtil.matAvgDiff(Gold, Host);
-		PP.setPrecision(3);
-		PP.setScientific(true);
-		
-		PP.p("["+testName+"]", diff < tol ? "PASS:" : "FAIL:", diff);
+		PP.p("["+description+"]", diff < TOL ? "PASS:" : "FAIL:", diff);
+		assertTrue("Doesn't agree with Gold", diff < TOL);
+	}
+	public void checkGold(FloatMat gpu, String goldFile)
+	{
+		checkGold(gpu, goldFile, goldFile.substring(5));
+	}
+	
+	/**
+	 * Simply compare two numbers. The files contains one number
+	 */
+	public void checkGold(float res, String goldFile, String description)
+	{
+		newReader(goldFile);
+		float gold = csv.readFloatVec(1)[0];
+		float diff = Math.abs(gold - res);
+		PP.p("["+description+"]", diff < TOL ? "PASS" : "FAIL");
+		if (diff > TOL)
+    	{
+			PP.p("yours=", res, "  but gold=", gold);
+			fail("Doesn't agree with Gold");
+    	}
+	}
+	
+	/**
+	 * Compare two FloatMats
+	 */
+	public void checkGold(FloatMat x, FloatMat gold, String description)
+	{
+		FloatMat diffMat = new FloatMat(x);
+		GpuBlas.add(x, gold, diffMat , 1, -1);
+		float diff = diffMat .abs().sum() / diffMat .size();
+		PP.p("["+description+"]", diff < TOL ? "PASS:" : "FAIL:", diff);
+		assertTrue("Doesn't agree with Gold", diff < TOL);
+	}
+	
+	public void printSessionTitle()
+	{
+		PP.pTitledSectionLine(sessionName + " Test", "%", 20);
 	}
 }
