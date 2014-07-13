@@ -224,19 +224,19 @@ void test_set_row_col()
 
 
 // ****************** Babel specific tests ******************
-void test_id_minus_softmax()
+void test_softmax_minus_id()
 {
 	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
 	device_vector<float> D = getDf(x, 7);
 	pr(gpu_product_float(range));
 	pr(gpu_min_float(range));
 
-	gpu_id_minus_softmax(range, 3);
+	gpu_softmax_minus_id(range, &D[0], 3);
 	printD(D);
 }
 
 // babel mini-batch (I[] - softmax)
-void test_id_minus_softmax_batch()
+void test_softmax_minus_id_batch()
 {
 	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
 	device_vector<float> D = getDf(x, 12);
@@ -245,13 +245,13 @@ void test_id_minus_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	lp = offset(lp, 2);
 
-	gpu_batch_id_minus_softmax(&D[0], 4, 3, lp);
+	gpu_batch_softmax_minus_id(&D[0], 4, 3, &D[0], lp);
 	printD(D, 4);
 
 	D = getDf(x, 12);
 	device_vector<float> outLogProb(3);
 	float sumLogProb =
-		gpu_batch_id_minus_softmax_log_prob(
+		gpu_batch_softmax_minus_id_log_prob(
 			&D[0], 4, 3, &outLogProb[0], lp);
 	printD(D, 4);
 	printD(outLogProb, 1);
@@ -275,7 +275,7 @@ void test_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	D = getDf(x, 12);
 	device_vector<float> out(4);
-	gpu_batch_softmax(&D[0], 3, 4, &out[0], lp);
+	gpu_batch_softmax_at_label(&D[0], 3, 4, &out[0], lp);
 	printD(out, 1);
 	printf("Log likelihood sum: %f\n", 
 		   gpu_log_sum(&out[0], out.size()));
@@ -348,7 +348,7 @@ int main()
 {
 	test_tranpose();
 	test_sigmoid();
-	test_id_minus_softmax_batch();
+	test_softmax_minus_id_batch();
 	test_softmax_batch();
 	test_set_row_col();
 	test_exp_double();

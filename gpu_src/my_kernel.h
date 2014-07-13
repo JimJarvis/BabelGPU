@@ -107,11 +107,13 @@ namespace MyGpu
                 thrust::raw_pointer_cast(in), row, col, thrust::raw_pointer_cast(out));
     }
 
-    /**********************************************/
-    /* Softmax/labeling related kernels  */
-    /**********************************************/
+    /**********************************************
+    * Softmax/labeling related kernels  *
+	All __device__ functions should be prefixed with 'device_'
+	All __global__ kernel<<< >>> functions should be prefixed with 'kernel_'
+    **********************************************/
     __inline__ __device__
-	float kernel_max(float *begin, int size)
+	float device_max(float *begin, int size)
 	{
 		// find max
 		float mx = -1e20;
@@ -120,99 +122,11 @@ namespace MyGpu
 		return mx;
 	}
 
-    // Used in 2 other kernels
-    // return the probability (before log()) at the correct label
-    __inline__ __device__
-	float kernel_id_minus_softmax(int idx, float *begin, int row, int col, int *labels)
+	__inline__ __device__
+	float device_softmax(float *begin, int row, int col, float *out)
 	{
-		begin += idx * row; // beginning of a column
-
 		// find max
-		float mx = kernel_max(begin, row);
-		// subtract max from each and do exp
-		// also compute sum of these exp
-		float sum = 0;
-		for (int i = 0; i < row; i++)
-		{
-			begin[i] = exp(begin[i] - mx);
-			sum += begin[i];
-		}
-		// -exp(..)/sum
-		for (int i = 0; i < row; i++)
-			begin[i] /= -sum;
-
-		// Add 1 to the identity function
-		float probCorrect = -begin[labels[idx]];
-		++begin[labels[idx]];
-		return probCorrect;
-	}
-
-    ///// mini-batch I [y==j] - softmax(alpha_vec)
-    __global__
-	void kernel_batch_id_minus_softmax(
-			float *begin, int row, int col, int *labels)
-	{
-		ThreadIndex1D(idx, col);
-
-		kernel_id_minus_softmax(idx, begin, row, col, labels);
-	}
-
-    inline void gpu_batch_id_minus_softmax(
-            device_ptr<float> begin, int row, int col, int *labels)
-    {
-        if (col == 1) // use the thrust version
-        {
-            int label;
-            cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-            gpu_id_minus_softmax(begin, row, label);
-        }
-        else // real batch
-        {
-            dim3 gridDim, blockDim;
-            setKernelDim1D(col, gridDim, blockDim);
-
-            kernel_batch_id_minus_softmax << <gridDim, blockDim >> >(
-                    thrust::raw_pointer_cast(begin), row, col, labels);
-        }
-    }
-
-    ///// id-softmax AND return the sum of log probability.
-    // combine gpu_batch_id_minus_softmax and gpu_log_prob
-    __global__
-	void kernel_batch_id_minus_softmax_log_prob(
-			float *begin, int row, int col, float *outLogProb, int *labels)
-	{
-		ThreadIndex1D(idx, col);
-
-		outLogProb[idx] = log(
-				kernel_id_minus_softmax(idx, begin, row, col, labels));
-	}
-
-    // Computes the id - softmax() for each column, and return the sum of the log prob at the correct labels
-    // writes the log probability at the correct labels to 'outLogProb'
-    inline float gpu_batch_id_minus_softmax_log_prob(
-            device_ptr<float> begin, int row, int col, device_ptr<float> outLogProb, int *labels)
-    {
-        dim3 gridDim, blockDim;
-        setKernelDim1D(col, gridDim, blockDim);
-
-        kernel_batch_id_minus_softmax_log_prob << <gridDim, blockDim >> >(
-                thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outLogProb), labels);
-
-        return gpu_sum_float(outLogProb, col);
-    }
-
-    ///// mini-batch softmax(alpha_vec)
-    __global__
-	void kernel_batch_softmax(float *begin, int row, int col, float *out)
-	{
-		ThreadIndex1D(idx, col);
-
-		begin += idx * row; // beginning of a column
-		if (out != begin) out += idx * row;
-
-		// find max
-		float mx = kernel_max(begin, row);
+		float mx = device_max(begin, row);
 		// subtract max from each and do exp
 		// also compute sum of these exp
 		float sum = 0;
@@ -226,21 +140,31 @@ namespace MyGpu
 			out[i] /= sum;
 	}
 
-    // Computes the mini-batch softmax probability distribution for the full matrix
-    inline void gpu_batch_softmax(
-            device_ptr<float> begin, int row, int col, device_ptr<float> out)
-    {
-        if (col == 1) // use the thrust version
-            gpu_softmax(begin, row);
-        else // real batch
-        {
-            dim3 gridDim, blockDim;
-            setKernelDim1D(col, gridDim, blockDim);
+	///// mini-batch softmax(alpha_vec)
+	__global__
+	void kernel_batch_softmax(float *begin, int row, int col, float *out)
+	{
+		ThreadIndex1D(idx, col);
+		begin += idx * row; // beginning of a column
+		if (out != begin) out += idx * row;
+		device_softmax(begin, row, col, out);
+	}
 
-            kernel_batch_softmax << <gridDim, blockDim >> >(
-                    thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out));
-        }
-    }
+	// Computes the mini-batch softmax probability distribution for the full matrix
+	inline void gpu_batch_softmax(
+		device_ptr<float> begin, int row, int col, device_ptr<float> out)
+	{
+		if (col == 1) // use the thrust version
+			gpu_softmax(begin, row, out);
+		else // real batch
+		{
+			dim3 gridDim, blockDim;
+			setKernelDim1D(col, gridDim, blockDim);
+
+			kernel_batch_softmax << <gridDim, blockDim >> >(
+				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out));
+		}
+	}
 
 	inline void gpu_batch_softmax(
 		device_ptr<float> begin, int row, int col)
@@ -248,17 +172,18 @@ namespace MyGpu
 		gpu_batch_softmax(begin, row, col, begin);
 	}
 
-    ///// mini-batch softmax(alpha_vec) that writes to 'out' only the probability at the correct label
-    __global__
+	///// mini-batch softmax(alpha_vec) that writes to 'outProb' only the probability at the correct label
+	// Non-intrusive: doesn't change 'begin'
+	__global__
 	void kernel_batch_softmax(
-			float *begin, int row, int col, float *outProb, int *labels)
+		float *begin, int row, int col, float *outProb, int *labels)
 	{
 		ThreadIndex1D(idx, col);
 
 		begin += idx * row; // beginning of a column
 
 		// find max
-		float mx = kernel_max(begin, row);
+		float mx = device_max(begin, row);
 		// subtract max from each and do exp
 		// also compute sum of these exp
 		float sum = 0;
@@ -273,30 +198,116 @@ namespace MyGpu
 		outProb[idx] = numerator / sum;
 	}
 
-    // Computes the mini-batch softmax probability distribution for the full matrix
-    // writes to 'out' only the probability at the correct label
-    // int *labels is on GPU
-    inline void gpu_batch_softmax(
-            device_ptr<float> begin, int row, int col, device_ptr<float> outProb, int *labels)
+	// writes to 'outProb' only the probability at the correct label
+	// int *labels is on GPU
+	// input data 'begin' won't be changed
+	inline void gpu_batch_softmax_at_label(
+		device_ptr<float> begin, int row, int col, device_ptr<float> outProb, int *labels)
+	{
+		if (col == 1) // use the thrust version
+		{
+			int label;
+			cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
+			gpu_softmax_at_label(begin, row, label, outProb);
+		}
+		else // real batch
+		{
+			dim3 gridDim, blockDim;
+			setKernelDim1D(col, gridDim, blockDim);
+
+			kernel_batch_softmax << <gridDim, blockDim >> >(
+				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outProb), labels);
+		}
+	}
+
+    // Used in 2 other kernels
+    // return the probability (before log()) at the correct label
+    __inline__ __device__
+	float kernel_softmax_minus_id(int idx, float *begin, int row, int col, float *out, int *labels)
+	{
+		begin += idx * row; // beginning of a column
+		if (out != begin) out += idx * row;
+
+		device_softmax(begin, row, col, out);
+
+		// Add 1 to the identity function
+		float probCorrect = out[labels[idx]];
+		-- out[labels[idx]];
+		return probCorrect;
+	}
+
+    ///// mini-batch softmax(alpha_vec) - I [y==j]
+    __global__
+	void kernel_batch_softmax_minus_id(
+			float *begin, int row, int col, float *out, int *labels)
+	{
+		ThreadIndex1D(idx, col);
+
+		kernel_softmax_minus_id(idx, begin, row, col, out, labels);
+	}
+
+    inline void gpu_batch_softmax_minus_id(
+            device_ptr<float> begin, int row, int col, device_ptr<float> out, int *labels)
     {
         if (col == 1) // use the thrust version
         {
             int label;
             cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-            gpu_softmax(begin, row, label, outProb);
+            gpu_softmax_minus_id(begin, row, out, label);
         }
         else // real batch
         {
             dim3 gridDim, blockDim;
             setKernelDim1D(col, gridDim, blockDim);
 
-            kernel_batch_softmax << <gridDim, blockDim >> >(
-                    thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outProb), labels);
+            kernel_batch_softmax_minus_id << <gridDim, blockDim >> >(
+				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), labels);
         }
     }
+	// Overload: in == out
+	inline void gpu_batch_softmax_minus_id(
+		device_ptr<float> begin, int row, int col, float *out, int *labels)
+	{
+		gpu_batch_softmax_minus_id(begin, row, col, begin, labels);
+	}
 
-    ///// Fill 'outLabels' with the label corresponding to the maximum probability of a column
+    ///// softmax - id AND return the sum of log probability.
+    // combine gpu_batch_softmax_minus_id and gpu_log
     __global__
+	void kernel_batch_softmax_minus_id_log_prob(
+			float *begin, int row, int col, float *out, float *outLogProb, int *labels)
+	{
+		ThreadIndex1D(idx, col);
+
+		outLogProb[idx] = log(
+				kernel_softmax_minus_id(idx, begin, row, col, out, labels));
+	}
+
+    // Computes the softmax() - id for each column, and return the sum of the log prob at the correct labels
+    // writes the log probability at the correct labels to 'outLogProb'
+    inline float gpu_batch_softmax_minus_id_log_prob(
+            device_ptr<float> begin, int row, int col, device_ptr<float> out, 
+			device_ptr<float> outLogProb, int *labels)
+    {
+        dim3 gridDim, blockDim;
+        setKernelDim1D(col, gridDim, blockDim);
+
+        kernel_batch_softmax_minus_id_log_prob << <gridDim, blockDim >> >(
+                thrust::raw_pointer_cast(begin), row, col, 
+				thrust::raw_pointer_cast(out),thrust::raw_pointer_cast(outLogProb), labels);
+
+        return gpu_sum_float(outLogProb, col);
+    }
+	// Overload: in == out
+	inline float gpu_batch_softmax_minus_id_log_prob(
+		device_ptr<float> begin, int row, int col,
+		device_ptr<float> outLogProb, int *labels)
+	{
+		return gpu_batch_softmax_minus_id_log_prob(begin, row, col, begin, outLogProb, labels);
+	}
+
+	///// Fill 'outLabels' with the label corresponding to the maximum probability of a column
+	__global__
 	void kernel_best_label(
 			float *begin, int row, int col, int *outLabels)
 	{

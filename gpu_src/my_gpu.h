@@ -359,34 +359,31 @@ namespace MyGpu
 	GEN_raw_pointer_func(double);
 
 
-/**********************************************/
-/* More sophisticated functions for machine learning  */
-/**********************************************/
+	/**********************************************/
+	/* More sophisticated functions for machine learning  */
+	/**********************************************/
 #define GEN_gpu_softmax(Ftype) \
-	/* I [y==j] - softmax(alpha_vec) */ \
-	inline void gpu_id_minus_softmax(device_ptr<Ftype> begin, int size, int label) \
-	{ \
-		Ftype mx = gpu_max_##Ftype(begin, size); \
-		gpu_exp_##Ftype(begin, size, 1, -mx); \
-		Ftype s = gpu_sum_##Ftype(begin, size); \
-		gpu__##Ftype(begin, size, -1.0 / s, 0); \
-		++ *(begin + label);  /* when at id, x = 1 - x */ \
-	} \
 	/* softmax(alpha_vec) */ \
-	inline void gpu_softmax(device_ptr<Ftype> begin, int size) \
+	inline void gpu_softmax(device_ptr<Ftype> begin, int size, device_ptr<Ftype> out) \
 	{ \
 		Ftype mx = gpu_max_##Ftype(begin, size); \
-		gpu_exp_##Ftype(begin, size, 1, -mx); \
-		Ftype s = gpu_sum_##Ftype(begin, size); \
-		gpu__##Ftype(begin, size, 1.0 / s, 0); \
+		gpu_exp_##Ftype(begin, size, out, 1, -mx); \
+		Ftype s = gpu_sum_##Ftype(out, size); \
+		gpu__##Ftype(out, size, 1.0 / s, 0); \
 	} \
-	/* softmax(alpha_vec) at only the correct label. 'out' is a 1 float device_ptr */ \
-	inline void gpu_softmax(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> out) \
+	/* softmax(alpha_vec) - I [y==j] */ \
+	inline void gpu_softmax_minus_id(device_ptr<Ftype> begin, int size, device_ptr<Ftype> out, int label) \
+	{ \
+		gpu_softmax(begin, size, out); \
+		-- *(out + label);  /* when at id, x -= 1 */ \
+	} \
+	/* softmax(alpha_vec) at only the correct label. 'outProb' is a 1 float device_ptr. 'begin' data won't be changed */ \
+	inline void gpu_softmax_at_label(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> outProb) \
 	{ \
 		Ftype mx = gpu_max_##Ftype(begin, size); \
 		Ftype expSum = thrust::transform_reduce(begin, begin + size, \
-		functor_exp_##Ftype##_1(-mx), 0.0, thrust::plus<Ftype>()); \
-		out[0] = exp(begin[label] - mx) / expSum; \
+			functor_exp_##Ftype##_1(-mx), 0.0, thrust::plus<Ftype>()); \
+		outProb[0] = exp(begin[label] - mx) / expSum; \
 	}
 
 	GEN_gpu_softmax(float);
@@ -401,17 +398,9 @@ namespace MyGpu
 										functor_log_float(), 0.0, thrust::plus<float>());
 	}
 
-	///// Second way to implement (id - softmax()), exactly the same numerical result. 
-	struct functor_id_minus_softmax_2
-	{
-		const float b;
-		functor_id_minus_softmax_2(float _b = 0) : b(_b) {}
-		__host__ __device__ float operator()(const float& x) const { return -exp(x - b); }
-	};
-
-	// I [y==j] - softmax(alpha_vec)
+	// softmax(alpha_vec) - I [y==j]
 	// A = exp(A - (mx + log(sum(exp(A - mx))))
-	inline void gpu_id_minus_softmax_2(device_ptr<float> begin, int size, int id)
+	inline void gpu_softmax_minus_id_2(device_ptr<float> begin, int size, int id)
 	{
 		float mx = gpu_max_float(begin, size);
 
@@ -419,8 +408,8 @@ namespace MyGpu
 			thrust::transform_reduce(begin, begin + size,
 			functor_exp_float_1(-mx), 0.0, thrust::plus<float>()));
 
-		thrust::transform(begin, begin + size, begin, functor_id_minus_softmax_2(mx + logsum));
-		++ *(begin + id);  // when at id, x = 1 - x
+		gpu_exp_float(begin, size, 1, -(mx + logsum));
+		-- *(begin + id);  // when at id, x -= 1
 	}
 }
 #endif // my_thrust__
