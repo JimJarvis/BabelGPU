@@ -34,43 +34,44 @@ public class SoftmaxTest
 		IntPointer labelsDevice = kit.loadIntGpu("input_Labels");
 
 		/*
-		 * softmax(X) in full
+		 * softmax(X) intrusive
 		 */
 		Thrust.batch_softmax(X);
 		kit.checkGold(X, "gold_batch_softmax");
 
 		/*
-		 * softmax(X) in full
+		 * softmax(X) non-intrusive
 		 */
 		X.copyFrom(X_backup);
 		FloatMat X_out = new FloatMat(X);
 		Thrust.batch_softmax(X, X_out);
 		kit.checkGold(X_out, "gold_batch_softmax");
-		kit.checkGold(X, X_backup, "input X shouldn't be changed");
+		kit.checkGold(X, X_backup, "batch_softmax: X shouldn't be changed");
 		
 		/*
-		 * Softmax(X) - id
+		 * Softmax(X) - id intrusive
 		 */
 		X.copyFrom(X_backup);
 		Thrust.batch_softmax_minus_id(X, labelsDevice);
 		kit.checkGold(X, "gold_batch_softmax_minus_id");
 
 		/*
-		 * Softmax(X) - id
+		 * Softmax(X) - id non-intrusive
 		 */
 		X.copyFrom(X_backup);
 		Thrust.batch_softmax_minus_id(X, X_out, labelsDevice);
 		kit.checkGold(X_out, "gold_batch_softmax_minus_id");
-		kit.checkGold(X, X_backup, "input X shouldn't be changed");
+		kit.checkGold(X, X_backup, "softmax - id: X shouldn't be changed");
 
 		/*
 		 * softmax(X) return only the probability at the correct label of each column
+		 * non-intrusive
 		 */
 		X.copyFrom(X_backup);
 		FloatMat maxProbs = new FloatMat(1, COL, false);
 		Thrust.batch_softmax_at_label(X, maxProbs, labelsDevice);
 		kit.checkGold(maxProbs, "gold_batch_softmax_at_label");
-		kit.checkGold(X, X_backup, "input X shouldn't be changed");
+		kit.checkGold(X, X_backup, "softmax_at_label: X shouldn't be changed");
 		
 		// compute sum of log likelihood
 		kit.checkGold(Thrust.log_sum(maxProbs), "gold_log_prob", "Sum of log probs");
@@ -97,5 +98,6 @@ public class SoftmaxTest
 			PP.p("[best label]: FAIL", fault);
 		else
 			PP.p("[best label]: PASS");
+		kit.checkGold(X, X_backup, "best_labels: X shouldn't be changed");
 	}
 }

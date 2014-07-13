@@ -124,6 +124,9 @@ public class Natives
     public static native float gpu_sum_float(@ByVal FloatDevicePointer begin, int size);
     public static native float gpu_product_float(@ByVal FloatDevicePointer begin, int size);
     
+    // Sum of log(x)
+    public static native float gpu_log_sum(@ByVal FloatDevicePointer begin, int size);
+    
     /**
      * Element-wise multiplication
      */
@@ -208,20 +211,9 @@ public class Natives
     public static native void gpu_batch_softmax_minus_id(
     		@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out, @ByPtr IntPointer labels);
     
-    // combine babel_batch_id_minus_softmax with babel_log_prob
-    public static native float gpu_batch_softmax_minus_id_log_prob(
-    		@ByVal FloatDevicePointer begin, int row, int col, 
-    		@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
-    public static native float gpu_batch_softmax_minus_id_log_prob(
-    		@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out,
-    		@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
-    
     // The best labels, non-intrusive
     public static native void gpu_best_label(
     		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer outLabels);
-    
-    // Sum of log probability from the correct label
-    public static native float gpu_log_sum(@ByVal FloatDevicePointer begin, int size);
     
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);

@@ -247,15 +247,6 @@ void test_softmax_minus_id_batch()
 
 	gpu_batch_softmax_minus_id(&D[0], 4, 3, &D[0], lp);
 	printD(D, 4);
-
-	D = getDf(x, 12);
-	device_vector<float> outLogProb(3);
-	float sumLogProb =
-		gpu_batch_softmax_minus_id_log_prob(
-			&D[0], 4, 3, &outLogProb[0], lp);
-	printD(D, 4);
-	printD(outLogProb, 1);
-	printf("Sum of log prob %f\n", sumLogProb);
 }
 
 

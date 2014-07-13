@@ -421,26 +421,6 @@ public class Thrust
     	Natives.gpu_batch_softmax_at_label(
     			x.getThrustPointer(), x.row, x.col, outProb.getThrustPointer(), labels);
     }
-
-    /**
-     * Combines batch_softmax_minus_id with log_sum
-	 * @param x intrusive: x will be changed unless 'out' is specified
-     * @param outLogProb records log probability at the correct label of each column
-     * 			can be used as temporary storage.
-     * @return sum(outLogProb)
-     */
-    public static float batch_softmax_minus_id_log_prob(
-    		FloatMat x, FloatMat outLogProb, IntPointer labels)
-    {
-    	return Natives.gpu_batch_softmax_minus_id_log_prob(
-    			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
-    }
-    public static float batch_softmax_minus_id_log_prob(
-    		FloatMat x, FloatMat out, FloatMat outLogProb, IntPointer labels)
-    {
-    	return Natives.gpu_batch_softmax_minus_id_log_prob(
-    			x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), outLogProb.getThrustPointer(), labels);
-    }
     
     /**
      * Minibatch: get the labels where the maximum probability occurs

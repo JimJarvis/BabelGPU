@@ -271,41 +271,6 @@ namespace MyGpu
 		gpu_batch_softmax_minus_id(begin, row, col, begin, labels);
 	}
 
-    ///// softmax - id AND return the sum of log probability.
-    // combine gpu_batch_softmax_minus_id and gpu_log
-    __global__
-	void kernel_batch_softmax_minus_id_log_prob(
-			float *begin, int row, int col, float *out, float *outLogProb, int *labels)
-	{
-		ThreadIndex1D(idx, col);
-
-		outLogProb[idx] = log(
-				kernel_softmax_minus_id(idx, begin, row, col, out, labels));
-	}
-
-    // Computes the softmax() - id for each column, and return the sum of the log prob at the correct labels
-    // writes the log probability at the correct labels to 'outLogProb'
-    inline float gpu_batch_softmax_minus_id_log_prob(
-            device_ptr<float> begin, int row, int col, device_ptr<float> out, 
-			device_ptr<float> outLogProb, int *labels)
-    {
-        dim3 gridDim, blockDim;
-        setKernelDim1D(col, gridDim, blockDim);
-
-        kernel_batch_softmax_minus_id_log_prob << <gridDim, blockDim >> >(
-                thrust::raw_pointer_cast(begin), row, col, 
-				thrust::raw_pointer_cast(out),thrust::raw_pointer_cast(outLogProb), labels);
-
-        return gpu_sum_float(outLogProb, col);
-    }
-	// Overload: in == out
-	inline float gpu_batch_softmax_minus_id_log_prob(
-		device_ptr<float> begin, int row, int col,
-		device_ptr<float> outLogProb, int *labels)
-	{
-		return gpu_batch_softmax_minus_id_log_prob(begin, row, col, begin, outLogProb, labels);
-	}
-
 	///// Fill 'outLabels' with the label corresponding to the maximum probability of a column
 	__global__
 	void kernel_best_label(
