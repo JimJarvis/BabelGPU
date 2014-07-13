@@ -7,8 +7,8 @@ main="gpu/MinibatchTest"
 main="deep/IniterTest"
 main="gpu/MiscTest"
 
-units="test.deep.SimpleSigmoidNetTest test.deep.ElementComputeLayersTest"
 units="test.gpu.SoftmaxTest"
+units="test.deep.SimpleSigmoidNetTest test.deep.ElementComputeLayersTest"
 
 
 cp gpu_src/*.h bin/gpu/

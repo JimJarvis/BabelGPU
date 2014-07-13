@@ -10,6 +10,8 @@ public abstract class ComputeUnit extends Unit
 	public int outDim;
 	// Do we include bias units?
 	protected boolean hasBias;
+	// Do we store input/output data separately?
+	protected boolean mergeIO = false;
 
 	/**
 	 * ALWAYS equal to prev.output
@@ -46,6 +48,16 @@ public abstract class ComputeUnit extends Unit
 		this(name, outDim, true);
 	}
 	
+	/**
+	 * Forward propagation abstraction
+	 */
+	public abstract void forward(); 
+	
+	/**
+	 * Backward propagation abstraction
+	 */
+	public abstract void backward();
+	
 	public void setup()
 	{
 		setupLink();
@@ -60,8 +72,13 @@ public abstract class ComputeUnit extends Unit
 	
 	protected void setupOutput()
 	{
-		this.output = new DataUnit("out[" + this.name + "]", new FloatMat(outDim, input.batchSize()));
-		this.output.initGradient();
+		if (mergeIO) // use memory efficiently
+			this.output = this.input;
+		else
+		{
+			this.output = new DataUnit("out[" + this.name + "]", new FloatMat(outDim, input.batchSize()));
+			this.output.initGradient();
+		}
 	}
 	
 	/**
@@ -80,12 +97,13 @@ public abstract class ComputeUnit extends Unit
 	}
 	
 	/**
-	 * Forward propagation abstraction
+	 * 'mergeIO' flag: whether or not 'input' and 'output' will be distinct memory places. 
+	 * default false. If set to true, 'input' and 'output' will essentially be the same, 
+	 * so changes will be made in-place (intrusively). 
+	 * Turn to true for cases where input.data would never be needed again. Optimize memory usage
+	 * Needs to be called BEFORE setup()
 	 */
-	public abstract void forward(); 
+	public void setMergeIO(boolean mergeIO) { this.mergeIO = mergeIO; }
 	
-	/**
-	 * Backward propagation abstraction
-	 */
-	public abstract void backward();
+	public boolean isMergeIO() {	return this.mergeIO;	}
 }
