@@ -45,7 +45,7 @@ device_vector<double> getDd(double A[], int len)
 	return D;
 }
 
-// gpu_exp_float() in place transformation
+// gpu_exp<float>() in place transformation
 void test_exp()
 {
 	host_vector<float> A(4);
@@ -55,66 +55,66 @@ void test_exp()
 	A[3] = -PI/3;
 
 	device_vector<float> D = A;
-	pr( gpu_max_float(range) );
+	pr( gpu_max<float>(range) );
 
-	gpu_cos_float(range);
+	gpu_cos<float>(range);
 	printD(D);
 
 	printf("exp\n");
 	printf("x\n");
-	D = A; gpu_exp_float(range, 1, 0); printD(D);
+	D = A; gpu_exp<float>(range, 1, 0); printD(D);
 	printf("0.5 * x\n");
-	D = A; gpu_exp_float(range, 0.5, 0); printD(D);
+	D = A; gpu_exp<float>(range, 0.5, 0); printD(D);
 	printf("x + 3\n");
-	D = A; gpu_exp_float(range, 1, 3); printD(D);
+	D = A; gpu_exp<float>(range, 1, 3); printD(D);
 	printf("0.5 * x + 3\n");
-	D = A; gpu_exp_float(range, 0.5, 3); printD(D);
+	D = A; gpu_exp<float>(range, 0.5, 3); printD(D);
 
 	printf("pow and sqrt\n");
 	printf("x\n");
 	float x[4] = { 25, 100, 16, 1024 };
 	device_vector<float> F = getDf(x, 4);
-	D = F; gpu_pow_float(range, 0.5, 1, 0); printD(D);
-	D = F; gpu_sqrt_float(range, 1, 0); printD(D); // sqrt() should be the same as pow(x, 0.5)
+	D = F; gpu_pow<float>(range, 0.5, 1, 0); printD(D);
+	D = F; gpu_sqrt<float>(range, 1, 0); printD(D); // sqrt() should be the same as pow(x, 0.5)
 	printf("0.7 * x\n");
-	D = F; gpu_pow_float(range, 0.5, 0.7, 0); printD(D);
-	D = F; gpu_sqrt_float(range, 0.7, 0); printD(D);
+	D = F; gpu_pow<float>(range, 0.5, 0.7, 0); printD(D);
+	D = F; gpu_sqrt<float>(range, 0.7, 0); printD(D);
 	printf("x + 4\n");
-	D = F; gpu_pow_float(range, 0.5, 1, 4); printD(D);
-	D = F; gpu_sqrt_float(range, 1, 4); printD(D);
+	D = F; gpu_pow<float>(range, 0.5, 1, 4); printD(D);
+	D = F; gpu_sqrt<float>(range, 1, 4); printD(D);
 	printf("0.7 * x + 4\n");
-	D = F; gpu_pow_float(range, 0.5, 0.7, 4); printD(D);
-	D = F; gpu_sqrt_float(range, 0.7, 4); printD(D);
+	D = F; gpu_pow<float>(range, 0.5, 0.7, 4); printD(D);
+	D = F; gpu_sqrt<float>(range, 0.7, 4); printD(D);
 }
 
 void test_sort_copy_swap()
 {
 	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
 	device_vector<float> D = getDf(x, 7);
-	gpu_sort_float(range);
+	gpu_sort<float>(range);
 	printD(D);
 
 	D = getDf(x, 7);
-	gpu_sort_float(range, -1);
+	gpu_sort<float>(range, -1);
 	printD(D);
 
 	device_vector<float> E(7, -666);
 	printf("Copying E\n");
-	gpu_copy_float(range, &E[0]);
+	gpu_copy<float>(range, &E[0]);
 	printD(E);
-	gpu_fill_float(&E[0], E.size(), -666);
-	gpu_copy_float(&D[2], 3, &E[4]);
+	gpu_fill<float>(&E[0], E.size(), -666);
+	gpu_copy<float>(&D[2], 3, &E[4]);
 	printD(E);
 
 	printf("Swapping E\n");
 	float y[4] = { 400, 300, 200, 100 };
 	D = getDf(y, 4);
-	gpu_swap_float(range, &E[0]);
+	gpu_swap<float>(range, &E[0]);
 	printD(D);
 	printD(E);
 }
 
-// gpu_exp_float with output pointer
+// gpu_exp<float> with output pointer
 void test_exp_out_pointer()
 {
 	host_vector<float> A(4);
@@ -126,18 +126,18 @@ void test_exp_out_pointer()
 	device_vector<float> D = A;
 	device_vector<float> E = A;
 
-	gpu_cos_float(range, &E[0]);
+	gpu_cos<float>(range, &E[0]);
 	printD(E);
 
 	printf("exp\n");
 	printf("x\n");
-	gpu_exp_float(range, &E[0], 1, 0); printD(E);
+	gpu_exp<float>(range, &E[0], 1, 0); printD(E);
 	printf("0.5 * x\n");
-	gpu_exp_float(range, &E[0], 0.5, 0); printD(E);
+	gpu_exp<float>(range, &E[0], 0.5, 0); printD(E);
 	printf("x + 3\n");
-	gpu_exp_float(range, &E[0], 1, 3); printD(E);
+	gpu_exp<float>(range, &E[0], 1, 3); printD(E);
 	printf("0.5 * x + 3\n");
-	gpu_exp_float(range, &E[0], 0.5, 3); printD(E);
+	gpu_exp<float>(range, &E[0], 0.5, 3); printD(E);
 }
 
 void test_exp_double()
@@ -149,61 +149,61 @@ void test_exp_double()
 	A[3] = -PI / 3;
 
 	device_vector<double> D = A;
-	pr(gpu_max_double(range));
+	pr(gpu_max<double>(range));
 
-	gpu_cos_double(range);
+	gpu_cos<double>(range);
 	printD(D);
 
 	printf("exp\n");
 	printf("x\n");
-	D = A; gpu_exp_double(range, 1, 0); printD(D);
+	D = A; gpu_exp<double>(range, 1, 0); printD(D);
 	printf("0.5 * x\n");
-	D = A; gpu_exp_double(range, 0.5, 0); printD(D);
+	D = A; gpu_exp<double>(range, 0.5, 0); printD(D);
 	printf("x + 3\n");
-	D = A; gpu_exp_double(range, 1, 3); printD(D);
+	D = A; gpu_exp<double>(range, 1, 3); printD(D);
 	printf("0.5 * x + 3\n");
-	D = A; gpu_exp_double(range, 0.5, 3); printD(D);
+	D = A; gpu_exp<double>(range, 0.5, 3); printD(D);
 
 	printf("pow and sqrt\n");
 	printf("x\n");
 	double x[4] = { 25, 100, 16, 1024 };
 	device_vector<double> F = getDd(x, 4);
-	D = F; gpu_pow_double(range, 0.5, 1, 0); printD(D);
-	D = F; gpu_sqrt_double(range, 1, 0); printD(D); // sqrt() should be the same as pow(x, 0.5)
+	D = F; gpu_pow<double>(range, 0.5, 1, 0); printD(D);
+	D = F; gpu_sqrt<double>(range, 1, 0); printD(D); // sqrt() should be the same as pow(x, 0.5)
 	printf("0.7 * x\n");
-	D = F; gpu_pow_double(range, 0.5, 0.7, 0); printD(D);
-	D = F; gpu_sqrt_double(range, 0.7, 0); printD(D);
+	D = F; gpu_pow<double>(range, 0.5, 0.7, 0); printD(D);
+	D = F; gpu_sqrt<double>(range, 0.7, 0); printD(D);
 	printf("x + 4\n");
-	D = F; gpu_pow_double(range, 0.5, 1, 4); printD(D);
-	D = F; gpu_sqrt_double(range, 1, 4); printD(D);
+	D = F; gpu_pow<double>(range, 0.5, 1, 4); printD(D);
+	D = F; gpu_sqrt<double>(range, 1, 4); printD(D);
 	printf("0.7 * x + 4\n");
-	D = F; gpu_pow_double(range, 0.5, 0.7, 4); printD(D);
-	D = F; gpu_sqrt_double(range, 0.7, 4); printD(D);
+	D = F; gpu_pow<double>(range, 0.5, 0.7, 4); printD(D);
+	D = F; gpu_sqrt<double>(range, 0.7, 4); printD(D);
 }
 
 void test_sort_copy_swap_double()
 {
 	double x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
 	device_vector<double> D = getDd(x, 7);
-	gpu_sort_double(range);
+	gpu_sort<double>(range);
 	printD(D);
 
 	D = getDd(x, 7);
-	gpu_sort_double(range, -1);
+	gpu_sort<double>(range, -1);
 	printD(D);
 
 	device_vector<double> E(7, -666);
 	printf("Copying E\n");
-	gpu_copy_double(range, &E[0]);
+	gpu_copy<double>(range, &E[0]);
 	printD(E);
-	gpu_fill_double(&E[0], E.size(), -666);
-	gpu_copy_double(&D[2], 3, &E[4]);
+	gpu_fill<double>(&E[0], E.size(), -666);
+	gpu_copy<double>(&D[2], 3, &E[4]);
 	printD(E);
 
 	printf("Swapping E\n");
 	double y[4] = { 400, 300, 200, 100 };
 	D = getDd(y, 4);
-	gpu_swap_double(range, &E[0]);
+	gpu_swap<double>(range, &E[0]);
 	printD(D);
 	printD(E);
 }
@@ -213,12 +213,12 @@ void test_set_row_col()
 {
 	float x[12] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6, 2.5, 1.7, -0.2, -0.9, 0.4 };
 	device_vector<float> D = getDf(x, 12);
-	gpu_fill_col_float(&D[0], 4, 3, -2, 600);
-	gpu_fill_row_float(&D[0], 4, 3, -1, 100);
+	gpu_fill_col<float>(&D[0], 4, 3, -2, 600);
+	gpu_fill_row<float>(&D[0], 4, 3, -1, 100);
 	printD(D, 4);
 	D = getDf(x, 12);
-	gpu_fill_row_float(&D[0], 4, 3, 3, -100);
-	gpu_fill_col_float(&D[0], 4, 3, 2, -600);
+	gpu_fill_row<float>(&D[0], 4, 3, 3, -100);
+	gpu_fill_col<float>(&D[0], 4, 3, 2, -600);
 	printD(D, 4);
 }
 
@@ -228,8 +228,8 @@ void test_softmax_minus_id()
 {
 	float x[7] = { 4.2, 5.9, -2.1, -3.7, 3.3, 1.9, -0.6 };
 	device_vector<float> D = getDf(x, 7);
-	pr(gpu_product_float(range));
-	pr(gpu_min_float(range));
+	pr(gpu_product<float>(range));
+	pr(gpu_min<float>(range));
 
 	gpu_softmax_minus_id(range, &D[0], 3);
 	printD(D);
@@ -302,14 +302,14 @@ void test_sigmoid()
 
 	printf("sigmoid\n");
 	printf("x\n");
-	gpu_sigmoid_float(range, &E[0], 1, 0); printD(E);
-	gpu_sigmoid_deriv_float(range, &E[0], 1, 0); printD(E);
+	gpu_sigmoid<float>(range, &E[0], 1, 0); printD(E);
+	gpu_sigmoid_deriv<float>(range, &E[0], 1, 0); printD(E);
 	printf("0.5 * x\n");
-	gpu_sigmoid_float(range, &E[0], 0.5, 0); printD(E);
+	gpu_sigmoid<float>(range, &E[0], 0.5, 0); printD(E);
 	printf("x + 3\n");
-	gpu_sigmoid_float(range, &E[0], 1, 3); printD(E);
+	gpu_sigmoid<float>(range, &E[0], 1, 3); printD(E);
 	printf("0.5 * x + 3\n");
-	gpu_sigmoid_float(range, &E[0], 0.5, 3); printD(E);
+	gpu_sigmoid<float>(range, &E[0], 0.5, 3); printD(E);
 }
 
 void test_tranpose()
@@ -320,16 +320,16 @@ void test_tranpose()
 	device_vector<float> Out = getDf(out, 12);
 	printf("Original mat\n");
 	printD(In, 4);
-	gpu_transpose_float(&In[0], 4, 3, &Out[0]);
+	gpu_transpose<float>(&In[0], 4, 3, &Out[0]);
 	printf("Transposed mat 3 x 4\n");
 	printD(Out, 3);
-	gpu_transpose_float(&In[0], 6, 2, &Out[0]);
+	gpu_transpose<float>(&In[0], 6, 2, &Out[0]);
 	printf("Transposed mat 2 x 6\n");
 	printD(Out, 2);
-	gpu_transpose_float(&In[0], 12, 1, &Out[0]);
+	gpu_transpose<float>(&In[0], 12, 1, &Out[0]);
 	printf("Transposed mat 1 x 12\n");
 	printD(Out, 1);
-	gpu_transpose_float(&In[0], 2, 6, &Out[0]);
+	gpu_transpose<float>(&In[0], 2, 6, &Out[0]);
 	printf("Transposed mat 6 x 2\n");
 	printD(Out, 6);
 }

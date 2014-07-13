@@ -37,7 +37,8 @@ namespace MyGpu
 
     // The specified col will be set to a specific value
     // negative 'colIdx' means counting from the last col (-n => col - n)
-    inline void gpu_fill_col_float(device_ptr<float> begin, int row, int col, int colIdx, float val)
+	template <typename T>
+    inline void gpu_fill_col(device_ptr<T> begin, int row, int col, int colIdx, T val)
     {
         if (colIdx < 0)  colIdx += col;
         thrust::fill_n(begin + row * colIdx, row, val);
@@ -45,8 +46,9 @@ namespace MyGpu
 
     // Change a specific row of a column major matrix to a specific value
     // negative 'rowIdx' means counting from the last row (-n => row - n)
+	template <typename T>
     __global__
-	void kernel_fill_row_float(float *begin, int row, int col, int rowIdx, float val)
+	void kernel_fill_row(T *begin, int row, int col, int rowIdx, T val)
 	{
 		ThreadIndex1D(idx, col);
 
@@ -56,14 +58,15 @@ namespace MyGpu
 
     // The specified row will be set to a specific value
     // negative 'rowIdx' means counting from the last row (-n => row - n)
-    inline void gpu_fill_row_float(device_ptr<float> begin, int row, int col, int rowIdx, float val)
+	template <typename T>
+    inline void gpu_fill_row(device_ptr<T> begin, int row, int col, int rowIdx, T val)
     {
         dim3 gridDim, blockDim;
         setKernelDim1D(col, gridDim, blockDim);
 
         if (rowIdx < 0) rowIdx += row;
 
-        kernel_fill_row_float << <gridDim, blockDim >> >(
+		kernel_fill_row<T> << <gridDim, blockDim >> >(
                 thrust::raw_pointer_cast(begin), row, col, rowIdx, val);
     }
 
@@ -72,9 +75,10 @@ namespace MyGpu
     // Code from http://www.evl.uic.edu/aej/525/code/transpose_kernel.cu
     // http://www.evl.uic.edu/aej/525/code/transpose.cu
 #define BLOCK_DIM 16
-    __global__ void kernel_transpose_float(float *in, int width, int height, float *out)
+	template <typename T>
+    __global__ void kernel_transpose(T *in, int width, int height, T *out)
     {
-        __shared__ float block[BLOCK_DIM][BLOCK_DIM + 1];
+        __shared__ T block[BLOCK_DIM][BLOCK_DIM + 1];
 
         // read the matrix tile into shared memory
         unsigned int xIndex = blockIdx.x * BLOCK_DIM + threadIdx.x;
@@ -98,12 +102,13 @@ namespace MyGpu
     }
 
     // Transposes 'in' and fills 'out'
-    inline void gpu_transpose_float(device_ptr<float> in, int row, int col, device_ptr<float> out)
+	template <typename T>
+    inline void gpu_transpose(device_ptr<T> in, int row, int col, device_ptr<T> out)
     {
         dim3 gridDim(std::ceil(1.0 *row / BLOCK_DIM), std::ceil(1.0 * col / BLOCK_DIM)),
              blockDim(BLOCK_DIM, BLOCK_DIM);
 
-        kernel_transpose_float << <gridDim, blockDim >> >(
+		kernel_transpose<T> << <gridDim, blockDim >> >(
                 thrust::raw_pointer_cast(in), row, col, thrust::raw_pointer_cast(out));
     }
 
@@ -112,24 +117,26 @@ namespace MyGpu
 	All __device__ functions should be prefixed with 'device_'
 	All __global__ kernel<<< >>> functions should be prefixed with 'kernel_'
     **********************************************/
+	template <typename T>
     __inline__ __device__
-	float device_max(float *begin, int size)
+	T device_max(T *begin, int size)
 	{
 		// find max
-		float mx = -1e20;
+		T mx = -1e20;
 		for (int i = 0; i < size; i++)
 			if (begin[i] > mx) mx = begin[i];
 		return mx;
 	}
 
+	template <typename T>
 	__inline__ __device__
-	void device_softmax(float *begin, int row, int col, float *out)
+	void device_softmax(T *begin, int row, int col, T *out)
 	{
 		// find max
-		float mx = device_max(begin, row);
+		T mx = device_max<T>(begin, row);
 		// subtract max from each and do exp
 		// also compute sum of these exp
-		float sum = 0;
+		T sum = 0;
 		for (int i = 0; i < row; i++)
 		{
 			out[i] = exp(begin[i] - mx);
@@ -141,53 +148,57 @@ namespace MyGpu
 	}
 
 	///// mini-batch softmax(alpha_vec)
+	template <typename T>
 	__global__
-	void kernel_batch_softmax(float *begin, int row, int col, float *out)
+	void kernel_batch_softmax(T *begin, int row, int col, T *out)
 	{
 		ThreadIndex1D(idx, col);
 		begin += idx * row; // beginning of a column
 		if (out != begin) out += idx * row;
-		device_softmax(begin, row, col, out);
+		device_softmax<T>(begin, row, col, out);
 	}
 
 	// Computes the mini-batch softmax probability distribution for the full matrix
+	template <typename T>
 	inline void gpu_batch_softmax(
-		device_ptr<float> begin, int row, int col, device_ptr<float> out)
+		device_ptr<T> begin, int row, int col, device_ptr<T> out)
 	{
 		if (col == 1) // use the thrust version
-			gpu_softmax(begin, row, out);
+			gpu_softmax<T>(begin, row, out);
 		else // real batch
 		{
 			dim3 gridDim, blockDim;
 			setKernelDim1D(col, gridDim, blockDim);
 
-			kernel_batch_softmax << <gridDim, blockDim >> >(
+			kernel_batch_softmax<T> << <gridDim, blockDim >> >(
 				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out));
 		}
 	}
 
+	template <typename T>
 	inline void gpu_batch_softmax(
-		device_ptr<float> begin, int row, int col)
+		device_ptr<T> begin, int row, int col)
 	{
-		gpu_batch_softmax(begin, row, col, begin);
+		gpu_batch_softmax<T>(begin, row, col, begin);
 	}
 
 	///// mini-batch softmax(alpha_vec) that writes to 'outProb' only the probability at the correct label
 	// Non-intrusive: doesn't change 'begin'
+	template <typename T>
 	__global__
 	void kernel_batch_softmax(
-		float *begin, int row, int col, float *outProb, int *labels)
+		T *begin, int row, int col, T *outProb, int *labels)
 	{
 		ThreadIndex1D(idx, col);
 
 		begin += idx * row; // beginning of a column
 
 		// find max
-		float mx = device_max(begin, row);
+		T mx = device_max(begin, row);
 		// subtract max from each and do exp
 		// also compute sum of these exp
-		float sum = 0;
-		float numerator, tmp;
+		T sum = 0;
+		T numerator, tmp;
 		int label = labels[idx];
 		for (int i = 0; i < row; i++)
 		{
@@ -201,29 +212,31 @@ namespace MyGpu
 	// writes to 'outProb' only the probability at the correct label
 	// int *labels is on GPU
 	// input data 'begin' won't be changed
+	template <typename T>
 	inline void gpu_batch_softmax_at_label(
-		device_ptr<float> begin, int row, int col, device_ptr<float> outProb, int *labels)
+		device_ptr<T> begin, int row, int col, device_ptr<T> outProb, int *labels)
 	{
 		if (col == 1) // use the thrust version
 		{
 			int label;
 			cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-			gpu_softmax_at_label(begin, row, label, outProb);
+			gpu_softmax_at_label<T>(begin, row, label, outProb);
 		}
 		else // real batch
 		{
 			dim3 gridDim, blockDim;
 			setKernelDim1D(col, gridDim, blockDim);
 
-			kernel_batch_softmax << <gridDim, blockDim >> >(
+			kernel_batch_softmax<T> << <gridDim, blockDim >> >(
 				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outProb), labels);
 		}
 	}
 
     // Used in 2 other kernels
     // return the probability (before log()) at the correct label
+	template <typename T>
     __inline__ __device__
-	float kernel_softmax_minus_id(int idx, float *begin, int row, int col, float *out, int *labels)
+	T kernel_softmax_minus_id(int idx, T *begin, int row, int col, T *out, int *labels)
 	{
 		begin += idx * row; // beginning of a column
 		if (out != begin) out += idx * row;
@@ -231,57 +244,61 @@ namespace MyGpu
 		device_softmax(begin, row, col, out);
 
 		// Add 1 to the identity function
-		float probCorrect = out[labels[idx]];
+		T probCorrect = out[labels[idx]];
 		-- out[labels[idx]];
 		return probCorrect;
 	}
 
     ///// mini-batch softmax(alpha_vec) - I [y==j]
+	template <typename T>
     __global__
 	void kernel_batch_softmax_minus_id(
-			float *begin, int row, int col, float *out, int *labels)
+			T *begin, int row, int col, T *out, int *labels)
 	{
 		ThreadIndex1D(idx, col);
 
-		kernel_softmax_minus_id(idx, begin, row, col, out, labels);
+		kernel_softmax_minus_id<T>(idx, begin, row, col, out, labels);
 	}
 
+	template <typename T>
     inline void gpu_batch_softmax_minus_id(
-            device_ptr<float> begin, int row, int col, device_ptr<float> out, int *labels)
+            device_ptr<T> begin, int row, int col, device_ptr<T> out, int *labels)
     {
         if (col == 1) // use the thrust version
         {
             int label;
             cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-            gpu_softmax_minus_id(begin, row, out, label);
+			gpu_softmax_minus_id<T>(begin, row, out, label);
         }
         else // real batch
         {
             dim3 gridDim, blockDim;
             setKernelDim1D(col, gridDim, blockDim);
 
-            kernel_batch_softmax_minus_id << <gridDim, blockDim >> >(
+			kernel_batch_softmax_minus_id<T> << <gridDim, blockDim >> >(
 				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), labels);
         }
     }
 	// Overload: in == out
+	template <typename T>
 	inline void gpu_batch_softmax_minus_id(
-		device_ptr<float> begin, int row, int col, int *labels)
+		device_ptr<T> begin, int row, int col, int *labels)
 	{
-		gpu_batch_softmax_minus_id(begin, row, col, begin, labels);
+		gpu_batch_softmax_minus_id<T>(begin, row, col, begin, labels);
 	}
 
 	///// Fill 'outLabels' with the label corresponding to the maximum probability of a column
+	template <typename T>
 	__global__
 	void kernel_best_label(
-			float *begin, int row, int col, int *outLabels)
+			T *begin, int row, int col, int *outLabels)
 	{
 		ThreadIndex1D(idx, col);
 
 		begin += idx * row; // beginning of a column
 
 		// find max
-		float mx = -1e20;
+		T mx = -1e20;
 		int maxLabel = 0;
 		for (int i = 0; i < row; i++)
 			if (begin[i] > mx)
@@ -294,13 +311,14 @@ namespace MyGpu
 
     // Fill 'outLabels' with the label corresponding to the maximum probability of a column
     // outLabels is filled out on GPU
+	template <typename T>
     inline void gpu_best_label(
-            device_ptr<float> begin, int row, int col, int *outLabels)
+            device_ptr<T> begin, int row, int col, int *outLabels)
     {
         dim3 gridDim, blockDim;
         setKernelDim1D(col, gridDim, blockDim);
 
-        kernel_best_label << <gridDim, blockDim >> >(
+		kernel_best_label<T> << <gridDim, blockDim >> >(
                 thrust::raw_pointer_cast(begin), row, col, outLabels);
     }
 }

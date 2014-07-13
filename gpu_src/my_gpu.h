@@ -29,120 +29,111 @@ using namespace thrust;
 // functor_2: exp(a * x)
 // functor_3: exp(a*x + b)
 // default a = 1 and b = 0
-#define GEN_linear_functor(name, Ftype) \
-struct functor_##name##_##Ftype{ \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(x); } \
+#define GEN_linear_functor(name) \
+	template <typename T> \
+struct functor_##name{ \
+	__host__ __device__ T operator()(const T& x) const { return name(x); } \
 }; \
-struct functor_##name##_##Ftype##_1{ \
-	const Ftype b; \
-	functor_##name##_##Ftype##_1(Ftype _b = 0) : b(_b) {} \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(x + b); } \
+	template <typename T> \
+struct functor_##name##_1{ \
+	const T b; \
+	functor_##name##_1(T _b = 0) : b(_b) {} \
+	__host__ __device__ T operator()(const T& x) const { return name(x + b); } \
 }; \
-struct functor_##name##_##Ftype##_2{ \
-	const Ftype a; \
-	functor_##name##_##Ftype##_2(Ftype _a = 1) : a(_a) {} \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(a * x); } \
+	template <typename T> \
+struct functor_##name##_2{ \
+	const T a; \
+	functor_##name##_2(T _a = 1) : a(_a) {} \
+	__host__ __device__ T operator()(const T& x) const { return name(a * x); } \
 }; \
-struct functor_##name##_##Ftype##_3{ \
-	const Ftype a, b; \
-	functor_##name##_##Ftype##_3(Ftype _a = 1, Ftype _b = 0) : a(_a), b(_b) {} \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(a * x + b); } \
+	template <typename T> \
+struct functor_##name##_3{ \
+	const T a, b; \
+	functor_##name##_3(T _a = 1, T _b = 0) : a(_a), b(_b) {} \
+	__host__ __device__ T operator()(const T& x) const { return name(a * x + b); } \
 };
 
 // Macro defines corresponding thrust::transform for various linear unary functors
 // gpu_exp_float(begin, size) is in place transformation, while gpu_exp_float(begin, size, out) writes to an output pointer.
-#define GEN_transf_ftype(name, Ftype) \
-GEN_linear_functor(name, Ftype); \
-inline void gpu_##name##_##Ftype(device_ptr<Ftype> begin, int size, Ftype a = 1, Ftype b = 0) \
-{ \
-	if (a == 1 && b == 0) \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype()); \
-	else if (a == 1) \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype##_1(b)); \
-	else if (b == 0) \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype##_2(a)); \
-	else \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype##_3(a, b)); \
-} \
-inline void gpu_##name##_##Ftype(device_ptr<Ftype> begin, int size, \
-	device_ptr<Ftype> out, Ftype a = 1, Ftype b = 0) \
+#define GEN_transf(name) \
+GEN_linear_functor(name); \
+template <typename T> \
+inline void gpu_##name(device_ptr<T> begin, int size, \
+								device_ptr<T> out, T a = 1, T b = 0) \
 { \
 if (a == 1 && b == 0) \
-	transform(begin, begin + size, out, functor_##name##_##Ftype()); \
+	transform(begin, begin + size, out, functor_##name<T>()); \
 	else if (a == 1) \
-	transform(begin, begin + size, out, functor_##name##_##Ftype##_1(b)); \
+	transform(begin, begin + size, out, functor_##name##_1<T>(b)); \
 	else if (b == 0) \
-	transform(begin, begin + size, out, functor_##name##_##Ftype##_2(a)); \
+	transform(begin, begin + size, out, functor_##name##_2<T>(a)); \
 	else \
-	transform(begin, begin + size, out, functor_##name##_##Ftype##_3(a, b)); \
+	transform(begin, begin + size, out, functor_##name##_3<T>(a, b)); \
+} \
+/* Overload in == out */ \
+template <typename T> \
+inline void gpu_##name(device_ptr<T> begin, int size, T a = 1, T b = 0) \
+{ \
+	gpu_##name<T>(begin, size, begin, a, b); \
 }
 
 
 // Macro defines functors for linear transformations inside a binary function
-// Ftype: float or double
+// T: float or double
 // for example, functor: pow(x, p) 
 // functor_1: pow(x + b, p) 
 // functor_2: pow(a * x, p)
 // functor_3: pow(a*x + b, p)
 // default a = 1 and b = 0
-#define GEN_linear_functor_2(name, Ftype) \
-struct functor_##name##_##Ftype{ \
-	const Ftype p; \
-	functor_##name##_##Ftype(Ftype _p) : p(_p) {} \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(x, p); } \
+#define GEN_linear_functor_2(name) \
+template <typename T> \
+struct functor_##name{ \
+	const T p; \
+	functor_##name(T _p) : p(_p) {} \
+	__host__ __device__ T operator()(const T& x) const { return name(x, p); } \
 }; \
-struct functor_##name##_##Ftype##_1{ \
-	const Ftype p, b; \
-	functor_##name##_##Ftype##_1(Ftype _p, Ftype _b = 0) : p(_p), b(_b) {} \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(x + b, p); } \
+template <typename T> \
+struct functor_##name##_1{ \
+	const T p, b; \
+	functor_##name##_1(T _p, T _b = 0) : p(_p), b(_b) {} \
+	__host__ __device__ T operator()(const T& x) const { return name(x + b, p); } \
 }; \
-struct functor_##name##_##Ftype##_2{ \
-	const Ftype p, a; \
-	functor_##name##_##Ftype##_2(Ftype _p, Ftype _a = 1) : p(_p), a(_a) {} \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(a * x, p); } \
+template <typename T> \
+struct functor_##name##_2{ \
+	const T p, a; \
+	functor_##name##_2(T _p, T _a = 1) : p(_p), a(_a) {} \
+	__host__ __device__ T operator()(const T& x) const { return name(a * x, p); } \
 }; \
-struct functor_##name##_##Ftype##_3{ \
-	const Ftype p, a, b; \
-	functor_##name##_##Ftype##_3(Ftype _p, Ftype _a = 1, Ftype _b = 0) : p(_p), a(_a), b(_b) {} \
-	__host__ __device__ Ftype operator()(const Ftype& x) const { return name(a * x + b, p); } \
+template <typename T> \
+struct functor_##name##_3{ \
+	const T p, a, b; \
+	functor_##name##_3(T _p, T _a = 1, T _b = 0) : p(_p), a(_a), b(_b) {} \
+	__host__ __device__ T operator()(const T& x) const { return name(a * x + b, p); } \
 };
 
 // Macro defines corresponding thrust::transform for various linear binary functors
 // gpu_pow_float(begin, size) is in place transformation, while gpu_pow_float(begin, size, out) writes to an output pointer.
-#define GEN_transf_ftype_2(name, Ftype) \
-GEN_linear_functor_2(name, Ftype); \
-inline void gpu_##name##_##Ftype(device_ptr<Ftype> begin, int size, Ftype p, Ftype a = 1, Ftype b = 0) \
-{ \
-	if (a == 1 && b == 0) \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype(p)); \
-	else if (a == 1) \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype##_1(p, b)); \
-	else if (b == 0) \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype##_2(p, a)); \
-	else \
-		transform(begin, begin + size, begin, functor_##name##_##Ftype##_3(p, a, b)); \
-} \
-inline void gpu_##name##_##Ftype(device_ptr<Ftype> begin, int size, \
-	device_ptr<Ftype> out, Ftype p, Ftype a = 1, Ftype b = 0) \
+#define GEN_transf_2(name) \
+GEN_linear_functor_2(name); \
+template <typename T> \
+inline void gpu_##name(device_ptr<T> begin, int size, \
+								device_ptr<T> out, T p, T a = 1, T b = 0) \
 { \
 if (a == 1 && b == 0) \
-	transform(begin, begin + size, out, functor_##name##_##Ftype(p)); \
+	transform(begin, begin + size, out, functor_##name<T>(p)); \
 	else if (a == 1) \
-	transform(begin, begin + size, out, functor_##name##_##Ftype##_1(p, b)); \
+	transform(begin, begin + size, out, functor_##name##_1<T>(p, b)); \
 	else if (b == 0) \
-	transform(begin, begin + size, out, functor_##name##_##Ftype##_2(p, a)); \
+	transform(begin, begin + size, out, functor_##name##_2<T>(p, a)); \
 	else \
-	transform(begin, begin + size, out, functor_##name##_##Ftype##_3(p, a, b)); \
+	transform(begin, begin + size, out, functor_##name##_3<T>(p, a, b)); \
+} \
+/* Overload in == out */	\
+template <typename T> \
+inline void gpu_##name(device_ptr<T> begin, int size, T p, T a = 1, T b = 0) \
+{ \
+	gpu_##name<T>(begin, size, begin, p, a, b); \
 }
-
-// Combines float and double functions
-#define GEN_transf(name) \
-	GEN_transf_ftype(name, float); \
-	GEN_transf_ftype(name, double);
-
-#define GEN_transf_2(name) \
-	GEN_transf_ftype_2(name, float); \
-	GEN_transf_ftype_2(name, double);
 
 namespace MyGpu
 {
@@ -175,42 +166,42 @@ namespace MyGpu
 	GEN_transf_2(fmod);
 
 	/* Other non-standard functions */
-	__host__ __device__
-	inline float sigmoid(float x) { return 1.0 / (1 + exp(-x)); }
+	template<typename T> __host__ __device__
+	inline T sigmoid(T x) { return 1.0 / (1 + exp(-x)); }
 	GEN_transf(sigmoid);
 	// Sigmoid derivative: x .* (1 - x)
-	__host__ __device__
-	inline float sigmoid_deriv(float x) { return x * (1 - x); }
+	template<typename T> __host__ __device__
+	inline T sigmoid_deriv(T x) { return x * (1 - x); }
 	GEN_transf(sigmoid_deriv);
 
 	// simple square routine
-	__host__ __device__
-	inline float square(float x) { return x * x; }
+	template<typename T> __host__ __device__
+	inline T square(T x) { return x * x; }
 	GEN_transf(square);
 	// simple cube routine
-	__host__ __device__
-	inline float cube(float x) { return x * x * x; }
+	template<typename T> __host__ __device__
+	inline T cube(T x) { return x * x * x; }
 	GEN_transf(cube);
 	// simple reciprocal routine
-	__host__ __device__
-	inline float reciprocal(float x) { return 1.0/x; }
+	template<typename T> __host__ __device__
+	inline T reciprocal(T x) { return 1.0/x; }
 	GEN_transf(reciprocal);
 
 	// Random distribution generators
 	// Cauchy CDF: given a uniform random var, transform it to be cauchy
-	__host__ __device__
-	inline float cauchy(float x) { return tan(M_PI * (x - 0.5)); }
+	template<typename T> __host__ __device__
+	inline T cauchy(T x) { return tan(M_PI * (x - 0.5)); }
 	GEN_transf(cauchy);
 
 	// Laplacian CDF: given a uniform random var, transform it to be lap
 	// if < 0, return -1; > 0, return 1
-	__host__ __device__
-	inline float signum(float val)
+	template<typename T> __host__ __device__
+	inline T signum(T val)
 	{
 		return (0 < val) - (val < 0);
 	}
-	__host__ __device__
-	inline float laplacian(float x)
+	template<typename T> __host__ __device__
+	inline T laplacian(T x)
 	{ 
 		x -= 0.5;
 		return -signum(x) * log(1 - 2 * fabs(x));
@@ -219,113 +210,116 @@ namespace MyGpu
 	GEN_transf(signum);
 
 
-//#ifndef _WIN32
-//	GEN_transf(exp2);
-//	GEN_transf(expm1); // exp - 1
-//	GEN_transf(log1p); // ln + 1
-//	GEN_transf(log2);
-//	GEN_transf(cbrt); // cubic root
-//	GEN_transf(hypot); // hypotenus
-//	GEN_transf(erf); // error function
-//	GEN_transf(erfc); // complementary error function
-//	GEN_transf(tgamma); // gamma function
-//	GEN_transf(lgamma); // log-gamma function
-//	GEN_transf(acosh);
-//	GEN_transf(asinh);
-//	GEN_transf(atanh);
-//#endif
-
-	// gpu_min|max_float|double
-#define GEN_minmax_ftype(name, Ftype) \
-	inline Ftype gpu_##name##_##Ftype(device_ptr<Ftype> begin, int size) \
-	{ \
-		device_ptr<Ftype> m = name##_element(begin, begin + size); \
-		return *m; \
+	///////***** OTHER functions *****///////
+	template <typename T>
+	inline T gpu_min(device_ptr<T> begin, int size) 
+	{
+		device_ptr<T> m = min_element(begin, begin + size);
+		return *m;
 	}
-    #define GEN_minmax(name) \
-	GEN_minmax_ftype(name, float); \
-	GEN_minmax_ftype(name, double);
 
-	GEN_minmax(min);
-	GEN_minmax(max);
+	template <typename T>
+	inline T gpu_max(device_ptr<T> begin, int size) 
+	{
+		device_ptr<T> m = max_element(begin, begin + size);
+		return *m;
+	}
 
 // dir = ascending: 1, descending -1
-#define GEN_sort(Ftype) \
-	inline void gpu_sort_##Ftype(device_ptr<Ftype> begin, int size, int dir = 1) \
-	{ \
-		if (dir > 0) \
-			thrust::sort(begin, begin+size); \
-		else /* descending sort */ \
-			thrust::sort(begin, begin+size, greater<Ftype>()); \
+	template <typename T>
+	inline void gpu_sort(device_ptr<T> begin, int size, int dir = 1)
+	{
+		if (dir > 0)
+			thrust::sort(begin, begin+size);
+		else /* descending sort */
+			thrust::sort(begin, begin+size, greater<T>());
 	}
 
-	GEN_sort(float); GEN_sort(double);
+	template <typename T>
+	struct functor_scale_mult { 
+		const T s; 
+		functor_scale_mult(T _s = 1) : s(_s) {} 
+		__host__ __device__  
+		T operator()(const T& x, const T& y) const { return s * x * y; } 
+	}; 
+	/* begin2 = begin1 .* begin2 */ 
+	template <typename T>
+	inline void gpu_dot_mult(device_ptr<T> begin1, int size, device_ptr<T> begin2, float scalor = 1) 
+	{
+		transform(begin1, begin1 + size, begin2, begin2, functor_scale_mult<T>(scalor));
+	}
+	/* out = begin1 .* begin2 */ 
+	template <typename T>
+	inline void gpu_dot_mult(device_ptr<T> begin1, int size, device_ptr<T> begin2, device_ptr<T> out, float scalor = 1) 
+	{
+		transform(begin1, begin1 + size, begin2, out, functor_scale_mult<T>(scalor));
+	}
 
-#define GEN_dot_mult(Ftype) \
-	struct functor_scale_mult_##Ftype { \
-	const Ftype s; \
-	functor_scale_mult_##Ftype(Ftype _s = 1) : s(_s) {} \
-	__host__ __device__  \
-	Ftype operator()(const Ftype& x, const Ftype& y) const { return s * x * y; } \
-	}; \
-	/* begin2 = begin1 .* begin2 */ \
-	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2, float scalor = 1) \
-	{ transform(begin1, begin1 + size, begin2, begin2, functor_scale_mult_##Ftype(scalor) ); } \
-	/* out = begin1 .* begin2 */ \
-	inline void gpu_dot_mult_##Ftype(device_ptr<Ftype> begin1, int size, device_ptr<Ftype> begin2, device_ptr<Ftype> out, float scalor = 1) \
-	{ transform(begin1, begin1 + size, begin2, out, functor_scale_mult_##Ftype(scalor)); }
+	template <typename T>
+	inline T gpu_sum(device_ptr<T> begin, int size)
+	{ return reduce(begin, begin+size, 0.0, thrust::plus<T>()); }
 
-	GEN_dot_mult(float); GEN_dot_mult(double);
-
-	inline float gpu_sum_float(device_ptr<float> begin, int size)
-	{ return reduce(begin, begin+size, 0.0, thrust::plus<float>()); }
-	inline double gpu_sum_double(device_ptr<double> begin, int size)
-	{ return reduce(begin, begin+size, 0.0, thrust::plus<double>()); }
-
-	inline float gpu_product_float(device_ptr<float> begin, int size)
-	{ return reduce(begin, begin+size, 1.0, thrust::multiplies<float>()); }
-	inline double gpu_product_double(device_ptr<double> begin, int size)
-	{ return reduce(begin, begin+size, 1.0, thrust::multiplies<double>()); }
+	template <typename T>
+	inline T gpu_product(device_ptr<T> begin, int size)
+	{ return reduce(begin, begin+size, 1.0, thrust::multiplies<T>()); }
 
 	// Fill the array with the same value
-	inline void gpu_fill_float(device_ptr<float> begin, int size, float val)
-	{ thrust::fill_n(begin, size, val); }
-	inline void gpu_fill_double(device_ptr<double> begin, int size, double val)
+	template <typename T>
+	inline void gpu_fill(device_ptr<T> begin, int size, T val)
 	{ thrust::fill_n(begin, size, val); }
 
-	inline void gpu_copy_float(device_ptr<float> begin, int size, device_ptr<float> out)
-	{ thrust::copy(begin, begin + size, out); }
-	inline void gpu_copy_double(device_ptr<double> begin, int size, device_ptr<double> out)
+	template <typename T>
+	inline void gpu_copy(device_ptr<T> begin, int size, device_ptr<T> out)
 	{ thrust::copy(begin, begin + size, out); }
 
 	// Swap two arrays
-	inline void gpu_swap_float(device_ptr<float> begin, int size, device_ptr<float> out)
-	{ thrust::swap_ranges(begin, begin + size, out); }
-	inline void gpu_swap_double(device_ptr<double> begin, int size, device_ptr<double> out)
+	template <typename T>
+	inline void gpu_swap(device_ptr<T> begin, int size, device_ptr<T> out)
 	{ thrust::swap_ranges(begin, begin + size, out); }
 
 	// Utility function for java
-	inline device_ptr<float> offset(device_ptr<float> begin, int offset)
-	{ return begin + offset; }
-	inline device_ptr<double> offset(device_ptr<double> begin, int offset)
+	template <typename T>
+	inline device_ptr<T> offset(device_ptr<T> begin, int offset)
 	{ return begin + offset; }
 
 	// Set or update a single value on device
 	// for gradCheck perturb()
-#define GEN_change_single_val(Ftype) \
-	inline void gpu_set_single_##Ftype(device_ptr<Ftype> begin, int offset, Ftype newVal) \
-	{ begin[offset] = newVal; } \
-	inline void gpu_incr_single_##Ftype(device_ptr<Ftype> begin, int offset, Ftype incrVal) \
-	{ begin[offset] += incrVal; }
+	template <typename T>
+	inline void gpu_set_single(device_ptr<T> begin, int offset, T newVal) 
+	{ begin[offset] = newVal; } 
 
-	GEN_change_single_val(float); GEN_change_single_val(double);
+	///////***** Deal with int, float, and double raw GPU pointers  *****///////
+	template <typename T>
+	inline T* offset(T *begin, int offset) { return begin + offset; } 
+	template <typename T>
+	inline void free_device(T *device) { cudaFree(device); } 
+	template <typename T>
+	inline void free_host(T *host) { free(host); } 
 
-	// Deal with int, float, and double raw GPU pointers
-#define GEN_raw_pointer_func(Ftype) \
-	inline Ftype* offset(Ftype *begin, int offset) \
-	{ return begin + offset; } \
-	inline void free_device(Ftype *device) { cudaFree(device); } \
-	inline void free_host(Ftype *host) { free(host); } \
+	template <typename T>
+	inline T *copy_host_to_device(T *host, int size) 
+	{ 
+		T *device; size *= sizeof(T); 
+		cudaMalloc((void **)&device, size); 
+		cudaMemcpy(device, host, size, cudaMemcpyHostToDevice); 
+		return device; 
+	} 
+	template <typename T>
+	inline T *copy_device_to_host(T *device, int size) 
+	{ 
+		size *= sizeof(T); 
+		T *host = (T *)malloc(size); 
+		cudaMemcpy(host, device, size, cudaMemcpyDeviceToHost); 
+		return host; 
+	} 
+	/* Can be used to copy directly to a primitive array (JavaCpp @Ptr) */ 
+	template <typename T>
+	inline void copy_device_to_host(T *device, T host[], int offset, int size) 
+	{ 
+		cudaMemcpy(host + offset, device, size * sizeof(T), cudaMemcpyDeviceToHost); 
+	}
+
+#define GEN_malloc(Ftype) \
 	inline Ftype* malloc_device_##Ftype(int size, bool memsetTo0) \
 	{  \
 		Ftype *device; \
@@ -333,88 +327,76 @@ namespace MyGpu
 		if (memsetTo0) \
 			cudaMemset(device, 0, size * sizeof(Ftype)); \
 		return device; \
-	} \
-	inline Ftype *copy_host_to_device(Ftype *host, int size) \
-	{ \
-		Ftype *device; size *= sizeof(Ftype); \
-		cudaMalloc((void **)&device, size); \
-		cudaMemcpy(device, host, size, cudaMemcpyHostToDevice); \
-		return device; \
-	} \
-	inline Ftype *copy_device_to_host(Ftype *device, int size) \
-	{ \
-		size *= sizeof(Ftype); \
-		Ftype *host = (Ftype *)malloc(size); \
-		cudaMemcpy(host, device, size, cudaMemcpyDeviceToHost); \
-		return host; \
-	} \
-	/* Can be used to copy directly to a primitive array (JavaCpp @Ptr) */ \
-	inline void copy_device_to_host(Ftype *device, Ftype host[], int offset, int size) \
-	{ \
-		cudaMemcpy(host + offset, device, size * sizeof(Ftype), cudaMemcpyDeviceToHost); \
-	}
-
-	GEN_raw_pointer_func(int);
-	GEN_raw_pointer_func(float);
-	GEN_raw_pointer_func(double);
+	} 
+	GEN_malloc(int);
+	GEN_malloc(float);
+	GEN_malloc(double);
 
 
 	/**********************************************/
 	/* More sophisticated functions for machine learning  */
 	/**********************************************/
-#define GEN_gpu_softmax(Ftype) \
-	/* softmax(alpha_vec) */ \
-	inline void gpu_softmax(device_ptr<Ftype> begin, int size, device_ptr<Ftype> out) \
-	{ \
-		Ftype mx = gpu_max_##Ftype(begin, size); \
-		gpu_exp_##Ftype(begin, size, out, 1, -mx); \
-		Ftype s = gpu_sum_##Ftype(out, size); \
-		gpu__##Ftype(out, size, 1.0 / s, 0); \
-	} \
-	/*Overload: in == out*/ \
-	inline void gpu_softmax(device_ptr<Ftype> begin, int size) \
-	{  gpu_softmax(begin, size, begin);  } \
-	/* softmax(alpha_vec) - I [y==j] */ \
-	inline void gpu_softmax_minus_id(device_ptr<Ftype> begin, int size, device_ptr<Ftype> out, int label) \
-	{ \
-		gpu_softmax(begin, size, out); \
-		-- *(out + label);  /* when at id, x -= 1 */ \
-	} \
-	/*Overload: in == out*/ \
-	inline void gpu_softmax_minus_id(device_ptr<Ftype> begin, int size, int label) \
-	{ gpu_softmax_minus_id(begin, size, begin, label); } \
-	/* softmax(alpha_vec) at only the correct label. 'outProb' is a 1 float device_ptr. 'begin' data won't be changed */ \
-	inline void gpu_softmax_at_label(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> outProb) \
-	{ \
-		Ftype mx = gpu_max_##Ftype(begin, size); \
-		Ftype expSum = thrust::transform_reduce(begin, begin + size, \
-			functor_exp_##Ftype##_1(-mx), 0.0, thrust::plus<Ftype>()); \
-		outProb[0] = exp(begin[label] - mx) / expSum; \
+	/* softmax(alpha_vec) */ 
+	template <typename T>
+	inline void gpu_softmax(device_ptr<T> begin, int size, device_ptr<T> out) 
+	{ 
+		T mx = gpu_max<T>(begin, size);
+		gpu_exp<T>(begin, size, out, 1, -mx); 
+		T s = gpu_sum<T>(out, size);
+		gpu_<T>(out, size, 1.0 / s, 0);
+	} 
+	/*Overload: in == out*/ 
+	template <typename T>
+	inline void gpu_softmax(device_ptr<T> begin, int size) 
+	{
+		gpu_softmax<T>(begin, size, begin);
 	}
 
-	GEN_gpu_softmax(float);
-	GEN_gpu_softmax(double);
+	/* softmax(alpha_vec) - I [y==j] */ 
+	template <typename T>
+	inline void gpu_softmax_minus_id(device_ptr<T> begin, int size, device_ptr<T> out, int label) 
+	{ 
+		gpu_softmax<T>(begin, size, out);
+		-- *(out + label);  /* when at id, x -= 1 */ 
+	} 
+	/*Overload: in == out*/ 
+	template <typename T>
+	inline void gpu_softmax_minus_id(device_ptr<T> begin, int size, int label) 
+	{
+		gpu_softmax_minus_id<T>(begin, size, begin, label);
+	}
 
+	/* softmax(alpha_vec) at only the correct label. 'outProb' is a 1 float device_ptr. 'begin' data won't be changed */ 
+	template <typename T>
+	inline void gpu_softmax_at_label(device_ptr<T> begin, int size, int label, device_ptr<T> outProb) 
+	{ 
+		T mx = gpu_max<T>(begin, size); 
+		T expSum = thrust::transform_reduce(begin, begin + size, 
+											functor_exp_1<T>(-mx), 0.0, thrust::plus<T>());
+		outProb[0] = exp(begin[label] - mx) / expSum; 
+	}
 
 	// Sum of log of correct label probability
 	// input: a float array computed by softmax()
-	inline float gpu_log_sum(device_ptr<float> begin, int size)
+	template <typename T>
+	inline T gpu_log_sum(device_ptr<T> begin, int size)
 	{
 		return thrust::transform_reduce(begin, begin + size,
-										functor_log_float(), 0.0, thrust::plus<float>());
+										functor_log<T>(), 0.0, thrust::plus<T>());
 	}
 
 	// softmax(alpha_vec) - I [y==j]
 	// A = exp(A - (mx + log(sum(exp(A - mx))))
+	// Deprecated
 	inline void gpu_softmax_minus_id_2(device_ptr<float> begin, int size, int id)
 	{
-		float mx = gpu_max_float(begin, size);
+		float mx = gpu_max<float>(begin, size);
 
 		float logsum = log(
 			thrust::transform_reduce(begin, begin + size,
-			functor_exp_float_1(-mx), 0.0, thrust::plus<float>()));
+			functor_exp_1<float>(-mx), 0.0, thrust::plus<float>()));
 
-		gpu_exp_float(begin, size, 1, -(mx + logsum));
+		gpu_exp<float>(begin, size, 1, -(mx + logsum));
 		-- *(begin + id);  // when at id, x -= 1
 	}
 }
