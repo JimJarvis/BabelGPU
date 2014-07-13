@@ -49,9 +49,7 @@ public class GpuTestKit
 	public FloatMat loadFloatMat(String file, int row, int col)
 	{
 		newReader(file);
-		FloatMat x = new FloatMat(csv.readFloatVec(true), row, col);
-		x.toDevice(true);
-		return x;
+		return new FloatMat(csv.readFloatVec(true), row, col);
 	}
 	
 	public float[] loadFloats(String file)

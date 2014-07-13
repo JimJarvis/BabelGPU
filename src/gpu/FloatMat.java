@@ -170,8 +170,7 @@ public class FloatMat
 	@Override
 	public FloatMat clone()
 	{
-		if (this.device == null)
-			throw new GpuException("Device is null, cannot clone.");
+		this.toDevice();
 		FloatMat clone = new FloatMat(this);
 		clone.copyFrom(this);
 		clone.hostMode = this.hostMode;

@@ -15,10 +15,10 @@ public class MiscTest
 												{4, 40, -10}};
 		
 		FloatMat b = new FloatMat(B.clone());
-		FloatMat m = new FloatMat(b);
+		FloatMat m = b.clone();
 		FloatMat a = new FloatMat(A.clone());
 		
-		Thrust.batch_softmax(b, m);
+		GpuBlas.add(m, b, m, 3, -1);
 		
 		PP.p(b);
 		PP.p(m);
