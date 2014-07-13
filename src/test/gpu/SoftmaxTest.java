@@ -74,7 +74,7 @@ public class SoftmaxTest
 		kit.checkGold(X, X_backup, "softmax_at_label: X shouldn't be changed");
 		
 		// compute sum of log likelihood
-		kit.checkGold(Thrust.log_sum(maxProbs), "gold_log_prob", "Sum of log probs");
+		kit.checkGold(Thrust.log_sum(maxProbs), "gold_log_prob", 1e-6f, "Sum of log probs");
 		
 		/*
 		 * Label where the maximum probability occurs

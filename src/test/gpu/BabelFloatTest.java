@@ -54,7 +54,7 @@ public class BabelFloatTest
 		// augment X with a column of 1
 		FloatMat X1 = new FloatMat(SAMPLES, X_DIM + 1, false);
 		X1.copyFrom(X);
-		Natives.gpu_fill_float(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
+		Natives.gpu_fill(X1.getThrustPointer().offset(X.size()), SAMPLES, 1);
 		float[][] jX1 = addCol1(jX);
 		
 		// Xnew: X_NEW_DIM * SAMPLES

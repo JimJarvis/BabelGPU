@@ -67,6 +67,15 @@ public class GpuTestKit
 	{
 		return Thrust.malloc_device_int(size);
 	}
+	
+	private static float matDiff(FloatMat x, FloatMat gold)
+	{
+		FloatMat diffMat = new FloatMat(x);
+		GpuBlas.add(x, gold, diffMat , 1, -1);
+		float diff = diffMat .abs().sum() / diffMat .size();
+		diffMat.destroy();
+		return diff;
+	}
 
 	/**
 	 * Check the gold standard generated from Matlab
@@ -77,10 +86,7 @@ public class GpuTestKit
 	public void checkGold(FloatMat gpu, String goldFile, String description)
 	{
 		newReader(goldFile);
-		float[][] Gold = csv.readFloatMat();
-		float[][] Host = gpu.deflatten();
-		
-		float diff = CpuUtil.matAvgDiff(Gold, Host);
+		float diff = matDiff(gpu, new FloatMat(csv.readFloatMat()));
 		PP.p("["+description+"]", diff < TOL ? "PASS:" : "FAIL:", diff);
 		assertTrue("Doesn't agree with Gold", diff < TOL);
 	}
@@ -92,13 +98,14 @@ public class GpuTestKit
 	/**
 	 * Simply compare two numbers. The files contains one number
 	 */
-	public void checkGold(float res, String goldFile, String description)
+	public void checkGold(float res, String goldFile, float tol, String description)
 	{
+		if (tol < 0) tol = TOL;
 		newReader(goldFile);
 		float gold = csv.readFloatVec(1)[0];
 		float diff = Math.abs(gold - res);
-		PP.p("["+description+"]", diff < TOL ? "PASS" : "FAIL");
-		if (diff > TOL)
+		PP.p("["+description+"]", diff < tol ? "PASS" : "FAIL");
+		if (diff > tol)
     	{
 			PP.p("yours=", res, "  but gold=", gold);
 			fail("Doesn't agree with Gold");
@@ -110,9 +117,7 @@ public class GpuTestKit
 	 */
 	public void checkGold(FloatMat x, FloatMat gold, String description)
 	{
-		FloatMat diffMat = new FloatMat(x);
-		GpuBlas.add(x, gold, diffMat , 1, -1);
-		float diff = diffMat .abs().sum() / diffMat .size();
+		float diff = matDiff(x, gold);
 		PP.p("["+description+"]", diff < TOL ? "PASS:" : "FAIL:", diff);
 		assertTrue("Doesn't agree with Gold", diff < TOL);
 	}
