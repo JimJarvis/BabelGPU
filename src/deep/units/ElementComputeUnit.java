@@ -70,7 +70,7 @@ public abstract class ElementComputeUnit extends ComputeUnit
 			backward_element();
     		GpuBlas.dotMult(output.gradient, input.gradient, scalor);
     		if (hasBias)
-    			input.gradient.fillRow(0, -1);
+    			input.gradient.fillLastRow0();
 		}
 	}
 	

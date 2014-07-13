@@ -772,6 +772,16 @@ public class FloatMat
 	{
 		Thrust.fill_row(this, rowIdx, val); return this;
 	}
+	
+	public FloatMat fillLastRow1()
+	{
+		return this.fillRow(1, -1);
+	}
+
+	public FloatMat fillLastRow0()
+	{
+		return this.fillRow(0, -1);
+	}
 
 	/**
 	 * @param colIdx like python, wrapped around: if negative, colIdx = rowDim + colIdx

@@ -53,7 +53,7 @@ public class FourierProjectUnit extends ComputeUnit
 	{
 		if (hasBias)
 		// The last row will have all ones
-			input.data.fillRow(1, -1);
+			input.data.fillLastRow1();
 		GpuBlas.mult(projector.data, input.data, output.data);
 	}
 

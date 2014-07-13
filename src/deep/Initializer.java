@@ -84,7 +84,7 @@ public abstract class Initializer
 			public void init(FloatMat w)
 			{
 				origIniter.init(w);
-				w.fillRow(0, -1);
+				w.fillLastRow0();
 			}
 		};
 	}

@@ -14,7 +14,7 @@ public class LinearUnit extends ParamComputeUnit
 	public void forward()
 	{
 		if (hasBias)
-			input.data.fillRow(1, -1);
+			input.data.fillLastRow1();
 		GpuBlas.mult(W.data, input.data, output.data);
 	}
 
@@ -35,14 +35,14 @@ public class LinearUnit extends ParamComputeUnit
     		{
     			GpuBlas.mult(output.gradient, input.data.transpose(), W.gradient);
     			GpuBlas.scaleAdd(W.data, W.gradient, learningPlan.reg);
-    			if (hasBias) W.gradient.fillRow(0, -1);
+    			if (hasBias) W.gradient.fillLastRow0();
     		}
 
     		// division by batchSize should be done in the terminal unit
     		GpuBlas.mult(output.gradient, input.data.transpose(), W.data, 
                 				- lr, 1 - lr * learningPlan.reg);
     		if (hasBias)
-    			W.data.fillRow(0, -1);
+    			W.data.fillLastRow0();
 		}
 	}
 

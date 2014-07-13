@@ -60,14 +60,14 @@ public class DeepTestKit
 			{
 				this.goldMat.setHostArray(dummyGold);
 				this.goldMat.toDevice(true);
-				if (hasBias) this.goldMat.fillRow(0, -1);
+				if (hasBias) this.goldMat.fillLastRow0();
 			}
 			@Override
 			public void nextBatch()
 			{
 				this.data.setHostArray(dummyInput);
 				this.data.toDevice(true);
-				if (hasBias) this.data.fillRow(1, -1);
+				if (hasBias) this.data.fillLastRow1();
 				hasNext = false;
 			}
 			@Override
@@ -99,13 +99,13 @@ public class DeepTestKit
 			public void nextGold()
 			{
 				this.goldMat.fill(goldVal);
-				if (hasBias) this.goldMat.fillRow(0, -1);
+				if (hasBias) this.goldMat.fillLastRow0();
 			}
 			@Override
 			public void nextBatch()
 			{
 				this.data.fill(inputVal);
-				if (hasBias) this.data.fillRow(1, -1);
+				if (hasBias) this.data.fillLastRow1();
 				hasNext = false;
 			}
 			@Override

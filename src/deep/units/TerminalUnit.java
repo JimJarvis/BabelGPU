@@ -54,7 +54,7 @@ public abstract class TerminalUnit extends ComputeUnit
 			updateLossReg();
 		
 		if (hasBias)
-			input.data.fillRow(0, -1);
+			input.data.fillLastRow0();
 
 		// Will be implemented by subclasses
 		updateLossPure(forward_terminal());
