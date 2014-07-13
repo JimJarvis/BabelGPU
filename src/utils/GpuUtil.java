@@ -176,25 +176,6 @@ public class GpuUtil
 		cudaMemset(device, 0, size * FLOAT);
 	}
 
-	/**
-	 * Check the gold standard generated from Matlab
-	 * Assume the goldFile has extension ".txt" and reside in bin/matlab_test
-	 * @param testName
-	 * @param tol tolerance of error
-	 */
-	public static void checkGold(FloatMat gpu, String goldFile, String testName, float tol)
-	{
-		CsvReader csv = new CsvReader("matlab_test/" + goldFile + ".txt");
-		float[][] Gold = csv.readFloatMat();
-		float[][] Host = gpu.deflatten();
-		
-		float diff = CpuUtil.matAvgDiff(Gold, Host);
-		PP.setPrecision(3);
-		PP.setScientific(true);
-		
-		PP.p("["+testName+"]", diff < tol ? "PASS:" : "FAIL:", diff);
-	}
-
 	//**************************************************/
 	//******************* DOUBLE *******************/
 	//**************************************************/
@@ -351,25 +332,6 @@ public class GpuUtil
 	public static void clearDeviceDouble(Pointer device, int size)
 	{
 		cudaMemset(device, 0, size * DOUBLE);
-	}
-	
-	/**
-	 * Check the gold standard generated from Matlab
-	 * Assume the goldFile has extension ".txt"
-	 * @param testName
-	 * @param tol tolerance of error
-	 */
-	public static void checkGold(DoubleMat gpu, String goldFile, String testName, double tol)
-	{
-		CsvReader csv = new CsvReader(goldFile + ".txt");
-		double[][] Gold = csv.readDoubleMat();
-		double[][] Host = gpu.deflatten();
-		
-		double diff = CpuUtil.matAvgDiff(Gold, Host);
-		PP.setPrecision(3);
-		PP.setScientific(true);
-		
-		PP.p("["+testName+"]", diff < tol ? "PASS:" : "FAIL:", diff);
 	}
 	
 	

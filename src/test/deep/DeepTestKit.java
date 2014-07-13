@@ -11,7 +11,7 @@ import deep.units.*;
  * Helps configure other unit tests
  * All settings will be global here through the test/deep package
  */
-public class TestKit
+public class DeepTestKit
 {
 	// ******************** CONFIG ********************/
 	// Input feature vector dimension

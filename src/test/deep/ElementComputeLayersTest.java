@@ -2,7 +2,7 @@ package test.deep;
 
 import static org.junit.Assert.*;
 import org.junit.*;
-import static test.deep.TestKit.*;
+import static test.deep.DeepTestKit.*;
 import utils.*;
 import deep.*;
 import deep.units.*;
