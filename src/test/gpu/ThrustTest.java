@@ -29,7 +29,7 @@ public class ThrustTest
 
 		O = new FloatMat(new float[] {4.2f, 5.9f, -2.1f, -3.7f, 3.3f, 1.9f, -0.6f});
 		a = new FloatMat(O);
-		a.copyFrom(O); Thrust.id_minus_softmax(a, 3); PP.p(a);
+		a.copyFrom(O); Thrust.batch_softmax_minus_id(a, 3); PP.p(a);
 	}
 
 }

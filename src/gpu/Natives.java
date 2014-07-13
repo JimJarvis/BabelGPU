@@ -185,37 +185,43 @@ public class Natives
     
     // ******************** Softmax/labeling specific methods ****************** /
     /**
-     * I[y == j] - softmax(alpha_vec)
+     * To calculate softmax() only, no subtraction from id[]
+     * intrusive: changes input data unless 'out' is specified
      */
-    public static native void gpu_id_minus_softmax(@ByVal FloatDevicePointer begin, int size, int id);
-    // version 2: more calculation, might be more numerically stable
-    public static native void gpu_id_minus_softmax_2(@ByVal FloatDevicePointer begin, int size, int id);
-    
-    // For minibatch
-    public static native void gpu_batch_id_minus_softmax(
-    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);
-    
-    // To calculate softmax() only, no subtraction from id[]
     public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col);
-
     public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out);
-
-    // Only the probability at the correct label
-    public static native void gpu_batch_softmax(
+    
+    /**
+     *  Only the probability at the correct label
+     *  Non-intrusive: 'input' won't be changed
+     */
+    public static native void gpu_batch_softmax_at_label(
     				@ByVal FloatDevicePointer begin, int row, int col, 
-    				@ByVal FloatDevicePointer out, @ByPtr IntPointer labels);
-
-    // The best labels
+    				@ByVal FloatDevicePointer outProb, @ByPtr IntPointer labels);
+    
+    /**
+     * softmax(alpha_vec) - I[y == j]
+     * Uses Thrust, only 1 col
+     */
+    public static native void gpu_batch_softmax_minus_id(
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);
+    public static native void gpu_batch_softmax_minus_id(
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out, @ByPtr IntPointer labels);
+    
+    // combine babel_batch_id_minus_softmax with babel_log_prob
+    public static native float gpu_batch_softmax_minus_id_log_prob(
+    		@ByVal FloatDevicePointer begin, int row, int col, 
+    		@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
+    public static native float gpu_batch_softmax_minus_id_log_prob(
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out,
+    		@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
+    
+    // The best labels, non-intrusive
     public static native void gpu_best_label(
     		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer outLabels);
     
     // Sum of log probability from the correct label
     public static native float gpu_log_sum(@ByVal FloatDevicePointer begin, int size);
-    
-    // combine babel_batch_id_minus_softmax with babel_log_prob
-    public static native float gpu_batch_id_minus_softmax_log_prob(
-    		@ByVal FloatDevicePointer begin, int row, int col, 
-    		@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
     
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);
@@ -365,11 +371,4 @@ public class Natives
      *  Utility: pointer += offset, advance the GPU pointer
      */
     public static native @ByVal DoubleDevicePointer offset(@ByVal DoubleDevicePointer begin, int offset);
-
-    
-    // ******************** Babel specific methods ****************** /
-    /**
-     * I[y == j] - softmax(alpha_vec)
-     */
-    public static native void gpu_id_minus_softmax(@ByVal DoubleDevicePointer begin, int size, int id);
 }

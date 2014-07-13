@@ -241,6 +241,14 @@ public class Thrust
 	{
 		return gpu_min_float(x.getThrustPointer(), x.size());
 	}
+	  
+    /**
+     * @return sum of log(x)
+     */
+    public static float log_sum(FloatMat x)
+    {
+    	return Natives.gpu_log_sum(x.getThrustPointer(), x.size());
+    }
 	
 	/**
 	 * Element-wise multiplication
@@ -355,66 +363,88 @@ public class Thrust
     		throw new GpuException("Transpose operation cannot have the same 'in' and 'out'");
     	Natives.gpu_transpose_float(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
     }
-	
-	 // ******************** Babel specific methods ****************** /
-    /**
-     * I[y == j] - softmax(alpha_vec)
-     */
-	public static void id_minus_softmax(FloatMat x, int id)
-	{
-		Natives.gpu_id_minus_softmax(x.getThrustPointer(), x.size(), id);
-	}
-	// version 2: more calculation, might be more numerically stable
-	public static void id_minus_softmax_2(FloatMat x, int id)
-	{
-		Natives.gpu_id_minus_softmax_2(x.getThrustPointer(), x.size(), id);
-	}
-	
-	/**
-	 * Minibatch: I[y == j] - softmax(alpha_vec)
-	 * @param labels must be already on GPU. Call copy_host_to_device().
-	 */
-	public static void batch_id_minus_softmax(FloatMat x, IntPointer labels)
-	{
-		Natives.gpu_batch_id_minus_softmax(x.getThrustPointer(), x.row, x.col, labels);
-	}
-	// helper
-	public static IntPointer copy_host_to_device(int[] labels)
-	{
-		return Natives.copy_host_to_device(new IntPointer(labels), labels.length);
-	}
+
+    // ******************** Softmax/labeling methods ****************** /
+    // helper for labeling
+    public static IntPointer copy_host_to_device(int[] labels)
+    {
+    	return Natives.copy_host_to_device(new IntPointer(labels), labels.length);
+    }
+    
     // Set the last row of a matrix to 1
     public static void set_last_row_one(FloatMat x)
     {
     	fill_row(x, -1, 1);
     }
-    
+     
     /**
-     * Minibatch: softmax(alpha_vec)
+     * Minibatch: softmax(cols)
+	 * @param x intrusive: x will be changed unless 'out' is specified
      */
     public static void batch_softmax(FloatMat x)
     {
     	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col);
     }
 
-   public static void batch_softmax(FloatMat x, FloatMat out)
+    public static void batch_softmax(FloatMat x, FloatMat out)
     {
     	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
     }
 
+	/**
+	 * Minibatch: softmax(cols) - I[y == j] 
+	 * @param x intrusive: x will be changed unless 'out' is specified
+	 * @param labels must be already on GPU. Call copy_host_to_device().
+	 */
+	public static void batch_softmax_minus_id(FloatMat x, IntPointer labels)
+	{
+		Natives.gpu_batch_softmax_minus_id(x.getThrustPointer(), x.row, x.col, labels);
+	}
+	/**
+	 * Minibatch: softmax(cols) - I[y == j] 
+	 * @param out result
+	 * @param labels must be already on GPU. Call copy_host_to_device().
+	 */
+	public static void batch_softmax_minus_id(FloatMat x, FloatMat out, IntPointer labels)
+	{
+		Natives.gpu_batch_softmax_minus_id(x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), labels);
+	}
+	
     /**
      * Minibatch: softmax(alpha_vec)
-     * @param out writes to 'out' with probability only at the correct label of a column
+     * @param x non-intrusive, x won't be changed
+     * @param outProb writes only the prob at the correct label of a column
 	 * @param labels must be already on GPU. Call copy_host_to_device().
      */
-    public static void batch_softmax(FloatMat x, FloatMat out, IntPointer labels)
+    public static void batch_softmax_at_label(FloatMat x, FloatMat outProb, IntPointer labels)
     {
-    	Natives.gpu_batch_softmax(
-    			x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), labels);
+    	Natives.gpu_batch_softmax_at_label(
+    			x.getThrustPointer(), x.row, x.col, outProb.getThrustPointer(), labels);
+    }
+
+    /**
+     * Combines babel_batch_id_minus_softmax with babel_log_prob
+	 * @param x intrusive: x will be changed unless 'out' is specified
+     * @param outLogProb records log probability at the correct label of each column
+     * 			can be used as temporary storage.
+     * @return sum(outLogProb)
+     */
+    public static float batch_softmax_minus_id_log_prob(
+    		FloatMat x, FloatMat outLogProb, IntPointer labels)
+    {
+    	return Natives.gpu_batch_softmax_minus_id_log_prob(
+    			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
+    }
+    public static float batch_softmax_minus_id_log_prob(
+    		FloatMat x, FloatMat out, FloatMat outLogProb, IntPointer labels)
+    {
+    	return Natives.gpu_batch_softmax_minus_id_log_prob(
+    			x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), outLogProb.getThrustPointer(), labels);
     }
     
     /**
      * Minibatch: get the labels where the maximum probability occurs
+     * @param x non-intrusive, x won't be changed
      * @param reusedDevicePtr use malloc_device() once to malloc on GPU
      * @param outLabels collects the maximum labels, 
      * 				writing from 'offset', write number of labels == label of columns
@@ -425,27 +455,7 @@ public class Thrust
     	Natives.gpu_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
     	Natives.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.col);
 	}
-    
-    /**
-     * @param x an array of softmax() of the correct labels
-     * @return sum of the log probability
-     */
-    public static float log_sum(FloatMat x)
-    {
-    	return Natives.gpu_log_sum(x.getThrustPointer(), x.size());
-    }
 
-    /**
-     * Combines babel_batch_id_minus_softmax with babel_log_prob
-     * @param outLogProb records log probability at the correct label of each column
-     * 			can be used as temporary storage.
-     */
-    public static float batch_id_minus_softmax_log_prob(
-    		FloatMat x, FloatMat outLogProb, IntPointer labels)
-    {
-    	return Natives.gpu_batch_id_minus_softmax_log_prob(
-    			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
-    }
    
     // A few duplicates from ThrustNative.java
 	// Force Thrust.java to generate code by JavaCpp
@@ -729,14 +739,4 @@ public class Thrust
 	{
 		gpu_fill_double(x.getThrustPointer(), x.size(), val);
 	}
-	
-	 // ******************** Babel specific methods ****************** /
-    /**
-     * I[y == j] - softmax(alpha_vec)
-     */
-	public static void id_minus_softmax(DoubleMat x, int id)
-	{
-		Natives.gpu_id_minus_softmax(x.getThrustPointer(), x.size(), id);
-	}
-	
 }

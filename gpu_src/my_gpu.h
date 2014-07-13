@@ -371,12 +371,18 @@ namespace MyGpu
 		Ftype s = gpu_sum_##Ftype(out, size); \
 		gpu__##Ftype(out, size, 1.0 / s, 0); \
 	} \
+	/*Overload: in == out*/ \
+	inline void gpu_softmax(device_ptr<Ftype> begin, int size) \
+	{  gpu_softmax(begin, size, begin);  } \
 	/* softmax(alpha_vec) - I [y==j] */ \
 	inline void gpu_softmax_minus_id(device_ptr<Ftype> begin, int size, device_ptr<Ftype> out, int label) \
 	{ \
 		gpu_softmax(begin, size, out); \
 		-- *(out + label);  /* when at id, x -= 1 */ \
 	} \
+	/*Overload: in == out*/ \
+	inline void gpu_softmax_minus_id(device_ptr<Ftype> begin, int size, int label) \
+	{ gpu_softmax_minus_id(begin, size, begin, label); } \
 	/* softmax(alpha_vec) at only the correct label. 'outProb' is a 1 float device_ptr. 'begin' data won't be changed */ \
 	inline void gpu_softmax_at_label(device_ptr<Ftype> begin, int size, int label, device_ptr<Ftype> outProb) \
 	{ \

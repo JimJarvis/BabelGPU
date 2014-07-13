@@ -43,7 +43,7 @@ public class SoftmaxTest
 		 */
 		X = rereadX();
 		FloatMat maxProbs = new FloatMat(1, COL, false);
-		Thrust.batch_softmax(X, maxProbs, labelsDevice);
+		Thrust.batch_softmax_at_label(X, maxProbs, labelsDevice);
 		GpuUtil.checkGold(maxProbs, "gold_softmax_labeled", "softmax(correct label)", TOL);
 		
 		// compute sum of log likelihood

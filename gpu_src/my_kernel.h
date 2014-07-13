@@ -123,7 +123,7 @@ namespace MyGpu
 	}
 
 	__inline__ __device__
-	float device_softmax(float *begin, int row, int col, float *out)
+	void device_softmax(float *begin, int row, int col, float *out)
 	{
 		// find max
 		float mx = device_max(begin, row);
@@ -266,7 +266,7 @@ namespace MyGpu
     }
 	// Overload: in == out
 	inline void gpu_batch_softmax_minus_id(
-		device_ptr<float> begin, int row, int col, float *out, int *labels)
+		device_ptr<float> begin, int row, int col, int *labels)
 	{
 		gpu_batch_softmax_minus_id(begin, row, col, begin, labels);
 	}
