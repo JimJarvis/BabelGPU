@@ -68,13 +68,13 @@ public class SoftmaxTest
 		 * non-intrusive
 		 */
 		X.copyFrom(X_backup);
-		FloatMat maxProbs = new FloatMat(1, COL, false);
-		Thrust.batch_softmax_at_label(X, maxProbs, labelsDevice);
-		kit.checkGold(maxProbs, "gold_batch_softmax_at_label");
+		FloatMat outLogProbs = new FloatMat(1, COL, false);
+		Thrust.batch_softmax_at_label(X, outLogProbs, labelsDevice);
+		kit.checkGold(outLogProbs, "gold_batch_softmax_at_label");
 		kit.checkGold(X, X_backup, "softmax_at_label: X shouldn't be changed");
 		
 		// compute sum of log likelihood
-		kit.checkGold(Thrust.log_sum(maxProbs), "gold_log_prob", 1e-6f, "Sum of log probs");
+		kit.checkGold(Thrust.sum(outLogProbs), "gold_log_prob", 5e-4f, "Sum of log probs");
 		
 		/*
 		 * Label where the maximum probability occurs

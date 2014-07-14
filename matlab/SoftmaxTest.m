@@ -27,12 +27,12 @@ dlm(res, 'gold_batch_softmax');
 res = - batch_id_softmax(X, row, col, Labels);
 dlm(res, 'gold_batch_softmax_minus_id');
 
-% softmax() for only the correct label
-res = batch_softmax(X, row, col, Labels);
+% softmax() for only the correct label and take log
+res = log(batch_softmax(X, row, col, Labels));
 dlm(res, 'gold_batch_softmax_at_label');
 
 % sum of log likelihood
-dlm(sum(log(res)), 'gold_log_prob');
+dlm(sum(res), 'gold_log_prob');
 
 % The best labels from X
 [~, labelIdx] = max(reshape(X, row, col), [], 1);

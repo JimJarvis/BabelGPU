@@ -8,7 +8,7 @@ import utils.*;
 public class GpuTestKit
 {
 	private String sessionName;
-	public static float TOL = 1e-9f;
+	public static float TOL = 1e-6f;
 	private CsvReader csv;
 	
 	public GpuTestKit(String sessionName)
@@ -105,7 +105,7 @@ public class GpuTestKit
 		PP.p("["+description+"]", diff < tol ? "PASS" : "FAIL");
 		if (diff > tol)
     	{
-			PP.p("yours=", res, "  but gold=", gold);
+			PP.p("yours=", res, "  but gold=", gold, "\tdiff=", diff);
 			fail("Doesn't agree with Gold");
     	}
 	}
