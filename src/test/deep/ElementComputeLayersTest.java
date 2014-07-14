@@ -25,6 +25,20 @@ public class ElementComputeLayersTest
 //		sigmoidLayers.runDebug(plan, hasBias);
 		check(sigmoidLayers, 1e-1f, 1e1f, false);
 	}
+
+	@Test
+	@Ignore
+	public void sigmoidLayersCrossEntropyTest()
+	{
+		DeepNet sigmoidLayers = 
+				DeepFactory.debugElementComputeLayers(
+						SigmoidUnit.class, 
+						uniRandInlet(2, 2), 
+						2, scalor, 
+						SquareErrorUnit.class);
+//		sigmoidLayers.runDebug(plan, hasBias);
+		check(sigmoidLayers, 1e-1f, 1e1f, true);
+	}
 	
 	@Test
 //	@Ignore
@@ -36,8 +50,6 @@ public class ElementComputeLayersTest
 						uniRandInlet(1, 1), 
 						3, scalor, 
 						SquareErrorUnit.class);
-//		cosineLayers = 
-//				DeepFactory.debugElementComputeLayers(CosineUnit.class, uniformInlet(0.6f, 0.5f), 4, scalor, SumUnit.class);
 //		cosineLayers.runDebug(plan, hasBias);
 		check(cosineLayers, 1e-1f, 1e5f, false);
 	}

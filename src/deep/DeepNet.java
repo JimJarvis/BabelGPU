@@ -303,7 +303,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public float gradCheck(LearningPlan learningPlan, boolean hasBias, float perturbRatio, boolean verbose)
 	{
-		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 25);
+		PP.pTitledSectionLine("GRAD CHECK: " + this.name, "=", 10);
 		
 	 	this.enableDebug();
 	 	this.setBias(hasBias); // all have bias units

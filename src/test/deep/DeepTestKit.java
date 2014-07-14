@@ -24,7 +24,6 @@ public class DeepTestKit
 	public static boolean hasBias = true;
 	// Scale ElementComputeUnit output
 	public static float scalor = 3f;
-	
 	// Regularization
 	public static float reg = 1.5f;
 	public static LearningPlan plan = new LearningPlan(2, reg, 0, batchSize);
@@ -40,15 +39,19 @@ public class DeepTestKit
 		return hasBias ? dim + 1 : dim;
 	}
 
-	public static InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh)
+	static float[][] dummyInput, dummyGold;
+	/**
+	 * CrossEntropyUnit requires that the sum of each column of goldMat must be 1
+	 */
+	public static InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh, final boolean sumTo1)
 	{
 		// inDim and outDim + 1 because of bias units
-		final float[][] dummyInput = 
+		dummyInput = 
 				CpuUtil.randFloatMat(inDim + 1, batchSize, inputLow, inputHigh);
 
-		final float[][] dummyGold = 
+		dummyGold = 
 				CpuUtil.randFloatMat(outDim + 1, batchSize, goldLow, goldHigh);
-
+		
 		return new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize)
 		{
 			boolean hasNext = true;
@@ -61,6 +64,13 @@ public class DeepTestKit
 				this.goldMat.setHostArray(dummyGold);
 				this.goldMat.toDevice(true);
 				if (hasBias) this.goldMat.fillLastRow0();
+
+				if (sumTo1) // normalize col sum to 1 for CrossEntropyUnit
+					for (int c = 0; c < goldMat.col; c++)
+					{
+						FloatMat colMat = goldMat.createColOffset(c, c+1);
+						GpuBlas.scale(colMat, 1f / colMat.sum());
+					}
 			}
 			@Override
 			public void nextBatch()
@@ -80,10 +90,21 @@ public class DeepTestKit
 	/**
 	 * inputLow, High = +/- inputSymm
 	 * goldLow, High = +/- goldSymm
+	 * CrossEntropyUnit requires that the sum of each column of goldMat must be 1
 	 */
+	public static InletUnit uniRandInlet(float inputSymm, float goldSymm, boolean sumTo1)
+	{
+		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm, sumTo1);
+	}
+	// default sumTo1 = false
+	public static InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh)
+	{
+		return uniRandInlet(inputLow, inputHigh, goldLow, goldHigh, false);
+	}
+	// default sumTo1 = false
 	public static InletUnit uniRandInlet(float inputSymm, float goldSymm)
 	{
-		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm);
+		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm, false);
 	}
 	
 	// Produce an artificial Inlet with uniform input and gold
@@ -124,14 +145,14 @@ public class DeepTestKit
 	{
 		if (net.getParams().size() == 0// this is a PureCompute debug network 
 			// the terminal class requires inDim == outDim
-			&& Arrays.asList( new Class[] {SquareErrorUnit.class}).contains(net.terminal.getClass())
+			&& Arrays.asList( new Class[] {SquareErrorUnit.class, CrossEntropyUnit.class}).contains(net.terminal.getClass())
 			&& inDim != outDim)
 		{
 			fail("PureComputeLayer debug test must have inDim == outDim");
 		}
 		
 		float avgPercentErr = net.gradCheck(plan, hasBias, perturbRatio, verbose);
-		assertTrue(net.name + " grad check", CpuUtil.withinTol(avgPercentErr, 0, TOL));
+		assertTrue(net.name + " grad check", CpuUtil.equal(avgPercentErr, 0, TOL));
 	}
 	public static void check(DeepNet net, double TOL, float perturbRatio) {	check(net, TOL, perturbRatio, false);	}
 	public static void check(DeepNet net, double TOL, boolean verbose) {	check(net, TOL, 1e3f, verbose);	}

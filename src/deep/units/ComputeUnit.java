@@ -104,6 +104,4 @@ public abstract class ComputeUnit extends Unit
 	 * Needs to be called BEFORE setup()
 	 */
 	public void setMergeIO(boolean mergeIO) { this.mergeIO = mergeIO; }
-	
-	public boolean isMergeIO() {	return this.mergeIO;	}
 }

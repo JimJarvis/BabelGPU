@@ -41,6 +41,21 @@ public class SimpleSigmoidNetTest
 	
 	@Test
 //	@Ignore
+	public void linearLayersCrossEntropyTest()
+	{
+		PP.p("LINEAR: Softmax-CrossEntropy");
+		DeepNet linearLayers = 
+				DeepFactory.debugLinearLayers(
+						uniRandInlet(2, 3, true),
+						new int[] {5, 8, 6, outDim},
+						CrossEntropyUnit.class, 
+						Initializer.uniformRandIniter(1));
+//		linearLayers.runDebug(plan, hasBias);
+		check(linearLayers, 1e-2, 1e2f, false);
+	}
+	
+	@Test
+//	@Ignore
 	public void linearLayersSumTest()
 	{
 		PP.p("LINEAR: Sum");

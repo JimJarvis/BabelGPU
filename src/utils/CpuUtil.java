@@ -22,7 +22,7 @@ public class CpuUtil
 	/**
 	 * @return whether abs(actual - gold) < TOL
 	 */
-	public static boolean withinTol(double actual, double gold, double TOL)
+	public static boolean equal(double actual, double gold, double TOL)
 	{
 		return Math.abs(actual - gold) < TOL;
 	}
