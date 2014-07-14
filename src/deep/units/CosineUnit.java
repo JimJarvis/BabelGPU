@@ -22,14 +22,14 @@ public class CosineUnit extends ElementComputeUnit
 	@Override
 	public void forward_element()
 	{
-		Thrust.cos(input.data, output.data);
+		Thrust.cos(input.data(), output.data());
 	}
 
 	@Override
 	public void backward_element()
 	{
-		Thrust.sin(input.data, input.gradient);
-		input.gradient.linear(-1, 0);
+		Thrust.sin(input.data(), input.gradient());
+		GpuBlas.scale(input.gradient(), -1);
 	}
 
 }

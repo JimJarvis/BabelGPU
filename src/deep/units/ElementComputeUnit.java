@@ -53,7 +53,7 @@ public abstract class ElementComputeUnit extends ComputeUnit
 	{
 		forward_element();
 		if (scalor != 1)
-    		output.data.linear(scalor, 0);
+			GpuBlas.scale(output.data(), scalor);
 	}
 	
 	public abstract void forward_element();
@@ -68,9 +68,9 @@ public abstract class ElementComputeUnit extends ComputeUnit
 		if (input.hasGradient())
 		{
 			backward_element();
-    		GpuBlas.dotMult(output.gradient, input.gradient, scalor);
+    		GpuBlas.dotMult(output.gradient(), input.gradient(), scalor);
     		if (hasBias)
-    			input.gradient.fillLastRow0();
+    			input.gradient().fillLastRow0();
 		}
 	}
 	

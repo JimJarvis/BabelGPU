@@ -281,11 +281,11 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (ComputeUnit unit : this.iterable(forward))
 		{
 			PP.p(unit.name);
-			PP.p("input", unit.input.data.row, "*", unit.input.data.col, ":", unit.input, "\n");
+			PP.p("input", unit.input.data().row, "*", unit.input.data().col, ":", unit.input, "\n");
 			if (unit instanceof ParamComputeUnit)
 			{
 				ParamUnit W = ((ParamComputeUnit) unit).W;
-				PP.p("W", W.data.row, "*", W.data.col, ":", W);
+				PP.p("W", W.data().row, "*", W.data().col, ":", W);
 			}
 			PP.pSectionLine();
 		}
@@ -346,8 +346,8 @@ public class DeepNet implements Iterable<ComputeUnit>
             // if doesn't have any param, 'params' will only have 1 null, iterate once and exit this loop
 			w = hasParams ? param : inlet;
 			
-			mat = new FloatMat(w.gradient);
-			mat.copyFrom(w.gradient);
+			mat = new FloatMat(w.gradient());
+			mat.copyFrom(w.gradient());
 			propGrad[i ++] = mat;
 			totalSize += mat.size() - (hasBias ? mat.row : 0);
 			totalAbsSum += mat.clone().abs().sum();
@@ -361,7 +361,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (ParamUnit param : params)
 		{
 			w = hasParams ? param : inlet;
-			mat = new FloatMat(w.data);
+			mat = new FloatMat(w.data());
 					
 			for (int idx = 0 ; idx < mat.size(); idx ++)
 			{
@@ -377,7 +377,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 					this.reset(); inlet.nextBatch();
     				
             		// Perturb -EPS
-            		w.data.incrSingle(idx, perturb * EPS);
+            		w.data().incrSingle(idx, perturb * EPS);
             		forwprop();
             		float result = terminal.lossTotal();
 

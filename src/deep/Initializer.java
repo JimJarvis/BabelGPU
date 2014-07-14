@@ -10,7 +10,7 @@ public abstract class Initializer
 {
 	public abstract void init(FloatMat w);
 	
-	public void init(ParamUnit W) {	this.init(W.data);  }
+	public void init(ParamUnit W) {	this.init(W.data());  }
 	
 	
 	private static final GpuRand gRand = new GpuRand(GpuRand.SEED);

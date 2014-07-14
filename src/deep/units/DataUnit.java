@@ -1,12 +1,18 @@
 package deep.units;
 
+import deep.DeepException;
 import utils.PP;
 import gpu.FloatMat;
 
 public class DataUnit extends Unit
 {
-    public FloatMat data = null;
-    public FloatMat gradient = null;
+    protected FloatMat data = null;
+    protected FloatMat gradient = null;
+    
+    // If the last batch is smaller than the previous ones
+    private int batchSize;
+    private FloatMat dataSub = null; // offset-mat: doesn't contain any GPU memory
+    private FloatMat gradientSub = null; // offset-mat: doesn't contain any GPU memory
     
     /**
      *  Dummy placeholder: if gradient == FloatMat.DUMMY, 
@@ -17,6 +23,10 @@ public class DataUnit extends Unit
 		super(name);
 		this.data = data;
 		this.gradient = gradient;
+		this.batchSize = data.col;
+		// For offset purpose
+		this.dataSub = data;
+		this.gradientSub = gradient;
 	}
 
 	/**
@@ -27,9 +37,49 @@ public class DataUnit extends Unit
 		this(name, data, null);
 	}
 	
+	/**
+	 * @return data.row
+	 */
 	public int dim() { return data.row; }
+
+	/**
+	 * @return Might be data.col, might be fewer
+	 */
+	public int batchSize() {	return batchSize; }
 	
-	public int batchSize() {	return data.col;	}
+	/**
+	 *  If the next batch has fewer columns than the previous
+	 *  We createOffset under the hood
+	 */
+	public void setNewBatch(int newBatchSize)
+	{
+		this.batchSize = newBatchSize;
+		// less than a previous batch in the latest data
+		if (batchSize < data.col)
+		{
+			this.dataSub = this.data.createColOffset(0, batchSize);
+			if (isGradientComputed())
+				this.gradientSub = this.gradient.createColOffset(0, batchSize);
+		}
+		else if (batchSize > data.col)
+			throw new DeepException("Batch size exceeds GPU 'data' matrix col dim.");
+	}
+	
+	/**
+	 * Should use this to access 'data' field
+	 */
+	public FloatMat data()
+	{
+		return batchSize < data.col ? this.dataSub : this.data;
+	}
+
+	/**
+	 * Should use this to access 'data' field
+	 */
+	public FloatMat gradient()
+	{
+		return batchSize < data.col ? this.gradientSub : this.gradient;
+	}
 	
 	public void initGradient()
 	{
@@ -39,6 +89,14 @@ public class DataUnit extends Unit
 	public boolean hasGradient()
 	{
 		return this.gradient != null;
+	}
+	
+	/**
+	 * Sometimes we don't explicitly compute the gradient, but do SGD on W.data directly
+	 */
+	public boolean isGradientComputed()
+	{
+		return hasGradient() && this.gradient != FloatMat.DUMMY;
 	}
 	
 	/**

@@ -54,7 +54,7 @@ public abstract class TerminalUnit extends ComputeUnit
 			updateLossReg();
 		
 		if (hasBias)
-			input.data.fillLastRow0();
+			input.data().fillLastRow0();
 
 		// Will be implemented by subclasses
 		updateLossPure(forward_terminal());
@@ -132,13 +132,13 @@ public abstract class TerminalUnit extends ComputeUnit
 			tmp_data_sqs = new FloatMat[wList.size()];
 			int i = 0;
 			for (ParamUnit w : wList)
-				tmp_data_sqs[i ++] = new FloatMat(w.data);
+				tmp_data_sqs[i ++] = new FloatMat(w.data());
 		}
 		// L2 regularizer
 		float loss = 0;
 		for (int i = 0; i < wList.size(); i++)
 		{
-            Thrust.square(wList.get(i).data, tmp_data_sqs[i]);
+            Thrust.square(wList.get(i).data(), tmp_data_sqs[i]);
 			loss += tmp_data_sqs[i].sum();
 		}
 		this.lossReg += 0.5 * loss * learningPlan.reg;

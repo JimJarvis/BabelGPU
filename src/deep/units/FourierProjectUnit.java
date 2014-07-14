@@ -45,7 +45,7 @@ public class FourierProjectUnit extends ComputeUnit
 	
 	public FloatMat getProjection()
 	{
-		return projector.data;
+		return projector.data();
 	}
 
 	@Override
@@ -53,16 +53,16 @@ public class FourierProjectUnit extends ComputeUnit
 	{
 		if (hasBias)
 		// The last row will have all ones
-			input.data.fillLastRow1();
-		GpuBlas.mult(projector.data, input.data, output.data);
+			input.data().fillLastRow1();
+		GpuBlas.mult(projector.data(), input.data(), output.data());
 	}
 
 	@Override
 	public void backward()
 	{
-		// update input.gradient only when necessary 
+		// update input.gradient() only when necessary 
 		// Don't upgrade the gradient of the input layer, of course
 		if (input.hasGradient())
-			GpuBlas.mult(projector.data.transpose(), output.gradient, input.gradient);
+			GpuBlas.mult(projector.data().transpose(), output.gradient(), input.gradient());
 	}
 }

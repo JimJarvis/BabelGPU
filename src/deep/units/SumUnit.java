@@ -25,13 +25,13 @@ public class SumUnit extends TerminalUnit
 	@Override
 	protected float forward_terminal()
 	{
-		return input.data.sum();
+		return input.data().sum();
 	}
 
 	@Override
 	public void backward()
 	{
-		Thrust.fill(input.gradient, super.batchNormalizer());
+		Thrust.fill(input.gradient(), super.batchNormalizer());
 	}
 
 }

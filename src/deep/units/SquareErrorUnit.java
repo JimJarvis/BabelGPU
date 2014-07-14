@@ -16,12 +16,12 @@ public class SquareErrorUnit extends TerminalUnit
 	public float forward_terminal()
 	{
 		if (tmp_y_minus_input_sq == null)
-			tmp_y_minus_input_sq = new FloatMat(input.data);
+			tmp_y_minus_input_sq = new FloatMat(input.data());
 		float norm = super.batchNormalizer();
 		
 		// This is actually the backward step:
-		GpuBlas.add(input.data, inlet.goldMat, input.gradient, norm, -norm);
-		Thrust.square(input.gradient, tmp_y_minus_input_sq);
+		GpuBlas.add(input.data(), inlet.goldMat, input.gradient(), norm, -norm);
+		Thrust.square(input.gradient(), tmp_y_minus_input_sq);
 		
         // we give back what we divide too much
 		// This amount will be used to update lossPure
