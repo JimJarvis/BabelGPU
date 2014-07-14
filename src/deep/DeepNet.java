@@ -419,24 +419,6 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	/**
-	 * Default verbose = false, hasBias = true, perturbRatio = 1e3f
-	 * @see DeepNet#gradCheck(LearningPlan, true)
-	 */
-	public float gradCheck(LearningPlan plan)
-	{	
-		return this.gradCheck(plan, true, 1e3f, false);
-	}
-	
-	/**
-	 * Default verbose = false, perturbRatio = 1e3f
-	 * @see DeepNet#gradCheck(LearningPlan, true)
-	 */
-	public float gradCheck(LearningPlan plan, boolean hasBias)
-	{	
-		return this.gradCheck(plan, hasBias, 1e3f, false);
-	}
-	
-	/**
 	 * Default verbose = false
 	 */
 	public float gradCheck(LearningPlan plan, boolean hasBias, float perturbRatio)

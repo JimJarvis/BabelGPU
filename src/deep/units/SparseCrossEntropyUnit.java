@@ -14,21 +14,18 @@ public class SparseCrossEntropyUnit extends TerminalUnit
 		super(name, inlet);
 	}
 
-	private FloatMat tmp_outProb;
+	private FloatMat tmp_outLogProb;
 	
 	@Override
 	protected float forward_terminal()
 	{
 		int batch = input.batchSize();
 
-		if (tmp_outProb == null)
-			tmp_outProb = new FloatMat(batch, 1);
-		else if (batch != tmp_outProb.col)
-			tmp_outProb = tmp_outProb.createColOffset(0, batch);
+		if (tmp_outLogProb == null)
+			tmp_outLogProb = new FloatMat(batch, 1);
 
-		Thrust.batch_softmax_at_label(input.data(), tmp_outProb, inlet.goldLabels);
-		
-		return - Thrust.log_sum(tmp_outProb);
+		return 
+			- Thrust.batch_softmax_at_label(input.data(), tmp_outLogProb, inlet.goldLabels);
 	}
 
 	@Override

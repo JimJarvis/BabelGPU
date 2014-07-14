@@ -12,7 +12,7 @@ public class LinearTest
 	public static void setUp() { systemInit(); }
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void linearLayersSquareErrorTest()
 	{
 		DeepNet linearLayers = 
@@ -23,44 +23,41 @@ public class LinearTest
 						Initializer.uniformRandIniter(1));
 		linearLayers.name = "Linear + SquareError";
 //		linearLayers.runDebug(plan, hasBias);
-		check(linearLayers, 3e-4, 1e2f, false);
+		check(linearLayers, 5e-4, 1e2f, false);
 	}
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void linearLayersCrossEntropyTest()
 	{
 		DeepNet linearLayers = 
 				DeepFactory.debugLinearLayers(
 						uniRandInlet(2, 3, InletMode.GoldSumTo1),
-						new int[] {5, 8, 6, outDim},
+						new int[] {5, 6, outDim},
 						CrossEntropyUnit.class, 
 						Initializer.uniformRandIniter(1));
 		linearLayers.name = "Linear + CrossEntropy";
 //		linearLayers.runDebug(plan, hasBias);
-		check(linearLayers, 1e-2, 1e3f, false);
+		check(linearLayers, 5e-2, 1e2f, false);
 	}
 	
 	@Test
 //	@Ignore
 	public void linearLayersSparseCrossEntropyTest()
 	{
-		inDim = 3;
-		outDim = 3;
-		batchSize = 2;
 		DeepNet linearLayers = 
 				DeepFactory.debugLinearLayers(
-						uniRandInlet(2, 0, InletMode.GoldLabel),
-						new int[] {4, outDim},
+						uniRandInlet(1, 0, InletMode.GoldLabel),
+						new int[] {8, 3, outDim},
 						SparseCrossEntropyUnit.class, 
 						Initializer.uniformRandIniter(1));
 		linearLayers.name = "Linear + SparseCrossEntropy";
 //		linearLayers.runDebug(plan, hasBias);
-		check(linearLayers, 1, 1e2f, true);
+		check(linearLayers, 5e-2, 1e2f, false);
 	}
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void linearLayersSumTest()
 	{
 		DeepNet linearLayers = 
