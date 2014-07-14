@@ -1,10 +1,12 @@
 package deep.units;
 
+import com.googlecode.javacpp.IntPointer;
 import gpu.FloatMat;
 
 public abstract class InletUnit extends DataUnit
 {
 	public FloatMat goldMat;
+	public IntPointer goldLabels;
 	
 	/**
 	 * Inlet doesn't have gradient
