@@ -197,10 +197,11 @@ public class Natives
     /**
      *  Only the probability at the correct label
      *  Non-intrusive: 'input' won't be changed
+     *  @return sum(outLogProb)
      */
-    public static native void gpu_batch_softmax_at_label(
+    public static native float gpu_batch_softmax_at_label(
     				@ByVal FloatDevicePointer begin, int row, int col, 
-    				@ByVal FloatDevicePointer outProb, @ByPtr IntPointer labels);
+    				@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
     
     /**
      * softmax(alpha_vec) - I[y == j]

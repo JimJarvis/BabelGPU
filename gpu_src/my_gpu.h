@@ -370,14 +370,17 @@ namespace MyGpu
 		gpu_softmax_minus_id<T>(begin, size, begin, label);
 	}
 
-	/* softmax(alpha_vec) at only the correct label. 'outProb' is a 1 float device_ptr. 'begin' data won't be changed */ 
+	// softmax(alpha_vec) at only the correct label. 'outLogProb' is a 1 float device_ptr. 'begin' data won't be changed
+	// Return sum of outLogProb
 	template <typename T>
-	inline void gpu_softmax_at_label(device_ptr<T> begin, int size, int label, device_ptr<T> outProb) 
+	inline float gpu_softmax_at_label(device_ptr<T> begin, int size, int label, device_ptr<T> outLogProb) 
 	{ 
 		T mx = gpu_max<T>(begin, size); 
 		T expSum = thrust::transform_reduce(begin, begin + size, 
 											functor_exp_1<T>(-mx), 0.0, thrust::plus<T>());
-		outProb[0] = exp(begin[label] - mx) / expSum; 
+		float sumLogProb = (begin[label] - mx) - log(expSum); 
+		outLogProb[0] = sumLogProb;
+		return sumLogProb;
 	}
 
 	// Sum of log of correct label probability

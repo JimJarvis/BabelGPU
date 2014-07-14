@@ -413,13 +413,14 @@ public class Thrust
     /**
      * Minibatch: softmax(alpha_vec)
      * @param x non-intrusive, x won't be changed
-     * @param outProb writes only the prob at the correct label of a column
+     * @param outLogProb writes only the log(prob) at the correct label of a column
 	 * @param labels must be already on GPU. Call copy_host_to_device().
+	 * @return sum(outLogProb)
      */
-    public static void batch_softmax_at_label(FloatMat x, FloatMat outProb, IntPointer labels)
+    public static float batch_softmax_at_label(FloatMat x, FloatMat outLogProb, IntPointer labels)
     {
-    	Natives.gpu_batch_softmax_at_label(
-    			x.getThrustPointer(), x.row, x.col, outProb.getThrustPointer(), labels);
+    	return Natives.gpu_batch_softmax_at_label(
+            			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
     }
     
     /**

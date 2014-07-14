@@ -186,7 +186,7 @@ namespace MyGpu
 	// Non-intrusive: doesn't change 'begin'
 	template <typename T>
 	__global__
-	void kernel_batch_softmax(
+	void kernel_batch_softmax_at_label(
 		T *begin, int row, int col, T *outProb, int *labels)
 	{
 		ThreadIndex1D(idx, col);
@@ -198,37 +198,39 @@ namespace MyGpu
 		// subtract max from each and do exp
 		// also compute sum of these exp
 		T sum = 0;
-		T numerator, tmp;
+		T numerator;
 		int label = labels[idx];
 		for (int i = 0; i < row; i++)
 		{
-			tmp = exp(begin[i] - mx);
-			if (i == label) numerator = tmp;
-			sum += tmp;
+			if (i == label) numerator = begin[i] - mx;
+			sum += exp(begin[i] - mx);
 		}
-		outProb[idx] = numerator / sum;
+		outProb[idx] = numerator - log(sum);
 	}
 
-	// writes to 'outProb' only the probability at the correct label
+	// writes to 'outLogProb' only the log(probability) at the correct label
+	// return sum(outLogProb)
 	// int *labels is on GPU
 	// input data 'begin' won't be changed
 	template <typename T>
-	inline void gpu_batch_softmax_at_label(
-		device_ptr<T> begin, int row, int col, device_ptr<T> outProb, int *labels)
+	inline float gpu_batch_softmax_at_label(
+		device_ptr<T> begin, int row, int col, device_ptr<T> outLogProb, int *labels)
 	{
 		if (col == 1) // use the thrust version
 		{
 			int label;
 			cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-			gpu_softmax_at_label<T>(begin, row, label, outProb);
+			return gpu_softmax_at_label<T>(begin, row, label, outLogProb);
 		}
 		else // real batch
 		{
 			dim3 gridDim, blockDim;
 			setKernelDim1D(col, gridDim, blockDim);
 
-			kernel_batch_softmax<T> << <gridDim, blockDim >> >(
-				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outProb), labels);
+			kernel_batch_softmax_at_label<T> << <gridDim, blockDim >> >(
+				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outLogProb), labels);
+
+			return gpu_sum<T>(outLogProb, col);
 		}
 	}
 
