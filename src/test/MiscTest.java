@@ -28,8 +28,9 @@ public class MiscTest
 			}
 			randProjMatrix[(c - 1)*r + r-1] = 1;
 		
-			PP.setSep("\n");
-			PP.pMat(CpuUtil.deflatten(randProjMatrix, r, true));
+//			PP.setSep("\n");
+//			PP.pMat(CpuUtil.deflatten(randProjMatrix, r, true));
+		PP.p(CpuUtil.randInts(20, 3, 8));
 	}
 
 }

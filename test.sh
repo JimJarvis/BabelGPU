@@ -9,6 +9,7 @@ main="gpu/MiscTest"
 
 units="test.gpu.SoftmaxTest"
 units="test.deep.ElementComputeTest test.deep.LinearTest test.deep.CombinedTest"
+units="test.deep.LinearTest"
 
 
 cp gpu_src/*.h bin/gpu/

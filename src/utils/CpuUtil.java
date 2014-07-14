@@ -28,6 +28,28 @@ public class CpuUtil
 	}
 	
 	/**
+	 * @param low inclusive
+	 * @param high exclusive
+	 * @return sequence of random ints
+	 */
+	public static int[] randInts(int size, int low, int high)
+	{
+		int[] rands = new int[size];
+		for (int i = 0; i < rands.length; i++)
+			rands[i] = rand.nextInt(high - low) + low;
+		return rands;
+	}
+
+	/**
+	 * @param high exclusive [0, high)
+	 * @return sequence of random ints
+	 */
+	public static int[] randInts(int size, int high)
+	{
+		return randInts(size, 0, high);
+	}
+	
+	/**
 	 * Inner class for 2D coordinate in the matrix
 	 */
 	public static class Coord

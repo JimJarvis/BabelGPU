@@ -2,6 +2,8 @@ package test.deep;
 
 import static org.junit.Assert.*;
 import java.util.Arrays;
+import java.util.Random;
+import com.googlecode.javacpp.IntPointer;
 import gpu.*;
 import utils.*;
 import deep.*;
@@ -28,6 +30,8 @@ public class DeepTestKit
 	public static float reg = 1.5f;
 	public static LearningPlan plan = new LearningPlan(2, reg, 0, batchSize);
 	
+	public enum InletMode {	None, GoldSumTo1, GoldLabel	};
+	
 	public static void systemInit()
 	{
 		GpuBlas.init();
@@ -39,39 +43,41 @@ public class DeepTestKit
 		return hasBias ? dim + 1 : dim;
 	}
 
-	static float[][] dummyInput, dummyGold;
+	static float[][] dummyInput, dummyGold; static int[] dummyLabels;
 	/**
 	 * CrossEntropyUnit requires that the sum of each column of goldMat must be 1
 	 */
-	public static InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh, final boolean sumTo1)
+	public static InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh, final InletMode mode)
 	{
-		// inDim and outDim + 1 because of bias units
 		dummyInput = 
-				CpuUtil.randFloatMat(inDim + 1, batchSize, inputLow, inputHigh);
+				CpuUtil.randFloatMat(changeDim(inDim), batchSize, inputLow, inputHigh);
 
 		dummyGold = 
-				CpuUtil.randFloatMat(outDim + 1, batchSize, goldLow, goldHigh);
+				CpuUtil.randFloatMat(changeDim(outDim), batchSize, goldLow, goldHigh);
+
+		dummyLabels = CpuUtil.randInts(batchSize, outDim);
 		
 		return new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize)
 		{
 			boolean hasNext = true;
 			{
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
-			}
-			@Override
-			public void nextGold()
-			{
 				this.goldMat.setHostArray(dummyGold);
 				this.goldMat.toDevice(true);
 				if (hasBias) this.goldMat.fillLastRow0();
 
-				if (sumTo1) // normalize col sum to 1 for CrossEntropyUnit
+				if (mode == InletMode.GoldSumTo1) // normalize col sum to 1 for CrossEntropyUnit
 					for (int c = 0; c < goldMat.col; c++)
 					{
 						FloatMat colMat = goldMat.createColOffset(c, c+1);
 						GpuBlas.scale(colMat, 1f / colMat.sum());
 					}
+				else if (mode == InletMode.GoldLabel)
+					this.goldLabels = Thrust.copy_host_to_device(dummyLabels);
 			}
+			
+			@Override
+			public void nextGold() { }
 			@Override
 			public void nextBatch()
 			{
@@ -92,19 +98,19 @@ public class DeepTestKit
 	 * goldLow, High = +/- goldSymm
 	 * CrossEntropyUnit requires that the sum of each column of goldMat must be 1
 	 */
-	public static InletUnit uniRandInlet(float inputSymm, float goldSymm, boolean sumTo1)
+	public static InletUnit uniRandInlet(float inputSymm, float goldSymm, InletMode mode)
 	{
-		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm, sumTo1);
+		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm, mode);
 	}
 	// default sumTo1 = false
 	public static InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh)
 	{
-		return uniRandInlet(inputLow, inputHigh, goldLow, goldHigh, false);
+		return uniRandInlet(inputLow, inputHigh, goldLow, goldHigh, InletMode.None);
 	}
 	// default sumTo1 = false
 	public static InletUnit uniRandInlet(float inputSymm, float goldSymm)
 	{
-		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm, false);
+		return uniRandInlet(-inputSymm, inputSymm, -goldSymm, goldSymm, InletMode.None);
 	}
 	
 	// Produce an artificial Inlet with uniform input and gold
@@ -115,13 +121,12 @@ public class DeepTestKit
 			boolean hasNext = true;
 			{
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
-			}
-			@Override
-			public void nextGold()
-			{
 				this.goldMat.fill(goldVal);
 				if (hasBias) this.goldMat.fillLastRow0();
 			}
+
+			@Override
+			public void nextGold() { }
 			@Override
 			public void nextBatch()
 			{

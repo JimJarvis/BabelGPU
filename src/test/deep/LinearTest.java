@@ -12,7 +12,7 @@ public class LinearTest
 	public static void setUp() { systemInit(); }
 	
 	@Test
-//	@Ignore
+	@Ignore
 	public void linearLayersSquareErrorTest()
 	{
 		DeepNet linearLayers = 
@@ -27,12 +27,12 @@ public class LinearTest
 	}
 	
 	@Test
-//	@Ignore
+	@Ignore
 	public void linearLayersCrossEntropyTest()
 	{
 		DeepNet linearLayers = 
 				DeepFactory.debugLinearLayers(
-						uniRandInlet(2, 3, true),
+						uniRandInlet(2, 3, InletMode.GoldSumTo1),
 						new int[] {5, 8, 6, outDim},
 						CrossEntropyUnit.class, 
 						Initializer.uniformRandIniter(1));
@@ -43,6 +43,24 @@ public class LinearTest
 	
 	@Test
 //	@Ignore
+	public void linearLayersSparseCrossEntropyTest()
+	{
+		inDim = 3;
+		outDim = 3;
+		batchSize = 2;
+		DeepNet linearLayers = 
+				DeepFactory.debugLinearLayers(
+						uniRandInlet(2, 0, InletMode.GoldLabel),
+						new int[] {4, outDim},
+						SparseCrossEntropyUnit.class, 
+						Initializer.uniformRandIniter(1));
+		linearLayers.name = "Linear + SparseCrossEntropy";
+//		linearLayers.runDebug(plan, hasBias);
+		check(linearLayers, 1, 1e2f, true);
+	}
+	
+	@Test
+	@Ignore
 	public void linearLayersSumTest()
 	{
 		DeepNet linearLayers = 
