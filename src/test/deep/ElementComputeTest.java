@@ -1,13 +1,12 @@
 package test.deep;
 
-import static org.junit.Assert.*;
 import org.junit.*;
 import static test.deep.DeepTestKit.*;
 import utils.*;
 import deep.*;
 import deep.units.*;
 
-public class ElementComputeLayersTest
+public class ElementComputeTest
 {
 	@BeforeClass
 	public static void setUp() { systemInit(); }
@@ -27,17 +26,18 @@ public class ElementComputeLayersTest
 	}
 
 	@Test
-	@Ignore
+//	@Ignore
 	public void sigmoidLayersCrossEntropyTest()
 	{
-		DeepNet sigmoidLayers = 
+		DeepNet net = 
 				DeepFactory.debugElementComputeLayers(
 						SigmoidUnit.class, 
-						uniRandInlet(2, 2), 
-						2, scalor, 
-						SquareErrorUnit.class);
+						uniRandInlet(2, 1, true), 
+						1, scalor, 
+						CrossEntropyUnit.class);
+		net.name = "Sigmoid + CrossEntropy";
 //		sigmoidLayers.runDebug(plan, hasBias);
-		check(sigmoidLayers, 1e-1f, 1e1f, true);
+		check(net, 1e-1f, 1e1f, false);
 	}
 	
 	@Test
@@ -52,5 +52,20 @@ public class ElementComputeLayersTest
 						SquareErrorUnit.class);
 //		cosineLayers.runDebug(plan, hasBias);
 		check(cosineLayers, 1e-1f, 1e5f, false);
+	}
+	
+	@Test
+//	@Ignore
+	public void cosineLayersCrossEntropyTest()
+	{
+		DeepNet net = 
+				DeepFactory.debugElementComputeLayers(
+						CosineUnit.class, 
+						uniRandInlet(2, 1, true), 
+						2, scalor, 
+						CrossEntropyUnit.class);
+		net.name = "Cosine +CrossEntropy";
+//		sigmoidLayers.runDebug(plan, hasBias);
+		check(net, 1e-1f, 1e5f, false);
 	}
 }

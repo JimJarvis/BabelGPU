@@ -1,7 +1,6 @@
 package deep.units;
 
-import deep.DeepException;
-import deep.Initializer;
+import deep.*;
 import gpu.FloatMat;
 
 public class ParamUnit extends DataUnit
