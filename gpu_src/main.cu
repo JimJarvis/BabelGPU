@@ -245,7 +245,7 @@ void test_softmax_minus_id_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	lp = offset(lp, 2);
 
-	gpu_batch_softmax_minus_id(&D[0], 4, 3, &D[0], lp);
+	gpu_batch_softmax_minus_id(&D[0], 4, 3, &D[0], lp, false);
 	printD(D, 4);
 }
 
@@ -257,7 +257,7 @@ void test_softmax_batch()
 	device_vector<float> D = getDf(x, 12);
 
 	printf("Unlabeled softmax\n");
-	gpu_batch_softmax(&D[0], 4, 3);
+	gpu_batch_softmax(&D[0], 4, 3, false);
 	printD(D, 4);
 
 	printf("Labeled softmax\n");
@@ -266,7 +266,7 @@ void test_softmax_batch()
 	int *lp = thrust::raw_pointer_cast(&L[0]);
 	D = getDf(x, 12);
 	device_vector<float> out(4);
-	gpu_batch_softmax_at_label(&D[0], 3, 4, &out[0], lp);
+	gpu_batch_softmax_at_label(&D[0], 3, 4, &out[0], lp, false);
 	printD(out, 1);
 	printf("Log likelihood sum: %f\n", 
 		   gpu_log_sum(&out[0], out.size()));
@@ -275,13 +275,13 @@ void test_softmax_batch()
 	float y[SIZE];
 	for (int i = 0; i < SIZE; y[i] = float(rand()) / RAND_MAX, i++);
 	D = getDf(y, SIZE);
-	gpu_batch_softmax(&D[0], 2, SIZE/2);
+	gpu_batch_softmax(&D[0], 2, SIZE / 2, false);
 
 	device_vector<int> outLabels(4);
 	float p[12] = {2, 5, 1, 3, -4, -2, 1, 0, 9, 3, -5, 6};
 	D = getDf(p, 12);
 	lp = thrust::raw_pointer_cast(&outLabels[0]);
-	gpu_best_label(&D[0], 4, 3, lp);
+	gpu_best_label(&D[0], 4, 3, lp, false);
 	printD(outLabels, 1);
 
 	int outLabelHost[10];

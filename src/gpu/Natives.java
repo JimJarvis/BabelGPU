@@ -191,8 +191,8 @@ public class Natives
      * To calculate softmax() only, no subtraction from id[]
      * intrusive: changes input data unless 'out' is specified
      */
-    public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col);
-    public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out);
+    public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col, boolean hasBias);
+    public static native void gpu_batch_softmax(@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out, boolean hasBias);
     
     /**
      *  Only the probability at the correct label
@@ -201,20 +201,20 @@ public class Natives
      */
     public static native float gpu_batch_softmax_at_label(
     				@ByVal FloatDevicePointer begin, int row, int col, 
-    				@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels);
+    				@ByVal FloatDevicePointer outLogProb, @ByPtr IntPointer labels, boolean hasBias);
     
     /**
      * softmax(alpha_vec) - I[y == j]
      * Uses Thrust, only 1 col
      */
     public static native void gpu_batch_softmax_minus_id(
-    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels);
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer labels, boolean hasBias);
     public static native void gpu_batch_softmax_minus_id(
-    		@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out, @ByPtr IntPointer labels);
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByVal FloatDevicePointer out, @ByPtr IntPointer labels, boolean hasBias);
     
     // The best labels, non-intrusive
     public static native void gpu_best_label(
-    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer outLabels);
+    		@ByVal FloatDevicePointer begin, int row, int col, @ByPtr IntPointer outLabels, boolean hasBias);
     
     // Helper for minibatch
     public static native @ByPtr IntPointer copy_host_to_device(@ByPtr IntPointer host, int size);

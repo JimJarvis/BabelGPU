@@ -128,10 +128,14 @@ namespace MyGpu
 		return mx;
 	}
 
+// If hasBias, don't process the last row
+#define biasrow (hasBias ? row - 1 : row)
+
 	template <typename T>
 	__inline__ __device__
-	void device_softmax(T *begin, int row, int col, T *out)
+	void device_softmax(T *begin, int row, int col, T *out, bool hasBias)
 	{
+		if (hasBias) -- row; // if hasBias, don't calc the last row
 		// find max
 		T mx = device_max<T>(begin, row);
 		// subtract max from each and do exp
@@ -150,36 +154,36 @@ namespace MyGpu
 	///// mini-batch softmax(alpha_vec)
 	template <typename T>
 	__global__
-	void kernel_batch_softmax(T *begin, int row, int col, T *out)
+	void kernel_batch_softmax(T *begin, int row, int col, T *out, bool hasBias)
 	{
 		ThreadIndex1D(idx, col);
 		begin += idx * row; // beginning of a column
 		if (out != begin) out += idx * row;
-		device_softmax<T>(begin, row, col, out);
+		device_softmax<T>(begin, row, col, out, hasBias);
 	}
 
 	// Computes the mini-batch softmax probability distribution for the full matrix
 	template <typename T>
 	inline void gpu_batch_softmax(
-		device_ptr<T> begin, int row, int col, device_ptr<T> out)
+		device_ptr<T> begin, int row, int col, device_ptr<T> out, bool hasBias)
 	{
 		if (col == 1) // use the thrust version
-			gpu_softmax<T>(begin, row, out);
+			gpu_softmax<T>(begin, biasrow, out);
 		else // real batch
 		{
 			dim3 gridDim, blockDim;
 			setKernelDim1D(col, gridDim, blockDim);
 
 			kernel_batch_softmax<T> << <gridDim, blockDim >> >(
-				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out));
+				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), hasBias);
 		}
 	}
 
 	template <typename T>
 	inline void gpu_batch_softmax(
-		device_ptr<T> begin, int row, int col)
+		device_ptr<T> begin, int row, int col, bool hasBias)
 	{
-		gpu_batch_softmax<T>(begin, row, col, begin);
+		gpu_batch_softmax<T>(begin, row, col, begin, hasBias);
 	}
 
 	///// mini-batch softmax(alpha_vec) that writes to 'outProb' only the probability at the correct label
@@ -187,12 +191,13 @@ namespace MyGpu
 	template <typename T>
 	__global__
 	void kernel_batch_softmax_at_label(
-		T *begin, int row, int col, T *outProb, int *labels)
+		T *begin, int row, int col, T *outProb, int *labels, bool hasBias)
 	{
 		ThreadIndex1D(idx, col);
 
 		begin += idx * row; // beginning of a column
 
+		if (hasBias) -- row; // if hasBias, don't calc the last row
 		// find max
 		T mx = device_max<T>(begin, row);
 		// subtract max from each and do exp
@@ -214,13 +219,13 @@ namespace MyGpu
 	// input data 'begin' won't be changed
 	template <typename T>
 	inline float gpu_batch_softmax_at_label(
-		device_ptr<T> begin, int row, int col, device_ptr<T> outLogProb, int *labels)
+		device_ptr<T> begin, int row, int col, device_ptr<T> outLogProb, int *labels, bool hasBias)
 	{
 		if (col == 1) // use the thrust version
 		{
 			int label;
 			cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-			return gpu_softmax_at_label<T>(begin, row, label, outLogProb);
+			return gpu_softmax_at_label<T>(begin, biasrow, label, outLogProb);
 		}
 		else // real batch
 		{
@@ -228,7 +233,7 @@ namespace MyGpu
 			setKernelDim1D(col, gridDim, blockDim);
 
 			kernel_batch_softmax_at_label<T> << <gridDim, blockDim >> >(
-				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outLogProb), labels);
+				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(outLogProb), labels, hasBias);
 
 			return gpu_sum<T>(outLogProb, col);
 		}
@@ -238,12 +243,12 @@ namespace MyGpu
     // return the probability (before log()) at the correct label
 	template <typename T>
     __inline__ __device__
-	T kernel_softmax_minus_id(int idx, T *begin, int row, int col, T *out, int *labels)
+	T kernel_softmax_minus_id(int idx, T *begin, int row, int col, T *out, int *labels, bool hasBias)
 	{
 		begin += idx * row; // beginning of a column
 		if (out != begin) out += idx * row;
 
-		device_softmax<T>(begin, row, col, out);
+		device_softmax<T>(begin, row, col, out, hasBias);
 
 		// Add 1 to the identity function
 		T probCorrect = out[labels[idx]];
@@ -255,22 +260,22 @@ namespace MyGpu
 	template <typename T>
     __global__
 	void kernel_batch_softmax_minus_id(
-			T *begin, int row, int col, T *out, int *labels)
+			T *begin, int row, int col, T *out, int *labels, bool hasBias)
 	{
 		ThreadIndex1D(idx, col);
 
-		kernel_softmax_minus_id<T>(idx, begin, row, col, out, labels);
+		kernel_softmax_minus_id<T>(idx, begin, row, col, out, labels, hasBias);
 	}
 
 	template <typename T>
     inline void gpu_batch_softmax_minus_id(
-            device_ptr<T> begin, int row, int col, device_ptr<T> out, int *labels)
+            device_ptr<T> begin, int row, int col, device_ptr<T> out, int *labels, bool hasBias)
     {
         if (col == 1) // use the thrust version
         {
             int label;
             cudaMemcpy(&label, labels, sizeof(int), cudaMemcpyDeviceToHost);
-			gpu_softmax_minus_id<T>(begin, row, out, label);
+			gpu_softmax_minus_id<T>(begin, biasrow, out, label);
         }
         else // real batch
         {
@@ -278,27 +283,28 @@ namespace MyGpu
             setKernelDim1D(col, gridDim, blockDim);
 
 			kernel_batch_softmax_minus_id<T> << <gridDim, blockDim >> >(
-				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), labels);
+				thrust::raw_pointer_cast(begin), row, col, thrust::raw_pointer_cast(out), labels, hasBias);
         }
     }
 	// Overload: in == out
 	template <typename T>
 	inline void gpu_batch_softmax_minus_id(
-		device_ptr<T> begin, int row, int col, int *labels)
+		device_ptr<T> begin, int row, int col, int *labels, bool hasBias)
 	{
-		gpu_batch_softmax_minus_id<T>(begin, row, col, begin, labels);
+		gpu_batch_softmax_minus_id<T>(begin, row, col, begin, labels, hasBias);
 	}
 
 	///// Fill 'outLabels' with the label corresponding to the maximum probability of a column
 	template <typename T>
 	__global__
 	void kernel_best_label(
-			T *begin, int row, int col, int *outLabels)
+			T *begin, int row, int col, int *outLabels, bool hasBias)
 	{
 		ThreadIndex1D(idx, col);
 
 		begin += idx * row; // beginning of a column
 
+		if (hasBias) --row;
 		// find max
 		T mx = -1e20;
 		int maxLabel = 0;
@@ -315,13 +321,13 @@ namespace MyGpu
     // outLabels is filled out on GPU
 	template <typename T>
     inline void gpu_best_label(
-            device_ptr<T> begin, int row, int col, int *outLabels)
+            device_ptr<T> begin, int row, int col, int *outLabels, bool hasBias)
     {
         dim3 gridDim, blockDim;
         setKernelDim1D(col, gridDim, blockDim);
 
 		kernel_best_label<T> << <gridDim, blockDim >> >(
-                thrust::raw_pointer_cast(begin), row, col, outLabels);
+                thrust::raw_pointer_cast(begin), row, col, outLabels, hasBias);
     }
 }
 

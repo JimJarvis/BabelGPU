@@ -21,7 +21,7 @@ public class CrossEntropyUnit extends TerminalUnit
 	@Override
 	protected float forward_terminal()
 	{
-		Thrust.batch_softmax(input.data(), input.gradient());
+		Thrust.batch_softmax(input.data(), input.gradient(), hasBias);
 
 		if (tmp_softmax == null)
 			tmp_softmax = new FloatMat(input.data());

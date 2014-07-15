@@ -380,34 +380,37 @@ public class Thrust
     /**
      * Minibatch: softmax(cols)
 	 * @param x intrusive: x will be changed unless 'out' is specified
+	 * @param hasBias if true, ignore the last row
      */
-    public static void batch_softmax(FloatMat x)
+    public static void batch_softmax(FloatMat x, boolean hasBias)
     {
-    	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col);
+    	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col, hasBias);
     }
 
-    public static void batch_softmax(FloatMat x, FloatMat out)
+    public static void batch_softmax(FloatMat x, FloatMat out, boolean hasBias)
     {
-    	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
+    	Natives.gpu_batch_softmax(x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), hasBias);
     }
 
 	/**
 	 * Minibatch: softmax(cols) - I[y == j] 
 	 * @param x intrusive: x will be changed unless 'out' is specified
 	 * @param labels must be already on GPU. Call copy_host_to_device().
+	 * @param hasBias if true, ignore the last row
 	 */
-	public static void batch_softmax_minus_id(FloatMat x, IntPointer labels)
+	public static void batch_softmax_minus_id(FloatMat x, IntPointer labels, boolean hasBias)
 	{
-		Natives.gpu_batch_softmax_minus_id(x.getThrustPointer(), x.row, x.col, labels);
+		Natives.gpu_batch_softmax_minus_id(x.getThrustPointer(), x.row, x.col, labels, hasBias);
 	}
 	/**
 	 * Minibatch: softmax(cols) - I[y == j] 
 	 * @param out result
 	 * @param labels must be already on GPU. Call copy_host_to_device().
+	 * @param hasBias if true, ignore the last row
 	 */
-	public static void batch_softmax_minus_id(FloatMat x, FloatMat out, IntPointer labels)
+	public static void batch_softmax_minus_id(FloatMat x, FloatMat out, IntPointer labels, boolean hasBias)
 	{
-		Natives.gpu_batch_softmax_minus_id(x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), labels);
+		Natives.gpu_batch_softmax_minus_id(x.getThrustPointer(), x.row, x.col, out.getThrustPointer(), labels, hasBias);
 	}
 	
     /**
@@ -415,12 +418,13 @@ public class Thrust
      * @param x non-intrusive, x won't be changed
      * @param outLogProb writes only the log(prob) at the correct label of a column
 	 * @param labels must be already on GPU. Call copy_host_to_device().
+	 * @param hasBias if true, ignore the last row
 	 * @return sum(outLogProb)
      */
-    public static float batch_softmax_at_label(FloatMat x, FloatMat outLogProb, IntPointer labels)
+    public static float batch_softmax_at_label(FloatMat x, FloatMat outLogProb, IntPointer labels, boolean hasBias)
     {
     	return Natives.gpu_batch_softmax_at_label(
-            			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels);
+            			x.getThrustPointer(), x.row, x.col, outLogProb.getThrustPointer(), labels, hasBias);
     }
     
     /**
@@ -429,11 +433,12 @@ public class Thrust
      * @param reusedDevicePtr use malloc_device() once to malloc on GPU
      * @param outLabels collects the maximum labels, 
      * 				writing from 'offset', write number of labels == label of columns
+	 * @param hasBias if true, ignore the last row
      */
     public static void best_label(
-    		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset)
+    		FloatMat x, IntPointer reusedDevicePtr, int[] outLabels, int offset, boolean hasBias)
 	{
-    	Natives.gpu_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr);
+    	Natives.gpu_best_label(x.getThrustPointer(), x.row, x.col, reusedDevicePtr, hasBias);
     	Natives.copy_device_to_host(reusedDevicePtr, outLabels, offset, x.col);
 	}
 

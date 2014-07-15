@@ -25,14 +25,14 @@ public class SparseCrossEntropyUnit extends TerminalUnit
 			tmp_outLogProb = new FloatMat(batch, 1);
 
 		return 
-			- Thrust.batch_softmax_at_label(input.data(), tmp_outLogProb, inlet.goldLabels);
+			- Thrust.batch_softmax_at_label(input.data(), tmp_outLogProb, inlet.goldLabels, hasBias);
 	}
 
 	@Override
 	public void backward()
 	{
 		// Gradient = 1/batch * (y - id)
-		Thrust.batch_softmax_minus_id(input.data(), input.gradient(), inlet.goldLabels);
+		Thrust.batch_softmax_minus_id(input.data(), input.gradient(), inlet.goldLabels, hasBias);
 		GpuBlas.scale(input.gradient(), super.batchNormalizer());
 	}
 
