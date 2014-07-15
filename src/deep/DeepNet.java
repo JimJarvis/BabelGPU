@@ -339,22 +339,25 @@ public class DeepNet implements Iterable<ComputeUnit>
 		DataUnit w; 
 		
 		int totalSize = 0;
-		float totalAbsSum = 0;
+		float totalGradAbsSum = 0, totalDataAbsSum = 0;
 		int i = 0;
 		for (ParamUnit param : params)
 		{
             // if doesn't have any param, 'params' will only have 1 null, iterate once and exit this loop
 			w = hasParams ? param : inlet;
 			
-			mat = new FloatMat(w.gradient());
+			mat = new FloatMat(w.data());
+			mat.copyFrom(w.data());
+			totalDataAbsSum += mat.abs().sum(); // mat is mutated
+
 			mat.copyFrom(w.gradient());
-			propGrad[i ++] = mat;
 			totalSize += mat.size() - (hasBias ? mat.row : 0);
-			totalAbsSum += mat.clone().abs().sum();
+			totalGradAbsSum += mat.clone().abs().sum();
+			propGrad[i ++] = mat;
 		}
 		// Get average abs parameter entry value
-		float avgAbsVal = totalAbsSum / totalSize;
-		final float EPS = Math.max( avgAbsVal / perturbRatio, 1e-3f);
+		float avgGradAbsVal = totalGradAbsSum / totalSize;
+		final float EPS = Math.max( totalDataAbsSum / totalSize / perturbRatio, 1e-3f);
 		
 		// Do finite-diff forward prop for every entry in every parameter
 		i = 0;
@@ -409,7 +412,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (i = 0 ; i < propGrad.length; i ++)
 			absErr += GpuBlas.add(propGrad[i], goldGrad[i], 1, -1).abs().sum();
 		float avgAbsErr = absErr / totalSize;
-		float avgPercentErr = avgAbsErr / avgAbsVal * 100;
+		float avgPercentErr = avgAbsErr / avgGradAbsVal * 100;
 		
 		PP.p("Average absolute error =", avgAbsErr);
 		PP.p("Average percent error =", avgPercentErr, "%\n");

@@ -22,7 +22,7 @@ public class ElementComputeTest
 						2, scalor, 
 						SquareErrorUnit.class);
 //		sigmoidLayers.runDebug(plan, hasBias);
-		check(sigmoidLayers, 1e-1f, 1e1f, false);
+		check(sigmoidLayers, 1e-1f, 1e2f, false);
 	}
 
 	@Test
@@ -37,7 +37,7 @@ public class ElementComputeTest
 						CrossEntropyUnit.class);
 		net.name = "Sigmoid + CrossEntropy";
 //		sigmoidLayers.runDebug(plan, hasBias);
-		check(net, 1e-1f, 1e1f, false);
+		check(net, 1e-1f, 1e2f, false);
 	}
 	
 	@Test
@@ -64,7 +64,22 @@ public class ElementComputeTest
 						uniRandInlet(2, 1, InletMode.GoldSumTo1), 
 						2, scalor, 
 						CrossEntropyUnit.class);
-		net.name = "Cosine +CrossEntropy";
+		net.name = "Cosine + CrossEntropy";
+//		sigmoidLayers.runDebug(plan, hasBias);
+		check(net, 1e-1f, 1e5f, false);
+	}
+
+	@Test
+//	@Ignore
+	public void cosineLayersSparseCrossEntropyTest()
+	{
+		DeepNet net = 
+				DeepFactory.debugElementComputeLayers(
+						CosineUnit.class, 
+						uniRandInlet(3, 1, InletMode.GoldLabel), 
+						3, scalor, 
+						SparseCrossEntropyUnit.class);
+		net.name = "Cosine + SparseCrossEntropy";
 //		sigmoidLayers.runDebug(plan, hasBias);
 		check(net, 1e-1f, 1e5f, false);
 	}

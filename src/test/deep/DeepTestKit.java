@@ -64,6 +64,7 @@ public class DeepTestKit
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
 				this.goldMat.setHostArray(dummyGold);
 				this.goldMat.toDevice(true);
+				
 				if (hasBias) this.goldMat.fillLastRow0();
 
 				if (mode == InletMode.GoldSumTo1) // normalize col sum to 1 for CrossEntropyUnit
@@ -123,6 +124,8 @@ public class DeepTestKit
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
 				this.goldMat.fill(goldVal);
 				if (hasBias) this.goldMat.fillLastRow0();
+				this.goldLabels = 
+						Thrust.copy_host_to_device(CpuUtil.randInts(batchSize, outDim));
 			}
 
 			@Override
