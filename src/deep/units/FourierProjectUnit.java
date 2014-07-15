@@ -41,6 +41,7 @@ public class FourierProjectUnit extends ComputeUnit
 	 */
 	public void reInitProjector()
 	{
+		this.projIniter.setBias(hasBias);
 		this.projIniter.init(projector);
 	}
 	

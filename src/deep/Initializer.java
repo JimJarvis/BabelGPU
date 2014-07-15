@@ -2,15 +2,36 @@ package deep;
 
 import java.util.ArrayList;
 
-import utils.PP;
 import gpu.*;
 import deep.units.ParamUnit;
 
 public abstract class Initializer
 {
+	private boolean hasBias = true;
+	
+	/**
+	 * All anonymous class needs to implement this
+	 */
 	public abstract void init(FloatMat w);
 	
-	public void init(ParamUnit W) {	this.init(W.data());  }
+	/**
+	 * @param hasBias if true, we'd assume W already has an extra vacant row
+	 * and then set the last row to 0
+	 * Then mult W * x will also have an extra row
+	 */
+	public void setBias(boolean hasBias) {	this.hasBias = hasBias;	}
+
+	/**
+	 * If hasBias is true, we'd assume W already has an extra vacant row
+	 * and then set the last row to 0
+	 * Then mult W * x will also have an extra row
+	 */
+	public void init(ParamUnit W)
+	{	
+		this.init(W.data());
+		if (hasBias)
+    		W.data().fillLastRow0();
+	}
 	
 	
 	private static final GpuRand gRand = new GpuRand(GpuRand.SEED);
@@ -71,23 +92,6 @@ public abstract class Initializer
 		};
 	}
 	
-	/**
-	 * Aggregate Initer to handle 'bias' units
-	 * Assume W already has an extra vacant row
-	 * Set the last row of an initiated parameter to be all 0
-	 * Then mult W * x will also have an extra row
-	 */
-	public static Initializer biasAggregIniter(final Initializer origIniter)
-	{
-		return new Initializer() {
-			@Override
-			public void init(FloatMat w)
-			{
-				origIniter.init(w);
-				w.fillLastRow0();
-			}
-		};
-	}
 	
 	// ******************** Distribution Initers ********************/
 	/**
@@ -146,8 +150,8 @@ public abstract class Initializer
 	
 	// Helper: used to set the last column of a distr-inited W to Uniform[0, 2*PI]
 	// a pure distribution initer => transform this initer
-	// hasBias would assume W has an extra row and set the last row to 0
-	private static Initializer projKernelAggregIniter(final Initializer distrIniter, boolean hasBias)
+	// Assumes an extra vacant row of 0 if hasBias is true
+	private static Initializer projKernelAggregIniter(final Initializer distrIniter)
 	{
 		Initializer origIniter = new Initializer() {
 			@Override
@@ -159,63 +163,63 @@ public abstract class Initializer
 						w.createColOffset(w.col-1, w.col), 0, 2 * Math.PI);
 			}
 		};
-		return hasBias ? biasAggregIniter(origIniter) : origIniter;
+		return origIniter;
 	}
 	
 	/**
 	 * Initialize Rahimi-Recht projection gaussian kernel, 
 	 * which is just gaussian distr itself
-	 * @param hasBias would assume W has an extra row and set the last row to 0
+	 * Assumes an extra vacant row of 0 if hasBias is true
 	 */
-	public static Initializer gaussianProjKernelIniter(final double gamma, boolean hasBias)
+	public static Initializer gaussianProjKernelIniter(final double gamma)
 	{
-		return projKernelAggregIniter(gaussianIniter(gamma), hasBias);
+		return projKernelAggregIniter(gaussianIniter(gamma));
 	}
 	
 	/**
 	 * Initialize Rahimi-Recht projection laplacian kernel, 
 	 * which is just cauchy distr
-	 * @param hasBias would assume W has an extra row and set the last row to 0
+	 * Assumes an extra vacant row of 0 if hasBias is true
 	 */
-	public static Initializer laplacianProjKernelIniter(final double gamma, boolean hasBias)
+	public static Initializer laplacianProjKernelIniter(final double gamma)
 	{
-		return projKernelAggregIniter(cauchyIniter(gamma), hasBias);
+		return projKernelAggregIniter(cauchyIniter(gamma));
 	}
 
 	/**
 	 * Initialize Rahimi-Recht projection cauchy kernel, 
 	 * which is just laplacian distr
-	 * @param hasBias would assume W has an extra row and set the last row to 0
+	 * Assumes an extra vacant row of 0 if hasBias is true
 	 */
-	public static Initializer cauchyProjKernelIniter(final double gamma, boolean hasBias)
+	public static Initializer cauchyProjKernelIniter(final double gamma)
 	{
-		return projKernelAggregIniter(laplacianIniter(gamma), hasBias);
+		return projKernelAggregIniter(laplacianIniter(gamma));
 	}
 	
 	/**
-	 * @param hasBias would assume W has an extra row and set the last row to 0
+	 * Assumes an extra vacant row of 0 if hasBias is true
 	 */
-	public static Initializer projKernelIniter(ProjKernel type, final double gamma, boolean hasBias)
+	public static Initializer projKernelIniter(ProjKernel type, final double gamma)
 	{
 		switch (type)
 		{
-		case Gaussian : return gaussianProjKernelIniter(gamma, hasBias); 
-		case Laplacian : return laplacianProjKernelIniter(gamma, hasBias); 
-		case Cauchy : return cauchyProjKernelIniter(gamma, hasBias); 
+		case Gaussian : return gaussianProjKernelIniter(gamma); 
+		case Laplacian : return laplacianProjKernelIniter(gamma); 
+		case Cauchy : return cauchyProjKernelIniter(gamma); 
 		}
 		return null;
 	}
 
 	/**
 	 * Aggregate Initer to mix different Rahimi-Recht kernels
+	 * Assumes an extra vacant row of 0 if hasBias is true
 	 * Sets the last column to be U[0, 2*PI]
 	 * @param distrIniters: each pure-distr initer is responsible for initing a range of ROWs.
 	 * can be repeated, e.g. lap for the first 30 rows, then gaussian 50 rows, then lap again 40 rows
 	 * @param relativeRatios: divide (W.row - 1) into regions for which each initers are responsible
-	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
 	public static Initializer mixProjKernelAggregIniter(
-			final ArrayList<Initializer> distrIniters, final ArrayList<Double> relativeRatios, boolean hasBias)
+			final ArrayList<Initializer> distrIniters, final ArrayList<Double> relativeRatios)
 	{
 		if (distrIniters.size() != relativeRatios.size())
 			throw new DeepException("Number of kernel initers must match number of relative ratios");
@@ -255,17 +259,16 @@ public abstract class Initializer
 		};
 		
 		// Post-process the initer to handle bias units and the extra U[0, 2*PI] col
-		return projKernelAggregIniter(mixOrigIniter, hasBias);
+		return projKernelAggregIniter(mixOrigIniter);
 	}
 	
 	/**
 	 * Use the pre-set enums to replace ArrayList<Initializers>
 	 * @param gamma assume common for all distrIniters
 	 * @see Initializer#mixProjKernelAggregIniter(ArrayList, ArrayList)
-	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
 	public static Initializer mixProjKernelAggregIniter(
-			final ArrayList<ProjKernel> projKernels, double gamma, final ArrayList<Double> relativeRatios, boolean hasBias)
+			final ArrayList<ProjKernel> projKernels, double gamma, final ArrayList<Double> relativeRatios)
 	{
 		ArrayList<Initializer> distrIniters = new ArrayList<>();
 		for (ProjKernel type : projKernels)
@@ -275,6 +278,6 @@ public abstract class Initializer
 			case Laplacian : distrIniters.add(cauchyIniter(gamma)); break;
 			case Cauchy: distrIniters.add(laplacianIniter(gamma)); break;
 			}
-		return mixProjKernelAggregIniter(distrIniters, relativeRatios, hasBias);
+		return mixProjKernelAggregIniter(distrIniters, relativeRatios);
 	}
 }
