@@ -1,5 +1,6 @@
 package test.gpu;
 
+import deep.Initializer;
 import gpu.*;
 import utils.*;
 
@@ -8,6 +9,17 @@ public class MiscTest
 	public static void main(String[] args)
 	{
 		GpuBlas.init();
+		FloatMat aa = new FloatMat(300000000, 1, false);
+		Initializer.uniformRandIniter(1).init(aa);
+		Timer t = Timer.getInstance();
+		Timer.setPrecision(10);
+		t.start();
+//		GpuBlas.scale(aa, 3);
+		aa.linear(3, 0);
+		GpuUtil.synchronize();
+		t.readFromLast();
+		
+		System.exit(0);
 		float A[] = new float[] {1, 2, 3, 4, 5, 6};
 		float B[][] = new float[][] {{1, 10, 6},
 												{2, 20, -2},
@@ -17,11 +29,6 @@ public class MiscTest
 		FloatMat b = new FloatMat(B.clone());
 		FloatMat m = b.clone();
 		FloatMat a = new FloatMat(A.clone());
-		
-		GpuBlas.add(m, b, m, 3, -1);
-		
-		PP.p(b);
-		PP.p(m);
 		
 		PP.p(GpuBlas.dotMult(a, b));
 		PP.p(b.reciprocal());

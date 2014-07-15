@@ -160,8 +160,10 @@ public abstract class Initializer
 		return origIniter;
 	}
 	
-	// Kernel projectors will need this scalor transformation
-	private static float gammaToScalor(float gamma, ProjKernel kernelType)
+	/**
+	 * Kernel projectors will need gamma -> scalor multiplier for distrIniters
+	 */
+	public static float gammaToScalor(float gamma, ProjKernel kernelType)
 	{
 		switch (kernelType)
 		{

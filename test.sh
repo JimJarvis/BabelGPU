@@ -2,16 +2,16 @@
 # to recompile the native libraries, ./test.sh c
 # To do JUnit testing, ./test.sh blabla  (whatever string not 'c')
 
-allunits="test.deep.ElementComputeTest test.deep.LinearTest test.deep.CombinedTest"
-main="gpu/RandTest"
+allunits="test.deep.ElementComputeTest test.deep.LinearTest test.deep.CombinedTest test.deep.KernelApproxTest test.gpu.SoftmaxTest"
 main="gpu/MinibatchTest"
 main="deep/IniterTest"
 main="gpu/MiscTest"
 
 units="test.deep.LinearTest"
 units="test.deep.ElementComputeTest"
-units="test.gpu.SoftmaxTest"
 units="test.deep.CombinedTest"
+units="test.deep.KernelApproxTest"
+units="test.gpu.SoftmaxTest"
 units=$allunits
 
 
