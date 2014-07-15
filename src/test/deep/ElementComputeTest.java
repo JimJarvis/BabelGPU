@@ -15,14 +15,15 @@ public class ElementComputeTest
 //	@Ignore
 	public void sigmoidLayersTest()
 	{
-		DeepNet sigmoidLayers = 
+		DeepNet net = 
 				DeepFactory.debugElementComputeLayers(
 						SigmoidUnit.class, 
 						uniRandInlet(2, 2), 
 						2, scalor, 
 						SquareErrorUnit.class);
+		net.name = "Sigmoid + SquareError";
 //		sigmoidLayers.runDebug(plan, hasBias);
-		check(sigmoidLayers, 1e-1f, 1e2f, false);
+		check(net, 1e-1f, 1e2f, false);
 	}
 
 	@Test
@@ -44,14 +45,15 @@ public class ElementComputeTest
 //	@Ignore
 	public void cosineLayersTest()
 	{
-		DeepNet cosineLayers = 
+		DeepNet net = 
 				DeepFactory.debugElementComputeLayers(
 						CosineUnit.class, 
-						uniRandInlet(1, 1), 
-						3, scalor, 
+						uniRandInlet(1, 3), 
+						3, 1 /*scalor*/, 
 						SquareErrorUnit.class);
+		net.name = "Cosine + SquareError";
 //		cosineLayers.runDebug(plan, hasBias);
-		check(cosineLayers, 1e-1f, 1e5f, false);
+		check(net, 1e-1f, 1e2f, false);
 	}
 	
 	@Test

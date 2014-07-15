@@ -355,8 +355,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 			totalGradAbsSum += mat.clone().abs().sum();
 			propGrad[i ++] = mat;
 		}
-		// Get average abs parameter entry value
-		float avgGradAbsVal = totalGradAbsSum / totalSize;
+		
+		// Heuristic to pick a good EPS
 		final float EPS = Math.max( totalDataAbsSum / totalSize / perturbRatio, 1e-3f);
 		
 		// Do finite-diff forward prop for every entry in every parameter
@@ -412,7 +412,9 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (i = 0 ; i < propGrad.length; i ++)
 			absErr += GpuBlas.add(propGrad[i], goldGrad[i], 1, -1).abs().sum();
 		float avgAbsErr = absErr / totalSize;
-		float avgPercentErr = avgAbsErr / avgGradAbsVal * 100;
+		
+		float avgAbsVal = (hasParams ? totalGradAbsSum : totalDataAbsSum) / totalSize;
+		float avgPercentErr = avgAbsErr / avgAbsVal * 100;
 		
 		PP.p("Average absolute error =", avgAbsErr);
 		PP.p("Average percent error =", avgPercentErr, "%\n");

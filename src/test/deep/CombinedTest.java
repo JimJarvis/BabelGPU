@@ -15,7 +15,7 @@ public class CombinedTest
 	public static void setUp() { systemInit(); }
 	
 	@Test
-	@Ignore
+//	@Ignore
 	public void simpleSigmoidNetTest()
 	{
 		DeepNet sigmoidNet = 
@@ -30,9 +30,6 @@ public class CombinedTest
 //	@Ignore
 	public void fourierProjectionNetTest()
 	{
-		inDim = 7;
-		outDim = 7;
-		batchSize = 5;
 		ArrayList<Initializer> initers = new ArrayList<>();
 		initers.add(Initializer.fillIniter(1));
 		initers.add(Initializer.fillIniter(2));
@@ -44,11 +41,11 @@ public class CombinedTest
 				DeepFactory.fourierProjectionNet(
 						uniRandInlet(3, 0, InletMode.GoldLabel), 
 //						uniformInlet(1, 0), 
-						new int[] {5, outDim}, 
-//						new Initializer[] {Initializer.gaussianIniter(2)},
-						CpuUtil.repeatedArray(Initializer.fillIniter(.1f), 1),
-						Initializer.fillIniter(2));
-		fourierNet.runDebug(plan, hasBias);
-		check(fourierNet, 1e-1f, 1e2f, true);
+						new int[] {5, 4, 10, outDim}, 
+						new Initializer[] {Initializer.gaussianProjKernelIniter(3), Initializer.laplacianProjKernelIniter(2), Initializer.cauchyProjKernelIniter(1)},
+//						CpuUtil.repeatedArray(Initializer.fillIniter(.1f), 1),
+						Initializer.uniformRandIniter(1));
+//		fourierNet.runDebug(plan, hasBias);
+		check(fourierNet, 1e-2f, 1e2f, false);
 	}
 }

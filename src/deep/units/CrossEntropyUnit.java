@@ -26,6 +26,7 @@ public class CrossEntropyUnit extends TerminalUnit
 		if (tmp_softmax == null)
 			tmp_softmax = new FloatMat(input.data());
 		Thrust.log(input.gradient(), tmp_softmax);
+		if (hasBias)	tmp_softmax.fillLastRow0(); // because the last row would be log(0) -> NaN
 
 		// Cross entropy: - t * log(y) where 't' is target value, 'y' is actual output
 		GpuBlas.dotMult(inlet.goldMat, tmp_softmax);

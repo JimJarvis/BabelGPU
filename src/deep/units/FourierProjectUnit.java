@@ -34,7 +34,6 @@ public class FourierProjectUnit extends ComputeUnit
 		projector = new ParamUnit("projector["+this.name+"]", outDim, input.dim());
 		projector.setNoGradient();
 		reInitProjector();
-		PP.p("Projector:", projector);
 	}
 	
 	/**

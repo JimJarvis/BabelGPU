@@ -81,9 +81,9 @@ public class DeepFactory
 		{
 			units.add(new FourierProjectUnit("", layerDims[i], projIniters[i]));
 			// scalor = sqrt(2/D) where D is #new features
-//			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i])));
+			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i])));
 		}
-//		units.add(new LinearUnit("", i, lastLinearIniter));
+		units.add(new LinearUnit("", layerDims[i], lastLinearIniter));
 		units.add(new SparseCrossEntropyUnit("", inlet));
 		return 
 			new DeepNet("FourierProjectionNet", inlet, units).genDefaultUnitName();
