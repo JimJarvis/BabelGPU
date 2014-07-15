@@ -2,10 +2,12 @@ package deep.units;
 
 import utils.PP;
 import gpu.*;
+import deep.DeepException;
 import deep.Initializer;
 
 /**
  * Rahami-Recht random Fourier projection features
+ * The input must have an extra row for bias
  */
 public class FourierProjectUnit extends ComputeUnit
 {
@@ -17,7 +19,7 @@ public class FourierProjectUnit extends ComputeUnit
 	 * 	Default: assume input has an extra row of 1 (bias unit), 
 	 * the projection matrix will have an extra row all zeros, except for the last element which is a 1.
 	 * in this way ProjMat * Input will preserve the extra row of 1
-	 * Default: hasBias is true
+	 * 'hasBias' must be true because the last column U[0, 2*pi] needs to be added
 	 * @param projIniter use a projKernelIniter instead of a pure distrIniter
 	 */
 	public FourierProjectUnit(String name, int outDim, Initializer projIniter)
@@ -29,6 +31,9 @@ public class FourierProjectUnit extends ComputeUnit
 	@Override
 	public void setup()
 	{
+		if (!hasBias && !debug)
+			throw new DeepException("FourierProjectUnit requires that hasBias is set to true.");
+			
 		super.setup();
 		// Leave the 'parent' ParamComputeUnit null
 		projector = new ParamUnit("projector["+this.name+"]", outDim, input.dim());
@@ -41,7 +46,7 @@ public class FourierProjectUnit extends ComputeUnit
 	 */
 	public void reInitProjector()
 	{
-		this.projIniter.setBias(hasBias);
+		this.projIniter.setBias(hasBias); // hasBias is always true
 		this.projIniter.init(projector);
 	}
 	
@@ -53,9 +58,8 @@ public class FourierProjectUnit extends ComputeUnit
 	@Override
 	public void forward()
 	{
-		if (hasBias)
-		// The last row will have all ones
-			input.data().fillLastRow1();
+		if (hasBias)   // hasBias must be true for the projection to work
+    		input.data().fillLastRow1();
 		GpuBlas.mult(projector.data(), input.data(), output.data());
 	}
 
