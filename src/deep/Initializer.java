@@ -160,7 +160,7 @@ public abstract class Initializer
 				distrIniter.init(w);
 				// Set last column to U[0, 2*PI] according to Rahimi-Recht
 				gRand.genUniformFloat(
-						w.createColOffset(w.col-1, w.col), 0, 2 * Math.PI);
+						w.createColOffset(-1), 0, 2 * Math.PI);
 			}
 		};
 		return origIniter;

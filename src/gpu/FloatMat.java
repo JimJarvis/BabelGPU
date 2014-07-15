@@ -460,6 +460,16 @@ public class FloatMat
 	}
 	
 	/**
+	 * @param colIdx retrive a single column offset. Negative means python wrap-around
+	 * @return new FloatMat
+	 */
+	public FloatMat createColOffset(int colIdx)
+	{
+		if (colIdx < 0) 	colIdx += this.col;
+		return createOffset(new FloatMat(), colIdx * this.row, this.row);
+	}
+	
+	/**
 	 * @return row * col
 	 */
 	public int size() { return row * col; }

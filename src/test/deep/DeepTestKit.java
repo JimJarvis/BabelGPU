@@ -32,10 +32,15 @@ public class DeepTestKit
 	
 	public enum InletMode {	None, GoldSumTo1, GoldLabel	};
 	
+	public static GpuRand grand;
+	public static Random rand;
+	
 	public static void systemInit()
 	{
 		GpuBlas.init();
 		GpuUtil.enableExceptions();
+		grand = new GpuRand(GpuRand.SEED);
+		rand = new Random(GpuRand.SEED);
 	}
 	
 	public static int changeDim(int dim)
@@ -70,7 +75,7 @@ public class DeepTestKit
 				if (mode == InletMode.GoldSumTo1) // normalize col sum to 1 for CrossEntropyUnit
 					for (int c = 0; c < goldMat.col; c++)
 					{
-						FloatMat colMat = goldMat.createColOffset(c, c+1);
+						FloatMat colMat = goldMat.createColOffset(c);
 						GpuBlas.scale(colMat, 1f / colMat.sum());
 					}
 				else if (mode == InletMode.GoldLabel)

@@ -44,7 +44,7 @@ public class CrossEntropyUnit extends TerminalUnit
 		// Debug ONLY
 		if (debug)
 			for (int c = 0; c < inlet.goldMat.col; c++)
-				if (! CpuUtil.equal(inlet.goldMat.createColOffset(c, c+1).sum(), 1, 1e-5f))
+				if (! CpuUtil.equal(inlet.goldMat.createColOffset(c).sum(), 1, 1e-5f))
 					throw new DeepException("Each column of the goldMat must sum up to 1\n"
 							+ "Otherwise the softmax-cross entropy gradient is incorrect.");
 	}
