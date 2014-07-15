@@ -146,8 +146,8 @@ public abstract class Initializer
 	
 	// Helper: used to set the last column of a distr-inited W to Uniform[0, 2*PI]
 	// a pure distribution initer => transform this initer
-	// Assumes an extra row of bias
-	private static Initializer projKernelAggregIniter(final Initializer distrIniter)
+	// hasBias would assume W has an extra row and set the last row to 0
+	private static Initializer projKernelAggregIniter(final Initializer distrIniter, boolean hasBias)
 	{
 		Initializer origIniter = new Initializer() {
 			@Override
@@ -159,63 +159,63 @@ public abstract class Initializer
 						w.createColOffset(w.col-1, w.col), 0, 2 * Math.PI);
 			}
 		};
-		return biasAggregIniter(origIniter);
+		return hasBias ? biasAggregIniter(origIniter) : origIniter;
 	}
 	
 	/**
 	 * Initialize Rahimi-Recht projection gaussian kernel, 
 	 * which is just gaussian distr itself
-	 * Assumes extra row of bias
+	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
-	public static Initializer gaussianProjKernelIniter(final double gamma)
+	public static Initializer gaussianProjKernelIniter(final double gamma, boolean hasBias)
 	{
-		return projKernelAggregIniter(gaussianIniter(gamma));
+		return projKernelAggregIniter(gaussianIniter(gamma), hasBias);
 	}
 	
 	/**
 	 * Initialize Rahimi-Recht projection laplacian kernel, 
 	 * which is just cauchy distr
-	 * Assumes extra row of bias
+	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
-	public static Initializer laplacianProjKernelIniter(final double gamma)
+	public static Initializer laplacianProjKernelIniter(final double gamma, boolean hasBias)
 	{
-		return projKernelAggregIniter(cauchyIniter(gamma));
+		return projKernelAggregIniter(cauchyIniter(gamma), hasBias);
 	}
 
 	/**
 	 * Initialize Rahimi-Recht projection cauchy kernel, 
 	 * which is just laplacian distr
-	 * Assumes extra row of bias
+	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
-	public static Initializer cauchyProjKernelIniter(final double gamma)
+	public static Initializer cauchyProjKernelIniter(final double gamma, boolean hasBias)
 	{
-		return projKernelAggregIniter(laplacianIniter(gamma));
+		return projKernelAggregIniter(laplacianIniter(gamma), hasBias);
 	}
 	
 	/**
-	 * Assumes extra row of bias
+	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
-	public static Initializer projKernelIniter(ProjKernel type, final double gamma)
+	public static Initializer projKernelIniter(ProjKernel type, final double gamma, boolean hasBias)
 	{
 		switch (type)
 		{
-		case Gaussian : return gaussianProjKernelIniter(gamma); 
-		case Laplacian : return laplacianProjKernelIniter(gamma); 
-		case Cauchy : return cauchyProjKernelIniter(gamma); 
+		case Gaussian : return gaussianProjKernelIniter(gamma, hasBias); 
+		case Laplacian : return laplacianProjKernelIniter(gamma, hasBias); 
+		case Cauchy : return cauchyProjKernelIniter(gamma, hasBias); 
 		}
 		return null;
 	}
 
 	/**
 	 * Aggregate Initer to mix different Rahimi-Recht kernels
-	 * Assume W has an extra row for handling bias units, calls multBiasAggregIniter
 	 * Sets the last column to be U[0, 2*PI]
 	 * @param distrIniters: each pure-distr initer is responsible for initing a range of ROWs.
 	 * can be repeated, e.g. lap for the first 30 rows, then gaussian 50 rows, then lap again 40 rows
 	 * @param relativeRatios: divide (W.row - 1) into regions for which each initers are responsible
+	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
 	public static Initializer mixProjKernelAggregIniter(
-			final ArrayList<Initializer> distrIniters, final ArrayList<Double> relativeRatios)
+			final ArrayList<Initializer> distrIniters, final ArrayList<Double> relativeRatios, boolean hasBias)
 	{
 		if (distrIniters.size() != relativeRatios.size())
 			throw new DeepException("Number of kernel initers must match number of relative ratios");
@@ -255,16 +255,17 @@ public abstract class Initializer
 		};
 		
 		// Post-process the initer to handle bias units and the extra U[0, 2*PI] col
-		return projKernelAggregIniter(mixOrigIniter);
+		return projKernelAggregIniter(mixOrigIniter, hasBias);
 	}
 	
 	/**
 	 * Use the pre-set enums to replace ArrayList<Initializers>
 	 * @param gamma assume common for all distrIniters
 	 * @see Initializer#mixProjKernelAggregIniter(ArrayList, ArrayList)
+	 * @param hasBias would assume W has an extra row and set the last row to 0
 	 */
 	public static Initializer mixProjKernelAggregIniter(
-			final ArrayList<ProjKernel> projKernels, double gamma, final ArrayList<Double> relativeRatios)
+			final ArrayList<ProjKernel> projKernels, double gamma, final ArrayList<Double> relativeRatios, boolean hasBias)
 	{
 		ArrayList<Initializer> distrIniters = new ArrayList<>();
 		for (ProjKernel type : projKernels)
@@ -274,6 +275,6 @@ public abstract class Initializer
 			case Laplacian : distrIniters.add(cauchyIniter(gamma)); break;
 			case Cauchy: distrIniters.add(laplacianIniter(gamma)); break;
 			}
-		return mixProjKernelAggregIniter(distrIniters, relativeRatios);
+		return mixProjKernelAggregIniter(distrIniters, relativeRatios, hasBias);
 	}
 }

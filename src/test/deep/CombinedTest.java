@@ -35,7 +35,10 @@ public class CombinedTest
 						uniRandInlet(3, 0, InletMode.GoldLabel), 
 //						uniformInlet(1, 0), 
 						new int[] {5, 4, 10, outDim}, 
-						new Initializer[] {Initializer.gaussianProjKernelIniter(3), Initializer.laplacianProjKernelIniter(2), Initializer.cauchyProjKernelIniter(1)},
+						new Initializer[]
+								{Initializer.gaussianProjKernelIniter(3, hasBias), 
+									Initializer.laplacianProjKernelIniter(2, hasBias), 
+									Initializer.cauchyProjKernelIniter(1, hasBias)},
 //						CpuUtil.repeatedArray(Initializer.fillIniter(.1f), 1),
 						Initializer.uniformRandIniter(1));
 //		fourierNet.runDebug(plan, hasBias);
@@ -54,11 +57,11 @@ public class CombinedTest
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (i = 0; i < projDims.length; i++)
 		{
-			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2)));
+			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2, hasBias)));
 			// scalor = sqrt(2/D) where D is #new features
 			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / projDims[i])));
     		units.add(new LinearUnit("", linearDims[i] / 2, Initializer.uniformRandIniter(1)));
-			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2)));
+			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2, hasBias)));
 			units.add(new SigmoidUnit(""));
     		units.add(new LinearUnit("", linearDims[i], Initializer.uniformRandIniter(1)));
 		}
