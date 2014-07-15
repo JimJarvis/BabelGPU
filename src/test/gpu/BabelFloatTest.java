@@ -88,7 +88,7 @@ public class BabelFloatTest
 			/*
 			 * Step3: get Id[y==j] - P(yj | x, Theta)
 			 */
-			Thrust.batch_softmax_minus_id(A, Thrust.copy_host_to_device(new int[] {Y[s]}));
+			Thrust.batch_softmax_minus_id(A, Thrust.copy_host_to_device(new int[] {Y[s]}), false);
 			A.linear(-1, 0);
 			jbabel_id_minus_softmax(jA, Y[s]);
 			

@@ -1,11 +1,9 @@
-% X: size = row * col
 % if 'labels' is given, then we return a row matrix that 
 % corresponds to the softmax probability at the correct label
 
-function res = batch_softmax(X, row, col, labels)
+function res = batch_softmax(X, labels)
 
-% rasterize X
-X = reshape(X, row, col);
+[row, col] = size(X);
 
 % calculate the full matrix
 if ~exist('labels', 'var')

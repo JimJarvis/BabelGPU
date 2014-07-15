@@ -37,7 +37,7 @@ public class MinibatchTest
 		
 		IntPointer labelsDevice = Thrust.copy_host_to_device(labels);
 		labelsDevice = Thrust.offset(labelsDevice, 3);
-		Thrust.batch_softmax_minus_id(X, labelsDevice);
+		Thrust.batch_softmax_minus_id(X, labelsDevice, false);
 		
 //		GpuUtil.checkGold(X, "gold_MB", "Mini-batch", TOL);
 		

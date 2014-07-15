@@ -42,8 +42,8 @@ public class CombinedTest
 		
 		DeepNet fourierNet =
 				DeepFactory.fourierProjectionNet(
-//						uniRandInlet(3, 0, InletMode.GoldLabel), 
-						uniformInlet(1, 0), 
+						uniRandInlet(3, 0, InletMode.GoldLabel), 
+//						uniformInlet(1, 0), 
 						new int[] {5, outDim}, 
 //						new Initializer[] {Initializer.gaussianIniter(2)},
 						CpuUtil.repeatedArray(Initializer.fillIniter(.1f), 1),

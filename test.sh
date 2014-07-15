@@ -8,11 +8,11 @@ main="gpu/MinibatchTest"
 main="deep/IniterTest"
 main="gpu/MiscTest"
 
-units="test.gpu.SoftmaxTest"
 units="test.deep.LinearTest"
 units="test.deep.ElementComputeTest"
-units=$allunits
 units="test.deep.CombinedTest"
+units=$allunits
+units="test.gpu.SoftmaxTest"
 
 
 cp gpu_src/*.h bin/gpu/
