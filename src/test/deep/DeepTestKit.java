@@ -3,7 +3,6 @@ package test.deep;
 import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Random;
-import com.googlecode.javacpp.IntPointer;
 import gpu.*;
 import utils.*;
 import deep.*;
@@ -165,7 +164,7 @@ public class DeepTestKit
 		}
 		
 		float avgPercentErr = net.gradCheck(plan, hasBias, perturbRatio, verbose);
-		assertTrue(net.name + " grad check", CpuUtil.equal(avgPercentErr, 0, TOL));
+		assertEquals(net.name + " grad check", avgPercentErr, 0, TOL);
 	}
 	public static void check(DeepNet net, double TOL, float perturbRatio) {	check(net, TOL, perturbRatio, false);	}
 	public static void check(DeepNet net, double TOL, boolean verbose) {	check(net, TOL, 1e3f, verbose);	}

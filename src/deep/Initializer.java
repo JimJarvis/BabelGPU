@@ -96,51 +96,45 @@ public abstract class Initializer
 	// ******************** Distribution Initers ********************/
 	/**
 	 * Initialize with standard Gaussian distribution
-	 * @param gamma scalor = sqrt(2 * gamma)
 	 */
-	public static Initializer gaussianIniter(double gamma)
+	public static Initializer gaussianIniter(final float scalor)
 	{
-		final float scalor = (float) Math.sqrt(2 * gamma);
 		return new Initializer() {
 			@Override
 			public void init(FloatMat w)
 			{
 				gRand.genNormalFloat(w);
-				w.linear(scalor, 0);
+				GpuBlas.scale(w, scalor);
 			}
 		};
 	}
 	
 	/**
 	 * Initialize with standard Laplacian distribution
-	 * @param gamam scalor = gamma
 	 */
-	public static Initializer laplacianIniter(final double gamma)
+	public static Initializer laplacianIniter(final float scalor)
 	{
-		final float scalor = (float) gamma;
 		return new Initializer() {
 			@Override
 			public void init(FloatMat w)
 			{
 				gRand.genLaplacianFloat(w);
-				w.linear(scalor, 0);
+				GpuBlas.scale(w, scalor);
 			}
 		};
 	}
 	
 	/**
 	 * Initialize with standard Cauchy distribution
-	 * @param gamam scalor = gamma
 	 */
-	public static Initializer cauchyIniter(double gamma)
+	public static Initializer cauchyIniter(final float scalor)
 	{
-		final float scalor = (float) Math.sqrt(gamma);
 		return new Initializer() {
 			@Override
 			public void init(FloatMat w)
 			{
 				gRand.genCauchyFloat(w);
-				w.linear(scalor, 0);
+				GpuBlas.scale(w, scalor);
 			}
 		};
 	}
@@ -166,40 +160,61 @@ public abstract class Initializer
 		return origIniter;
 	}
 	
+	// Kernel projectors will need this scalor transformation
+	private static float gammaToScalor(float gamma, ProjKernel kernelType)
+	{
+		switch (kernelType)
+		{
+		case Gaussian: return (float) Math.sqrt(2 * gamma);
+		case Laplacian: return gamma;
+		case Cauchy: return (float) Math.sqrt(gamma);
+		default: return 0;
+		}
+	}
+	
 	/**
 	 * Initialize Rahimi-Recht projection gaussian kernel, 
 	 * which is just gaussian distr itself
 	 * Assumes an extra vacant row of 0 if hasBias is true
+	 * @param gamma scalor = sqrt(2 * gamma)
 	 */
-	public static Initializer gaussianProjKernelIniter(final double gamma)
+	public static Initializer gaussianProjKernelIniter(float gamma)
 	{
-		return projKernelAggregIniter(gaussianIniter(gamma));
+		return projKernelAggregIniter(
+				gaussianIniter(
+						gammaToScalor(gamma, ProjKernel.Gaussian)));
 	}
 	
 	/**
 	 * Initialize Rahimi-Recht projection laplacian kernel, 
 	 * which is just cauchy distr
 	 * Assumes an extra vacant row of 0 if hasBias is true
+	 * @param gamam scalor = gamma
 	 */
-	public static Initializer laplacianProjKernelIniter(final double gamma)
+	public static Initializer laplacianProjKernelIniter(float gamma)
 	{
-		return projKernelAggregIniter(cauchyIniter(gamma));
+		return projKernelAggregIniter(
+				cauchyIniter(
+						gammaToScalor(gamma, ProjKernel.Laplacian)));
 	}
 
 	/**
 	 * Initialize Rahimi-Recht projection cauchy kernel, 
 	 * which is just laplacian distr
 	 * Assumes an extra vacant row of 0 if hasBias is true
+	 * @param gamam scalor = sqrt(gamma)
 	 */
-	public static Initializer cauchyProjKernelIniter(final double gamma)
+	public static Initializer cauchyProjKernelIniter(float gamma)
 	{
-		return projKernelAggregIniter(laplacianIniter(gamma));
+		return projKernelAggregIniter(
+				laplacianIniter(
+						gammaToScalor(gamma, ProjKernel.Cauchy)));
 	}
 	
 	/**
 	 * Assumes an extra vacant row of 0 if hasBias is true
 	 */
-	public static Initializer projKernelIniter(ProjKernel type, final double gamma)
+	public static Initializer projKernelIniter(ProjKernel type, float gamma)
 	{
 		switch (type)
 		{
@@ -268,16 +283,19 @@ public abstract class Initializer
 	 * @see Initializer#mixProjKernelAggregIniter(ArrayList, ArrayList)
 	 */
 	public static Initializer mixProjKernelAggregIniter(
-			final ArrayList<ProjKernel> projKernels, double gamma, final ArrayList<Double> relativeRatios)
+			final ArrayList<ProjKernel> projKernels, float gamma, final ArrayList<Double> relativeRatios)
 	{
 		ArrayList<Initializer> distrIniters = new ArrayList<>();
 		for (ProjKernel type : projKernels)
+		{
+			float scalor = gammaToScalor(gamma, type);
 			switch (type)
 			{
-			case Gaussian : distrIniters.add(gaussianIniter(gamma)); break;
-			case Laplacian : distrIniters.add(cauchyIniter(gamma)); break;
-			case Cauchy: distrIniters.add(laplacianIniter(gamma)); break;
+			case Gaussian : distrIniters.add(gaussianIniter(scalor)); break;
+			case Laplacian : distrIniters.add(cauchyIniter(scalor)); break;
+			case Cauchy: distrIniters.add(laplacianIniter(scalor)); break;
 			}
+		}
 		return mixProjKernelAggregIniter(distrIniters, relativeRatios);
 	}
 }
