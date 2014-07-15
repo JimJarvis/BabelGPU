@@ -1,5 +1,6 @@
 package deep.units;
 
+import utils.PP;
 import gpu.*;
 import deep.Initializer;
 
@@ -33,6 +34,7 @@ public class FourierProjectUnit extends ComputeUnit
 		projector = new ParamUnit("projector["+this.name+"]", outDim, input.dim());
 		projector.setNoGradient();
 		reInitProjector();
+		PP.p("Projector:", projector);
 	}
 	
 	/**
@@ -63,6 +65,10 @@ public class FourierProjectUnit extends ComputeUnit
 		// update input.gradient() only when necessary 
 		// Don't upgrade the gradient of the input layer, of course
 		if (input.hasGradient())
+		{
 			GpuBlas.mult(projector.data().transpose(), output.gradient(), input.gradient());
+    		if (debug && hasBias)
+    			input.gradient().fillLastRow0();
+		}
 	}
 }

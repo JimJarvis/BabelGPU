@@ -2,6 +2,7 @@
 # to recompile the native libraries, ./test.sh c
 # To do JUnit testing, ./test.sh blabla  (whatever string not 'c')
 
+allunits="test.deep.ElementComputeTest test.deep.LinearTest test.deep.CombinedTest"
 main="gpu/RandTest"
 main="gpu/MinibatchTest"
 main="deep/IniterTest"
@@ -9,7 +10,9 @@ main="gpu/MiscTest"
 
 units="test.gpu.SoftmaxTest"
 units="test.deep.LinearTest"
-units="test.deep.ElementComputeTest test.deep.LinearTest test.deep.CombinedTest"
+units="test.deep.ElementComputeTest"
+units=$allunits
+units="test.deep.CombinedTest"
 
 
 cp gpu_src/*.h bin/gpu/

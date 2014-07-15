@@ -62,6 +62,33 @@ public class DeepFactory
 				CpuUtil.repeatedArray(initer, layerDims.length));
 	}
 	
+	/**
+	 * The first (layerDims.length - 1) layers will all be Rahimi projectors
+	 * The last one will be SparseCrossEntropy terminal
+	 * @param layerDims including the terminal unit
+	 * @param projIniters for the first few projection layers
+	 * @param lastLinearIniter for the last linear layer before terminal
+	 */
+	public static DeepNet fourierProjectionNet(
+			InletUnit inlet, int[] layerDims, Initializer[] projIniters, Initializer lastLinearIniter)
+	{
+		if (projIniters.length != layerDims.length - 1)
+			throw new DeepException("Exactly 1 projection initer for each layer: len(projIniter)==len(layerDims)-1");
+		
+		ArrayList<ComputeUnit> units = new ArrayList<>();
+		int i;
+		for (i = 0; i < layerDims.length - 1; i++)
+		{
+			units.add(new FourierProjectUnit("", layerDims[i], projIniters[i]));
+			// scalor = sqrt(2/D) where D is #new features
+//			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i])));
+		}
+//		units.add(new LinearUnit("", i, lastLinearIniter));
+		units.add(new SparseCrossEntropyUnit("", inlet));
+		return 
+			new DeepNet("FourierProjectionNet", inlet, units).genDefaultUnitName();
+	}
+	
 	public static DeepNet debugLinearLayers(
 			InletUnit inlet, int[] layerDims, Class<? extends TerminalUnit> terminalClass, Initializer initer)
 	{
