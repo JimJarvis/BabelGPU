@@ -30,13 +30,6 @@ public class CombinedTest
 //	@Ignore
 	public void fourierProjectionNetTest()
 	{
-		ArrayList<Initializer> initers = new ArrayList<>();
-		initers.add(Initializer.fillIniter(1));
-		initers.add(Initializer.fillIniter(2));
-		ArrayList<Double> ratios = new ArrayList<>();
-		ratios.add(2.);
-		ratios.add(1.);
-		
 		DeepNet fourierNet =
 				DeepFactory.fourierProjectionNet(
 						uniRandInlet(3, 0, InletMode.GoldLabel), 
@@ -47,5 +40,31 @@ public class CombinedTest
 						Initializer.uniformRandIniter(1));
 //		fourierNet.runDebug(plan, hasBias);
 		check(fourierNet, 1e-2f, 1e2f, false);
+	}
+	
+	@Test
+	@Ignore
+	public void debugFourierTest()
+	{
+		InletUnit inlet = uniRandInlet(3, 0, InletMode.GoldLabel);
+		int[] projDims = new int[] {5, 10, 6};
+		int[] linearDims = new int[] {8, 6, outDim};
+
+		int i;
+		ArrayList<ComputeUnit> units = new ArrayList<>();
+		for (i = 0; i < projDims.length; i++)
+		{
+			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2)));
+			// scalor = sqrt(2/D) where D is #new features
+			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / projDims[i])));
+    		units.add(new LinearUnit("", linearDims[i] / 2, Initializer.uniformRandIniter(1)));
+			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2)));
+			units.add(new SigmoidUnit(""));
+    		units.add(new LinearUnit("", linearDims[i], Initializer.uniformRandIniter(1)));
+		}
+		units.add(new SparseCrossEntropyUnit("", inlet));
+		DeepNet net = new DeepNet("DebugFourierNet", inlet, units).genDefaultUnitName();
+		
+		check(net, 1e-1f, 1e2f, false);
 	}
 }
