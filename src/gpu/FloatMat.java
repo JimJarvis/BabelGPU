@@ -385,6 +385,7 @@ public class FloatMat
 	 * Specify the number of rows, or leave it to be the current row dim.
 	 * transpose flag will be cleared.
 	 * Also shallow copies hostArray and hostBuffer
+	 * If 'device' is null, copy nothing to GPU and simply set new dims.
 	 * @return new FloatMat
 	 */
 	public FloatMat createOffset(int offset, int size, int newRow)
@@ -393,9 +394,12 @@ public class FloatMat
 			throw new GpuException("Offset matrix size must be a whole multiple of the new row dim.");
 		
 		FloatMat offMat = new FloatMat();
-		offMat.device = this.toDevice().withByteOffset(offset * Sizeof.FLOAT);
-		// ThrustPointer doesn't automatically follow jcuda.Pointer, even if the latter has been offset!!
-		offMat.thrustPtr = this.getThrustPointer().offset(offset);
+		if (this.device != null)
+		{
+    		offMat.device = this.device.withByteOffset(offset * Sizeof.FLOAT);
+    		// ThrustPointer doesn't automatically follow jcuda.Pointer, even if the latter has been offset!!
+    		offMat.thrustPtr = this.getThrustPointer().offset(offset);
+		}
 		offMat.hostMode = this.hostMode;
 		offMat.hostArray = this.hostArray;
 		offMat.hostBuffer = this.hostBuffer;

@@ -16,6 +16,7 @@ units=$allunits
 
 
 cp gpu_src/*.h bin/gpu/
+mkdir -p bin/matlab_test/
 cp matlab/test/*.txt bin/matlab_test/
 
 cd bin

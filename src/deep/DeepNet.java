@@ -177,7 +177,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	/**
-	 * @see #reset(false)
+	 * @see DeepNet#reset(boolean)
 	 */
 	public void reset() { this.reset(false); }
 	
