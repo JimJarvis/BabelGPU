@@ -28,10 +28,10 @@ public class IterationTest
 
 		// Iteration column by column
 		FloatMat res = new FloatMat(r, 1, false);
-		FloatMat coltmp = new FloatMat();
+		FloatMat coltmp;
 		for (int i = 0; i < c2; i++)
 		{
-			W.createOffset(coltmp, c*i, c);
+			coltmp = W.createOffset(c*i, c);
 			GpuBlas.mult(X, coltmp, res);
 		}
 		GpuUtil.synchronize();

@@ -385,14 +385,14 @@ public class FloatMat
 	 * Specify the number of rows, or leave it to be the current row dim.
 	 * transpose flag will be cleared.
 	 * Also shallow copies hostArray and hostBuffer
-	 * @param offMat output parameter
-	 * @return input parameter 'offMat'
+	 * @return new FloatMat
 	 */
-	public FloatMat createOffset(FloatMat offMat, int offset, int size, int newRow)
+	public FloatMat createOffset(int offset, int size, int newRow)
 	{
 		if (size % newRow != 0)
 			throw new GpuException("Offset matrix size must be a whole multiple of the new row dim.");
 		
+		FloatMat offMat = new FloatMat();
 		offMat.device = this.toDevice().withByteOffset(offset * Sizeof.FLOAT);
 		// ThrustPointer doesn't automatically follow jcuda.Pointer, even if the latter has been offset!!
 		offMat.thrustPtr = this.getThrustPointer().offset(offset);
@@ -401,25 +401,6 @@ public class FloatMat
 		offMat.hostBuffer = this.hostBuffer;
 		offMat.initDim(newRow, size/newRow);
 		return offMat;
-	}
-	
-	/**
-	 * @see #createOffset(FloatMat, int, int, int)
-	 * @return new FloatMat
-	 */
-	public FloatMat createOffset(int offset, int size, int newRow)
-	{
-		return createOffset(new FloatMat(), offset, size, newRow);
-	}
-	
-	/**
-	 * @see #createOffset(FloatMat, int, int, int)
-	 * Assume newRow to be the same as the current row dim. 
-	 * @return input parameter 'offMat'
-	 */
-	public FloatMat createOffset(FloatMat offMat, int offset, int size)
-	{
-		return createOffset(offMat, offset, size, this.row);
 	}
 	
 	/**
@@ -439,7 +420,7 @@ public class FloatMat
 	 */
 	public FloatMat createColOffset(int colStart, int colEnd)
 	{
-		return createOffset(new FloatMat(), colStart * this.row, (colEnd - colStart) * this.row);
+		return createOffset(colStart * this.row, (colEnd - colStart) * this.row);
 	}
 	
 	/**
@@ -449,7 +430,7 @@ public class FloatMat
 	public FloatMat createColOffset(int colIdx)
 	{
 		if (colIdx < 0) 	colIdx += this.col;
-		return createOffset(new FloatMat(), colIdx * this.row, this.row);
+		return createOffset(colIdx * this.row, this.row);
 	}
 	
 	/**
