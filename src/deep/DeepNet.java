@@ -138,7 +138,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public boolean hasNext()
 	{
-		return learningPlan.curTrainSize < learningPlan.totalTrainSize;
+		return learningPlan.curSampleSize < learningPlan.totalSampleSize;
 	}
 
 	public void run(LearningPlan learningPlan)

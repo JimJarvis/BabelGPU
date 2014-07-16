@@ -6,18 +6,18 @@ public class LearningPlan implements Iterable<Integer>
 {
 	public float lr; // learning rate
 	public float reg; // regularization
-	public int totalTrainSize;
+	public int totalSampleSize;
 	public int totalEpochs;
-	public int curTrainSize = 0;
+	public int curSampleSize = 0;
 	public int curEpoch = 0;
 	
 	public LearningPlan() {};
 	
-	public LearningPlan(float lr, float reg, int totalTrainSize, int totalEpochs)
+	public LearningPlan(float lr, float reg, int totalSampleSize, int totalEpochs)
 	{
 		this.lr = lr;
 		this.reg = reg;
-		this.totalTrainSize = totalTrainSize;
+		this.totalSampleSize = totalSampleSize;
 		this.totalEpochs = totalEpochs;
 	}
 	
@@ -29,22 +29,30 @@ public class LearningPlan implements Iterable<Integer>
 	{
 		this.lr = other.lr;
 		this.reg = other.reg;
-		this.totalTrainSize = other.totalTrainSize;
+		this.totalSampleSize = other.totalSampleSize;
 		this.totalEpochs = other.totalEpochs;
 	}
 	
 	/**
 	 * Prepare for re-run
 	 */
-	public void reset() { this.curTrainSize = 0; }
+	public void reset()
+	{ 
+		this.curSampleSize = 0; 
+	}
+	
+	/**
+	 * How many samples left?
+	 */
+	public int remainTrainSize()
+	{
+		return this.totalSampleSize - this.curSampleSize;
+	}
 	
 	/**
 	 * Do we use regularization?
 	 */
-	public boolean hasReg()
-	{
-		return this.reg > 0;
-	}
+	public boolean hasReg() { return this.reg > 0; }
 
 	/**
 	 * Iterates over each epoch

@@ -102,7 +102,7 @@ public abstract class TerminalUnit extends ComputeUnit
 	 */
 	public float lossPure()
 	{
-		return this.lossPure / learningPlan.curTrainSize;
+		return this.lossPure / learningPlan.curSampleSize;
 	}
 	
 	/**
@@ -121,7 +121,7 @@ public abstract class TerminalUnit extends ComputeUnit
 	
 	protected void updateLearningPlan()
 	{
-		this.learningPlan.curTrainSize += input.batchSize();
+		this.learningPlan.curSampleSize += input.batchSize();
 	}
 	
 	private FloatMat tmp_data_sqs[];  // hold temp squared values
