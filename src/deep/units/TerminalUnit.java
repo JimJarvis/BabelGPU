@@ -57,7 +57,9 @@ public abstract class TerminalUnit extends ComputeUnit
 			input.data().fillLastRow0();
 
 		// Will be implemented by subclasses
-		updateLossPure(forward_terminal());
+		this.lossPure += forward_terminal();
+		
+		updateLearningPlan();  // incr curBatchSize
 	}
 
 	/**
@@ -117,10 +119,9 @@ public abstract class TerminalUnit extends ComputeUnit
 		this.lossReg = 0;
 	}
 	
-	protected float updateLossPure(float update)
+	protected void updateLearningPlan()
 	{
 		this.learningPlan.curTrainSize += input.batchSize();
-		return this.lossPure += update;
 	}
 	
 	private FloatMat tmp_data_sqs[];  // hold temp squared values
