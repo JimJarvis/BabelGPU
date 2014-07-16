@@ -5,6 +5,11 @@ import gpu.GpuBlas;
 
 public class LinearUnit extends ParamComputeUnit
 {
+	public LinearUnit(String name, int outDim, boolean hasBias, Initializer initer)
+	{
+		super(name, outDim, hasBias, initer);
+	}
+
 	public LinearUnit(String name, int outDim, Initializer wInitializer)
 	{
 		super(name, outDim, wInitializer);
