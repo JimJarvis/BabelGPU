@@ -6,7 +6,7 @@ public abstract class ComputeUnit extends Unit
 {
 	public ComputeUnit next = null;
 	public ComputeUnit prev = null;
-	public int outDim;
+	protected int outDim;
 	// Do we include bias units?
 	protected boolean hasBias;
 	// Do we store input/output data separately?
@@ -91,6 +91,14 @@ public abstract class ComputeUnit extends Unit
 				++ outDim;
 			this.hasBias = hasBias;
 		}
+	}
+	
+	/**
+	 * @return 'real' outDim: if hasBias, outDim-1
+	 */
+	public int biaslessOutdim()
+	{
+		return this.outDim - (hasBias ? 1 : 0);
 	}
 	
 	/**

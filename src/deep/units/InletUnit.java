@@ -23,6 +23,7 @@ public abstract class InletUnit extends DataUnit
 
 	/**
 	 * Construct a new 'data' matrix with row == 'dim' and col == 'batchSize'
+	 * @param dim raw row dimension (may include extra bias row)
 	 * NOTE: you're responsible for adding an extra row for bias here
 	 */
 	public InletUnit(String name, int dim, int batchSize)

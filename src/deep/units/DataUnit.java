@@ -1,6 +1,5 @@
 package deep.units;
 
-import deep.DeepException;
 import utils.PP;
 import gpu.FloatMat;
 
