@@ -1,6 +1,8 @@
 package deep.units;
 
 import com.googlecode.javacpp.IntPointer;
+
+import deep.DeepException;
 import gpu.FloatMat;
 
 public abstract class InletUnit extends DataUnit
@@ -10,15 +12,22 @@ public abstract class InletUnit extends DataUnit
 	
 	/**
 	 * Inlet doesn't have gradient
+	 * @param data mustn't be null. Include the extra row for bias if necessary
 	 */
-	public InletUnit(String name)
+	public InletUnit(String name, FloatMat data)
 	{
-		super(name, null, null);
+		super(name, data, null);
+		if (data == null)
+			throw new DeepException("Inlet data mustn't be null");
 	}
 
-	public InletUnit(String name, int row, int col)
+	/**
+	 * Construct a new 'data' matrix with row == 'dim' and col == 'batchSize'
+	 * NOTE: you're responsible for adding an extra row for bias here
+	 */
+	public InletUnit(String name, int dim, int batchSize)
 	{
-		super(name, new FloatMat(row, col), null);
+		super(name, new FloatMat(dim, batchSize), null);
 	}
 
 	/**

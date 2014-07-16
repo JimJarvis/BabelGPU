@@ -65,6 +65,18 @@ public class ParamUnit extends DataUnit
 	}
 	
 	/**
+	 * Simply 'data'. No colOffset
+	 */
+	@Override
+	public FloatMat data() { return this.data; }
+
+	/**
+	 * Simply 'gradient'. No colOffset
+	 */
+	@Override
+	public FloatMat gradient() { return this.gradient; }
+	
+	/**
 	 * Reinitialize this parameter with parent's initer
 	 */
 	public void reInit()

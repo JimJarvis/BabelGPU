@@ -9,11 +9,6 @@ public class DataUnit extends Unit
     protected FloatMat data = null;
     protected FloatMat gradient = null;
     
-    // If the last batch is smaller than the previous ones
-    private int batchSize = -1;
-    private FloatMat dataSub = null; // offset-mat: doesn't contain any GPU memory
-    private FloatMat gradientSub = null; // offset-mat: doesn't contain any GPU memory
-    
     /**
      *  Dummy placeholder: if gradient == FloatMat.DUMMY, 
      *  we calculate but don't store the gradient
@@ -23,11 +18,6 @@ public class DataUnit extends Unit
 		super(name);
 		this.data = data;
 		this.gradient = gradient;
-		if (data != null)
-    		this.batchSize = data.col;
-		// For offset purpose
-		this.dataSub = data;
-		this.gradientSub = gradient;
 	}
 
 	/**
@@ -44,36 +34,20 @@ public class DataUnit extends Unit
 	public int dim() { return data.row; }
 
 	/**
-	 * @return Might be data.col, might be fewer
+	 * Specified in the global learningPlan
+	 * Last batch might have fewer columns than all the previous ones
+	 * If set to -1 in learningPlan, return data.col
 	 */
 	public int batchSize() 
 	{	
-		if (batchSize < 0)
-		{
-			if (data != null)
-    			this.batchSize = data.col;
-			else
-				throw new DeepException("Cannot get batchSize: data == null");
-		}
+		int batchSize;
+		if (learningPlan == null)
+			batchSize = data.col;
+		else if (learningPlan.curBatchSize <= 0)
+			batchSize = learningPlan.curBatchSize = data.col;
+		else
+			batchSize = learningPlan.curBatchSize;
 		return batchSize;
-	}
-	
-	/**
-	 *  If the next batch has fewer columns than the previous
-	 *  We createOffset under the hood
-	 */
-	public void setBatchSize(int newBatchSize)
-	{
-		this.batchSize = newBatchSize;
-		// less than a previous batch in the latest data
-		if (batchSize < data.col)
-		{
-			this.dataSub = this.data.createColOffset(0, batchSize);
-			if (isGradientComputed())
-				this.gradientSub = this.gradient.createColOffset(0, batchSize);
-		}
-		else if (batchSize > data.col)
-			throw new DeepException("Batch size exceeds GPU 'data' matrix col dim.");
 	}
 	
 	/**
@@ -81,7 +55,9 @@ public class DataUnit extends Unit
 	 */
 	public FloatMat data()
 	{
-		return batchSize < data.col ? this.dataSub : this.data;
+		int batchSize = this.batchSize();
+		return data != null && batchSize < data.col ? 
+				this.data.createColOffset(0, batchSize) : this.data;
 	}
 
 	/**
@@ -89,7 +65,9 @@ public class DataUnit extends Unit
 	 */
 	public FloatMat gradient()
 	{
-		return batchSize < data.col ? this.gradientSub : this.gradient;
+		int batchSize = this.batchSize();
+		return gradient != null && batchSize  < data.col ? 
+				this.gradient.createColOffset(0, batchSize) : this.gradient;
 	}
 	
 	public void initGradient()

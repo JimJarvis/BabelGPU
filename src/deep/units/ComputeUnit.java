@@ -1,7 +1,6 @@
 package deep.units;
 
 import gpu.*;
-import deep.*;
 
 public abstract class ComputeUnit extends Unit
 {
@@ -21,8 +20,6 @@ public abstract class ComputeUnit extends Unit
 	 * ALWAYS equal to next.input
 	 */
 	public DataUnit output;
-	
-	public LearningPlan learningPlan;
 	
 	public ComputeUnit(String name)
 	{

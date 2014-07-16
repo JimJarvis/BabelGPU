@@ -76,7 +76,7 @@ public class DeepNet implements Iterable<ComputeUnit>
     				if (unit instanceof ParamComputeUnit)
     					break;
     			}
-			
+
 			setLearningPlan(learningPlan);
 			
 			setup = true;
@@ -95,11 +95,22 @@ public class DeepNet implements Iterable<ComputeUnit>
 			unit.backward();
 	}
 	
+	/**
+	 * Must be called after setup()
+	 * @param learningPlan applies to all ComputeUnits and DataUnits
+	 */
 	public void setLearningPlan(LearningPlan learningPlan)
 	{
 		this.learningPlan = learningPlan;
 		for (ComputeUnit unit : this)
-			unit.learningPlan = learningPlan;
+		{
+			unit.setLearningPlan(learningPlan);
+			unit.input.setLearningPlan(learningPlan);
+			if (unit.output != null)
+    			unit.output.setLearningPlan(learningPlan);
+			if (unit instanceof ParamComputeUnit)
+				((ParamComputeUnit) unit).W.setLearningPlan(learningPlan);
+		}
 	}
 	
 	/**
@@ -138,7 +149,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public boolean hasNext()
 	{
-		return learningPlan.curSampleSize < learningPlan.totalSampleSize;
+		return learningPlan.doneSampleSize < learningPlan.totalSampleSize;
 	}
 
 	public void run(LearningPlan learningPlan)

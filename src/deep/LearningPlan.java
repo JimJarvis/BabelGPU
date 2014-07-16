@@ -4,12 +4,26 @@ import java.util.Iterator;
 
 public class LearningPlan implements Iterable<Integer>
 {
-	public float lr; // learning rate
-	public float reg; // regularization
+	/**
+	 * Learning rate
+	 */
+	public float lr;
+	/**
+	 * Regularization
+	 */
+	public float reg;
 	public int totalSampleSize;
 	public int totalEpochs;
-	public int curSampleSize = 0;
+	/**
+	 * number of samples already processed
+	 */
+	public int doneSampleSize = 0;
 	public int curEpoch = 0;
+	/**
+	 * size of the batch just processed
+	 * If set to negative or 0, infer curBatchSize from DataUnit.data.col
+	 */
+	public int curBatchSize = -1;
 	
 	public LearningPlan() {};
 	
@@ -38,7 +52,7 @@ public class LearningPlan implements Iterable<Integer>
 	 */
 	public void reset()
 	{ 
-		this.curSampleSize = 0; 
+		this.doneSampleSize = 0; 
 	}
 	
 	/**
@@ -46,7 +60,7 @@ public class LearningPlan implements Iterable<Integer>
 	 */
 	public int remainTrainSize()
 	{
-		return this.totalSampleSize - this.curSampleSize;
+		return this.totalSampleSize - this.doneSampleSize;
 	}
 	
 	/**
