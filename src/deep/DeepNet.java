@@ -70,10 +70,10 @@ public class DeepNet implements Iterable<ComputeUnit>
 			if (!debug)
     			for (ComputeUnit unit : this)
     			{
+    				// SetNoGradient for all non-paramComputeUnits and the first paramComputeUnit
+    				unit.input.setNoGradient();
     				if (unit instanceof ParamComputeUnit)
     					break;
-    				else
-    					unit.input.setNoGradient();
     			}
 			
 			setLearningPlan(learningPlan);
