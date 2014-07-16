@@ -22,6 +22,18 @@ public class LearningPlan implements Iterable<Integer>
 	}
 	
 	/**
+	 * Copy ctor
+	 * NOTE: variable states like curXXX aren't copied
+	 */
+	public LearningPlan(LearningPlan other)
+	{
+		this.lr = other.lr;
+		this.reg = other.reg;
+		this.totalTrainSize = other.totalTrainSize;
+		this.totalEpochs = other.totalEpochs;
+	}
+	
+	/**
 	 * Prepare for re-run
 	 */
 	public void reset() { this.curTrainSize = 0; }
