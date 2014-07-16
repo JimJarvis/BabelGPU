@@ -43,7 +43,7 @@ public class FloatMat
 	public static final FloatMat DUMMY = new FloatMat();
 	
 	/**
-	 * Default ctor
+	 * Default ctor that does nothing
 	 */
 	public FloatMat() {	}
 	
@@ -145,23 +145,6 @@ public class FloatMat
 		this.ldim = row;
 	}
 	
-	// Shallow copy create new instance
-	private FloatMat shallowCopy()
-	{
-		FloatMat mat = new FloatMat();
-		mat.row = this.row;
-		mat.col = this.col;
-		mat.ldim = this.ldim;
-		mat.op = this.op;
-		mat.device = this.device;
-		mat.hostArray = this.hostArray;
-		mat.hostBuffer = this.hostBuffer;
-		mat.hostMode = this.hostMode;
-		mat.thrustPtr = this.thrustPtr;
-		
-		return mat;
-	}
-	
 	/**
 	 * ONLY clones the device data (GPU copy)
 	 * Use with caution! Make sure to free the new device memory!!!
@@ -185,7 +168,14 @@ public class FloatMat
 	public FloatMat transpose()
 	{
 		// Swap row and col dimension
-		FloatMat mat = this.shallowCopy();
+		FloatMat mat = new FloatMat();
+		mat.ldim = this.ldim;
+		mat.device = this.device;
+		mat.hostArray = this.hostArray;
+		mat.hostBuffer = this.hostBuffer;
+		mat.hostMode = this.hostMode;
+		mat.thrustPtr = this.thrustPtr;
+		
 		mat.row = this.col;
 		mat.col = this.row;
 		mat.op = (op != CUBLAS_OP_N) ? 
@@ -390,12 +380,13 @@ public class FloatMat
 	}
 	
 	/**
-	 * Get a device pointer (wrapped in a FloatMat) 
-	 * that starts from 'offset' and lasts 'size' floats.
+	 * Get a sub-FloatMat that starts from 'offset' and lasts 'size' floats.
 	 * The shape might need to be adjusted. 
 	 * Specify the number of rows, or leave it to be the current row dim.
-	 * host, thrustPointer and transpose flag will be cleared.
+	 * transpose flag will be cleared.
+	 * Also shallow copies hostArray and hostBuffer
 	 * @param offMat output parameter
+	 * @return input parameter 'offMat'
 	 */
 	public FloatMat createOffset(FloatMat offMat, int offset, int size, int newRow)
 	{
@@ -406,16 +397,15 @@ public class FloatMat
 		// ThrustPointer doesn't automatically follow jcuda.Pointer, even if the latter has been offset!!
 		offMat.thrustPtr = this.getThrustPointer().offset(offset);
 		offMat.hostMode = this.hostMode;
+		offMat.hostArray = this.hostArray;
+		offMat.hostBuffer = this.hostBuffer;
 		offMat.initDim(newRow, size/newRow);
 		return offMat;
 	}
 	
 	/**
-	 * Get a device pointer (wrapped in a FloatMat) 
-	 * that starts from 'offset' and lasts 'size' floats.
-	 * The shape might need to be adjusted. 
-	 * Specify the number of rows, or leave it to be the current row dim.
-	 * host, thrustPointer and transpose flag will be cleared.
+	 * @see #createOffset(FloatMat, int, int, int)
+	 * @return new FloatMat
 	 */
 	public FloatMat createOffset(int offset, int size, int newRow)
 	{
@@ -423,8 +413,9 @@ public class FloatMat
 	}
 	
 	/**
-	 * Default version of createOffset.
+	 * @see #createOffset(FloatMat, int, int, int)
 	 * Assume newRow to be the same as the current row dim. 
+	 * @return input parameter 'offMat'
 	 */
 	public FloatMat createOffset(FloatMat offMat, int offset, int size)
 	{
@@ -432,8 +423,9 @@ public class FloatMat
 	}
 	
 	/**
-	 * Default version of createOffset.
+	 * @see #createOffset(FloatMat, int, int, int)
 	 * Assume newRow to be the same as the current row dim. 
+	 * @return new FloatMat
 	 */
 	public FloatMat createOffset(int offset, int size)
 	{
@@ -443,20 +435,11 @@ public class FloatMat
 	/**
 	 * createOffset from column 'start' to column 'end'
 	 * 'start' inclusive and 'end' exclusive
-	 */
-	public FloatMat createColOffset(FloatMat offMat, int colStart, int colEnd)
-	{
-		return createOffset(colStart * this.row, (colEnd - colStart) * this.row);
-	}
-	
-	/**
-	 * createOffset from column 'start' to column 'end'
-	 * 'start' inclusive and 'end' exclusive
 	 * @return new FloatMat
 	 */
 	public FloatMat createColOffset(int colStart, int colEnd)
 	{
-		return createColOffset(new FloatMat(), colStart, colEnd);
+		return createOffset(new FloatMat(), colStart * this.row, (colEnd - colStart) * this.row);
 	}
 	
 	/**
