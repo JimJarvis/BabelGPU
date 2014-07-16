@@ -59,7 +59,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Any non-ParamComputeUnit before the first ParamComputeUnit doesn't need to calculate gradient
 	 * We explicitly disable it.
 	 */
-	public void setup()
+	public void setup(LearningPlan learningPlan)
 	{
 		if (!setup)
 		{
@@ -75,6 +75,8 @@ public class DeepNet implements Iterable<ComputeUnit>
     				else
     					unit.input.setNoGradient();
     			}
+			
+			setLearningPlan(learningPlan);
 			
 			setup = true;
 		}
@@ -130,8 +132,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 
 	public void run(LearningPlan learningPlan)
 	{
-		setLearningPlan(learningPlan);
-		setup();
+		setup(learningPlan);
 		
 		while (inlet.hasNext())
 		{
@@ -250,9 +251,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 	this.setBias(hasBias); // all have bias units
 	 	
 		PP.pTitledSectionLine("RUN DEBUG", "=", 25);
-	 	this.setLearningPlan(learningPlan);
 	 	PP.pTitledSectionLine("SETUP");
-	 	this.setup();
+	 	this.setup(learningPlan);
 	 	this.printDebug(true);
 		
 		// Handle debug networks that have no params
@@ -308,8 +308,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 	this.enableDebug();
 	 	this.setBias(hasBias); // all have bias units
 	 	
-	 	this.setLearningPlan(learningPlan);
-		this.setup();
+		this.setup(learningPlan);
 		this.reset(); inlet.nextBatch();
 		
 		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) terminal.getParams().clone();
