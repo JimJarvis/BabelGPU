@@ -43,11 +43,11 @@ public abstract class TerminalUnit extends ComputeUnit
 	}
 	
 	/**
-	 * 'final' ensures that subclass cannot directly override forward()
-	 * but must implement forward_terminal()
+	 * Subclasses should implement 'forward_terminal'
+	 * 'final' keyword could have prevented subclass from overriding forward()
 	 */
 	@Override
-	public final void forward()
+	public void forward()
 	{
 		inlet.nextGold();
 		if (learningPlan.hasReg())
