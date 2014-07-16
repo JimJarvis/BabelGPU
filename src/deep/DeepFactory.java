@@ -17,7 +17,7 @@ public class DeepFactory
 	 * from the first hidden layer to output layer (included)
 	 * @param initers for each layer
 	 */
-	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer[] initers)
+	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer... initers)
 	{
 		if (initers.length < layerDims.length)
 			throw new DeepException("Not enough initializers for each layer");
@@ -39,7 +39,7 @@ public class DeepFactory
 	 * from the first hidden layer to output layer (included)
 	 * We use the sqrt(6 / (L_in + L_out)) default init scheme
 	 */
-	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims)
+	public static DeepNet simpleSigmoidNet(InletUnit inlet, int ... layerDims)
 	{
 		int layerN = layerDims.length;
 		Initializer[] initers = new Initializer[layerN];
@@ -87,6 +87,32 @@ public class DeepFactory
 		units.add(new SparseCrossEntropyTUnit("", inlet));
 		return 
 			new DeepNet("FourierProjectionNet", inlet, units).genDefaultUnitName();
+	}
+	
+	/**
+	 * Compute-only Fourier projection net
+	 * The layers will all be Rahimi projectors
+	 * The last one will be a dummy ForwardOnly terminal
+	 * @param layerDims for projectors
+	 * @param projIniters must match layerDims in length
+	 */
+	public static DeepNet fourierProjectionNet(
+			InletUnit inlet, int[] layerDims, Initializer... projIniters)
+	{
+		if (projIniters.length != layerDims.length)
+			throw new DeepException("Exactly 1 projection initer for each layer: len(projIniter)==len(layerDims)");
+		
+		ArrayList<ComputeUnit> units = new ArrayList<>();
+		int i;
+		for (i = 0; i < layerDims.length; i++)
+		{
+			units.add(new FourierProjectUnit("", layerDims[i], projIniters[i]));
+			// scalor = sqrt(2/D) where D is #new features
+			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i])));
+		}
+		units.add(new ForwardOnlyTUnit(""));
+		return 
+			new DeepNet("FourierProjectionNet(foward-only)", inlet, units).genDefaultUnitName();
 	}
 	
 	public static DeepNet debugLinearLayers(
