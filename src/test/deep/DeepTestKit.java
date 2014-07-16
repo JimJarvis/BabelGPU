@@ -27,7 +27,7 @@ public class DeepTestKit
 	public static float scalor = 3f;
 	// Regularization
 	public static float reg = 1.5f;
-	public static LearningPlan plan = new LearningPlan(2, reg, 0, batchSize, 1);
+	public static LearningPlan plan = new LearningPlan(2, reg, batchSize, 1);
 	
 	public enum InletMode {	None, GoldSumTo1, GoldLabel	};
 	
