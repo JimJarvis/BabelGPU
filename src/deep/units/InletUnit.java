@@ -21,8 +21,21 @@ public abstract class InletUnit extends DataUnit
 		super(name, new FloatMat(row, col), null);
 	}
 
-	public abstract boolean hasNext();
+	/**
+	 * Update 'data' field
+	 * NOTE: 'data' must not have useless columns.
+	 * If the last batch has size less than previous batches, use {@link FloatMat#createColOffset}. 
+	 * Each column will be updated to LearningPlan as batchSize
+	 */
 	public abstract void nextBatch();
+
+	/**
+	 * Either load to 'goldMat' or 'goldLabels'
+	 */
 	public abstract void nextGold();
+
+	/**
+	 * Reset the inlet stream to prepare for the next epoch from start
+	 */
 	public abstract void reset();
 }

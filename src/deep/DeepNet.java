@@ -14,6 +14,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public ComputeUnit head;
 	public InletUnit inlet;
 	public TerminalUnit terminal;
+	public LearningPlan learningPlan;
 	
 	private boolean setup = false; // should only setup once
 	private boolean debug = false; // the whole net is in debug mode
@@ -96,6 +97,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	public void setLearningPlan(LearningPlan learningPlan)
 	{
+		this.learningPlan = learningPlan;
 		for (ComputeUnit unit : this)
 			unit.learningPlan = learningPlan;
 	}
@@ -129,35 +131,55 @@ public class DeepNet implements Iterable<ComputeUnit>
 			unit.enableDebug(debug);
 	}
 	public void enableDebug() {	this.enableDebug(true); }
+	
+	/**
+	 * While curTrainSize < totalTrainSize in learningPlan
+	 * Every terminal will update the curTrainSize
+	 */
+	public boolean hasNext()
+	{
+		return learningPlan.curTrainSize < learningPlan.totalTrainSize;
+	}
 
 	public void run(LearningPlan learningPlan)
 	{
 		setup(learningPlan);
-		for (int epoch : learningPlan)
+		for (int epoch : this.learningPlan)
 		{
-    		while (inlet.hasNext())
+    		while (this.hasNext())
     		{
     			inlet.nextBatch();
     			forwprop();
     			backprop();
     		}
     		
-    		inlet.reset();
+    		reset();
 		}
 	}
 	
 	/**
 	 * Prepare a network for re-run
+	 * @param all if true, reset the parameters as well. 
+	 * If false, only reset terminal loss, learningPlan and inlet to prepare for the next epoch. 
+	 * Default false
 	 */
-	public void reset()
+	public void reset(boolean all)
 	{
-		Initializer.resetRand();
-		for (ParamUnit w : terminal.getParams())
-			w.reInit();
+		if (all)
+		{
+			Initializer.resetRand();
+			for (ParamUnit w : terminal.getParams())
+				w.reInit();
+		}
 		terminal.clearLoss();
-		terminal.learningPlan.reset();
+		learningPlan.reset();
 		inlet.reset();
 	}
+	
+	/**
+	 * @see #reset(false)
+	 */
+	public void reset() { this.reset(false); }
 	
 	/**
 	 * Fill all compute units with default generated name
@@ -264,7 +286,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 			inlet.initGradient();
 
 		int i = 1;
-		while (inlet.hasNext())
+		while (this.hasNext())
 		{
 			PP.pSectionLine("-", 70);
 			PP.p("Iteration", i++, "reading inlet");
@@ -313,7 +335,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 	this.setBias(hasBias); // all have bias units
 	 	
 		this.setup(learningPlan);
-		this.reset(); inlet.nextBatch();
+		this.reset(true); inlet.nextBatch();
 		
 		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) terminal.getParams().clone();
 		// We also do gradient checking for pure computing networks that have no parameters
@@ -380,7 +402,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 				for (int perturb : new int[] {-1, 1})
 				{
     				// Re-init everything as the exact gradient initialization
-					this.reset(); inlet.nextBatch();
+					this.reset(true); inlet.nextBatch();
     				
             		// Perturb -EPS
             		w.data().incrSingle(idx, perturb * EPS);

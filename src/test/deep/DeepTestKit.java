@@ -63,7 +63,6 @@ public class DeepTestKit
 		
 		return new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize)
 		{
-			boolean hasNext = true;
 			{
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
 				this.goldMat.setHostArray(dummyGold);
@@ -89,12 +88,9 @@ public class DeepTestKit
 				this.data.setHostArray(dummyInput);
 				this.data.toDevice(true);
 				if (hasBias) this.data.fillLastRow1();
-				hasNext = false;
 			}
 			@Override
-			public boolean hasNext() { return hasNext; }
-			@Override
-			public void reset() { hasNext = true; }
+			public void reset() { }
 		};
 	}
 	
@@ -123,7 +119,6 @@ public class DeepTestKit
 	{
 		return new InletUnit("Uniform Inlet", changeDim(inDim), batchSize)
 		{
-			boolean hasNext = true;
 			{
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
 				this.goldMat.fill(goldVal);
@@ -139,12 +134,9 @@ public class DeepTestKit
 			{
 				this.data.fill(inputVal);
 				if (hasBias) this.data.fillLastRow1();
-				hasNext = false;
 			}
 			@Override
-			public boolean hasNext() { return hasNext; }
-			@Override
-			public void reset() { hasNext = true; }
+			public void reset() { }
 		};
 	}
 	
