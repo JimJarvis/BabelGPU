@@ -31,7 +31,8 @@ public class SumTUnit extends TerminalUnit
 	@Override
 	public void backward()
 	{
-		Thrust.fill(input.gradient(), super.batchNormalizer());
+		if (input.hasGradient())
+    		Thrust.fill(input.gradient(), super.batchNormalizer());
 	}
 
 }

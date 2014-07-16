@@ -31,9 +31,12 @@ public class SparseCrossEntropyTUnit extends TerminalUnit
 	@Override
 	public void backward()
 	{
-		// Gradient = 1/batch * (y - id)
-		Thrust.batch_softmax_minus_id(input.data(), input.gradient(), inlet.goldLabels, hasBias);
-		GpuBlas.scale(input.gradient(), super.batchNormalizer());
+		if (input.hasGradient())
+		{
+    		// Gradient = 1/batch * (y - id)
+    		Thrust.batch_softmax_minus_id(input.data(), input.gradient(), inlet.goldLabels, hasBias);
+    		GpuBlas.scale(input.gradient(), super.batchNormalizer());
+		}
 	}
 
 }
