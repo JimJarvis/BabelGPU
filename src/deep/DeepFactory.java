@@ -28,7 +28,7 @@ public class DeepFactory
 			units.add( new LinearUnit("", layerDims[i], initers[i]) );
 			units.add(new SigmoidUnit(""));
 		}
-		units.add(new SquareErrorUnit("", inlet));
+		units.add(new SquareErrorTUnit("", inlet));
 
 		return 
 			new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
@@ -84,7 +84,7 @@ public class DeepFactory
 			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i])));
 		}
 		units.add(new LinearUnit("", layerDims[i], lastLinearIniter));
-		units.add(new SparseCrossEntropyUnit("", inlet));
+		units.add(new SparseCrossEntropyTUnit("", inlet));
 		return 
 			new DeepNet("FourierProjectionNet", inlet, units).genDefaultUnitName();
 	}

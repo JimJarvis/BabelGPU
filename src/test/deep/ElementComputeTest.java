@@ -20,7 +20,7 @@ public class ElementComputeTest
 						SigmoidUnit.class, 
 						uniRandInlet(2, 2), 
 						2, scalor, 
-						SquareErrorUnit.class);
+						SquareErrorTUnit.class);
 		net.name = "Sigmoid + SquareError";
 //		sigmoidLayers.runDebug(plan, hasBias);
 		check(net, 1e-1f, 1e2f, false);
@@ -35,7 +35,7 @@ public class ElementComputeTest
 						SigmoidUnit.class, 
 						uniRandInlet(2, 1, InletMode.GoldSumTo1), 
 						1, scalor, 
-						CrossEntropyUnit.class);
+						CrossEntropyTUnit.class);
 		net.name = "Sigmoid + CrossEntropy";
 //		sigmoidLayers.runDebug(plan, hasBias);
 		check(net, 1e-1f, 1e2f, false);
@@ -50,7 +50,7 @@ public class ElementComputeTest
 						CosineUnit.class, 
 						uniRandInlet(1, 3), 
 						3, 1 /*scalor*/, 
-						SquareErrorUnit.class);
+						SquareErrorTUnit.class);
 		net.name = "Cosine + SquareError";
 //		cosineLayers.runDebug(plan, hasBias);
 		check(net, 1e-1f, 1e2f, false);
@@ -65,7 +65,7 @@ public class ElementComputeTest
 						CosineUnit.class, 
 						uniRandInlet(2, 1, InletMode.GoldSumTo1), 
 						2, scalor, 
-						CrossEntropyUnit.class);
+						CrossEntropyTUnit.class);
 		net.name = "Cosine + CrossEntropy";
 //		sigmoidLayers.runDebug(plan, hasBias);
 		check(net, 1e-1f, 1e5f, false);
@@ -80,7 +80,7 @@ public class ElementComputeTest
 						CosineUnit.class, 
 						uniRandInlet(3, 1, InletMode.GoldLabel), 
 						3, scalor, 
-						SparseCrossEntropyUnit.class);
+						SparseCrossEntropyTUnit.class);
 		net.name = "Cosine + SparseCrossEntropy";
 //		sigmoidLayers.runDebug(plan, hasBias);
 		check(net, 1e-1f, 1e5f, false);

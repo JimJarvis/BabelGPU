@@ -2,14 +2,14 @@ package deep.units;
 
 import gpu.*;
 
-public class SparseCrossEntropyUnit extends TerminalUnit
+public class SparseCrossEntropyTUnit extends TerminalUnit
 {
-	public SparseCrossEntropyUnit(String name, InletUnit inlet, boolean hasBias)
+	public SparseCrossEntropyTUnit(String name, InletUnit inlet, boolean hasBias)
 	{
 		super(name, inlet, hasBias);
 	}
 
-	public SparseCrossEntropyUnit(String name, InletUnit inlet)
+	public SparseCrossEntropyTUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);
 	}

@@ -6,9 +6,9 @@ import deep.DeepException;
  * For forward only calculations.
  * Isn't actually a neural network. Doesn't support back-prop
  */
-public class ForwardOnlyUnit extends TerminalUnit
+public class ForwardOnlyTUnit extends TerminalUnit
 {
-	public ForwardOnlyUnit(String name)
+	public ForwardOnlyTUnit(String name)
 	{
 		super(name, null);
 	}
@@ -17,13 +17,11 @@ public class ForwardOnlyUnit extends TerminalUnit
 	public void setup()
 	{
 		super.setup();
+		this.output = this.input;
 	}
 	
 	@Override
-	public final void forward()
-	{
-		
-	}
+	public final void forward() { }
 
 	@Override
 	protected float forward_terminal() { return 0; }

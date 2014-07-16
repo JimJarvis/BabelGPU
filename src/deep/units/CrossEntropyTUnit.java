@@ -4,14 +4,14 @@ import deep.*;
 import utils.*;
 import gpu.*;
 
-public class CrossEntropyUnit extends TerminalUnit
+public class CrossEntropyTUnit extends TerminalUnit
 {
-	public CrossEntropyUnit(String name, InletUnit inlet, boolean hasBias)
+	public CrossEntropyTUnit(String name, InletUnit inlet, boolean hasBias)
 	{
 		super(name, inlet, hasBias);
 	}
 
-	public CrossEntropyUnit(String name, InletUnit inlet)
+	public CrossEntropyTUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);
 	}

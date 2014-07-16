@@ -6,9 +6,9 @@ import gpu.Thrust;
 /**
  * Debug only
  */
-public class SumUnit extends TerminalUnit
+public class SumTUnit extends TerminalUnit
 {
-	public SumUnit(String name, InletUnit inlet)
+	public SumTUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);
 	}

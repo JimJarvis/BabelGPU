@@ -157,7 +157,7 @@ public class DeepTestKit
 	{
 		if (net.getParams().size() == 0// this is a PureCompute debug network 
 			// the terminal class requires inDim == outDim
-			&& Arrays.asList( new Class[] {SquareErrorUnit.class, CrossEntropyUnit.class}).contains(net.terminal.getClass())
+			&& Arrays.asList( new Class[] {SquareErrorTUnit.class, CrossEntropyTUnit.class}).contains(net.terminal.getClass())
 			&& inDim != outDim)
 		{
 			fail("PureComputeLayer debug test must have inDim == outDim");

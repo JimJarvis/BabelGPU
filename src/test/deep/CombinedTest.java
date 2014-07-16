@@ -65,7 +65,7 @@ public class CombinedTest
 			units.add(new SigmoidUnit(""));
     		units.add(new LinearUnit("", linearDims[i], Initializer.uniformRandIniter(1)));
 		}
-		units.add(new SparseCrossEntropyUnit("", inlet));
+		units.add(new SparseCrossEntropyTUnit("", inlet));
 		DeepNet net = new DeepNet("DebugFourierNet", inlet, units).genDefaultUnitName();
 		
 		check(net, 1e-1f, 1e2f, false);

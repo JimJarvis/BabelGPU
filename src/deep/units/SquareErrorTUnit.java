@@ -3,9 +3,9 @@ package deep.units;
 import gpu.*;
 
 // terminal unit
-public class SquareErrorUnit extends TerminalUnit
+public class SquareErrorTUnit extends TerminalUnit
 {
-	public SquareErrorUnit(String name, InletUnit inlet)
+	public SquareErrorTUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);
 	}

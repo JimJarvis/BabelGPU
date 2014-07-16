@@ -19,7 +19,7 @@ public class LinearTest
 				DeepFactory.debugLinearLayers(
 						uniRandInlet(2, 2), 
 						new int[] {3, 10, 6, 5, outDim}, 
-						SquareErrorUnit.class, 
+						SquareErrorTUnit.class, 
 						Initializer.uniformRandIniter(1));
 		linearLayers.name = "Linear + SquareError";
 //		linearLayers.runDebug(plan, hasBias);
@@ -34,7 +34,7 @@ public class LinearTest
 				DeepFactory.debugLinearLayers(
 						uniRandInlet(2, 3, InletMode.GoldSumTo1),
 						new int[] {5, 6, outDim},
-						CrossEntropyUnit.class, 
+						CrossEntropyTUnit.class, 
 						Initializer.uniformRandIniter(1));
 		linearLayers.name = "Linear + CrossEntropy";
 //		linearLayers.runDebug(plan, hasBias);
@@ -49,7 +49,7 @@ public class LinearTest
 				DeepFactory.debugLinearLayers(
 						uniRandInlet(1, 0, InletMode.GoldLabel),
 						new int[] {8, 3, outDim},
-						SparseCrossEntropyUnit.class, 
+						SparseCrossEntropyTUnit.class, 
 						Initializer.uniformRandIniter(1));
 		linearLayers.name = "Linear + SparseCrossEntropy";
 //		linearLayers.runDebug(plan, hasBias);
@@ -64,7 +64,7 @@ public class LinearTest
 				DeepFactory.debugLinearLayers(
 						uniRandInlet(2, 2), 
 						new int[] {3, 10, 6, 5, outDim}, 
-						SumUnit.class, 
+						SumTUnit.class, 
 						Initializer.uniformRandIniter(0,1));
 		linearLayers.name = "Linear + Sum";
 //		linearLayers.runDebug(plan, hasBiase);
