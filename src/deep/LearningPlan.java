@@ -1,6 +1,8 @@
 package deep;
 
-public class LearningPlan
+import java.util.Iterator;
+
+public class LearningPlan implements Iterable<Integer>
 {
 	public float lr; // learning rate
 	public float reg; // regularization
@@ -30,5 +32,30 @@ public class LearningPlan
 	public boolean hasReg()
 	{
 		return this.reg > 0;
+	}
+
+	/**
+	 * Iterates over each epoch
+	 */
+	@Override
+	public Iterator<Integer> iterator()
+	{
+		return new Iterator<Integer>()
+		{
+			@Override
+			public boolean hasNext()
+			{
+				return curEpoch < totalEpochs;
+			}
+
+			@Override
+			public Integer next()
+			{
+				return curEpoch ++;
+			}
+
+			@Override
+			public void remove() { }
+		};
 	}
 }

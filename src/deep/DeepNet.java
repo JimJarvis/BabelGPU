@@ -133,12 +133,16 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public void run(LearningPlan learningPlan)
 	{
 		setup(learningPlan);
-		
-		while (inlet.hasNext())
+		for (int epoch : learningPlan)
 		{
-			inlet.nextBatch();
-			forwprop();
-			backprop();
+    		while (inlet.hasNext())
+    		{
+    			inlet.nextBatch();
+    			forwprop();
+    			backprop();
+    		}
+    		
+    		inlet.reset();
 		}
 	}
 	
