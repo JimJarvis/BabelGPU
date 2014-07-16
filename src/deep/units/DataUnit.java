@@ -10,7 +10,7 @@ public class DataUnit extends Unit
     protected FloatMat gradient = null;
     
     // If the last batch is smaller than the previous ones
-    private int batchSize;
+    private int batchSize = -1;
     private FloatMat dataSub = null; // offset-mat: doesn't contain any GPU memory
     private FloatMat gradientSub = null; // offset-mat: doesn't contain any GPU memory
     
@@ -23,7 +23,8 @@ public class DataUnit extends Unit
 		super(name);
 		this.data = data;
 		this.gradient = gradient;
-		this.batchSize = data.col;
+		if (data != null)
+    		this.batchSize = data.col;
 		// For offset purpose
 		this.dataSub = data;
 		this.gradientSub = gradient;
@@ -45,13 +46,23 @@ public class DataUnit extends Unit
 	/**
 	 * @return Might be data.col, might be fewer
 	 */
-	public int batchSize() {	return batchSize; }
+	public int batchSize() 
+	{	
+		if (batchSize < 0)
+		{
+			if (data != null)
+    			this.batchSize = data.col;
+			else
+				throw new DeepException("Cannot get batchSize: data == null");
+		}
+		return batchSize;
+	}
 	
 	/**
 	 *  If the next batch has fewer columns than the previous
 	 *  We createOffset under the hood
 	 */
-	public void setNewBatch(int newBatchSize)
+	public void setBatchSize(int newBatchSize)
 	{
 		this.batchSize = newBatchSize;
 		// less than a previous batch in the latest data
