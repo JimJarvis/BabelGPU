@@ -2,6 +2,7 @@ package deep;
 
 import java.util.ArrayList;
 
+import utils.CpuUtil;
 import gpu.*;
 import deep.units.ParamUnit;
 
@@ -236,16 +237,16 @@ public abstract class Initializer
 	 * @param relativeRatios: divide (W.row - 1) into regions for which each initers are responsible
 	 */
 	public static Initializer mixProjKernelAggregIniter(
-			final ArrayList<Initializer> distrIniters, final ArrayList<Double> relativeRatios)
+			final Initializer[] distrIniters, final double ... relativeRatios)
 	{
-		if (distrIniters.size() != relativeRatios.size())
+		if (distrIniters.length != relativeRatios.length)
 			throw new DeepException("Number of kernel initers must match number of relative ratios");
 		
 		// Normalize relativeRatios so that they sum up to 1
 		double sum = 0;
 		for (double d : relativeRatios)	sum += d;
 		int i = 0;
-		for (double d : relativeRatios)	relativeRatios.set(i++, d / sum);
+		for (double d : relativeRatios)	relativeRatios[i++] = d / sum;
 		
 		Initializer mixOrigIniter = new Initializer() {
 			@Override
@@ -255,19 +256,19 @@ public abstract class Initializer
 				FloatMat wt = new FloatMat(w.transpose());
 				// wt's col will be w's row. So filling wt's col region by region is the same as 
 				// filling w's row region by region.
-				int nIniters = distrIniters.size();
+				int nIniters = distrIniters.length;
 				int colCur = 0; // current column index
 				final int colTotal = wt.col - 1; // reserve an extra row in 'w' for bias units
 				for (int i = 0; i < nIniters; ++i)
 				{
 					if (i != nIniters -1) // not the last initer
 					{
-						int colRange = (int) Math.round(relativeRatios.get(i) * colTotal);
-						distrIniters.get(i).init(wt.createColOffset(colCur, colCur + colRange));
+						int colRange = (int) Math.round(relativeRatios[i] * colTotal);
+						distrIniters[i].init(wt.createColOffset(colCur, colCur + colRange));
 						colCur += colRange;
 					}
 					else // the last initer inits any remaining uninitialized cols
-						distrIniters.get(i).init(wt.createColOffset(colCur, colTotal));
+						distrIniters[i].init(wt.createColOffset(colCur, colTotal));
 				}
 				// Give it back to w
 				Thrust.transpose(wt, w);
@@ -280,24 +281,41 @@ public abstract class Initializer
 	}
 	
 	/**
-	 * Use the pre-set enums to replace ArrayList<Initializers>
-	 * @param gamma assume common for all distrIniters
+	 * Use the pre-set enums to replace Initializer[]
+	 * @param gammas for each kernel
 	 * @see Initializer#mixProjKernelAggregIniter(ArrayList, ArrayList)
 	 */
 	public static Initializer mixProjKernelAggregIniter(
-			final ArrayList<ProjKernel> projKernels, float gamma, final ArrayList<Double> relativeRatios)
+			ProjKernel[] projKernels, float[] gammas, double ... relativeRatios)
 	{
-		ArrayList<Initializer> distrIniters = new ArrayList<>();
-		for (ProjKernel type : projKernels)
+		int N = projKernels.length;
+		Initializer[] distrIniters = new Initializer[N];
+		ProjKernel type;
+		for (int i = 0; i < N; ++i)
 		{
-			float scalor = gammaToScalor(gamma, type);
+			type = projKernels[i];
+			float scalor = gammaToScalor(gammas[i], type);
 			switch (type)
 			{
-			case Gaussian : distrIniters.add(gaussianIniter(scalor)); break;
-			case Laplacian : distrIniters.add(cauchyIniter(scalor)); break;
-			case Cauchy: distrIniters.add(laplacianIniter(scalor)); break;
+			case Gaussian : distrIniters[i] = gaussianIniter(scalor); break;
+			case Laplacian : distrIniters[i] = cauchyIniter(scalor); break;
+			case Cauchy: distrIniters[i] = laplacianIniter(scalor); break;
 			}
 		}
 		return mixProjKernelAggregIniter(distrIniters, relativeRatios);
+	}
+
+	/**
+	 * Use the pre-set enums to replace Initializer[]
+	 * @param gamma common for all kernel
+	 * @see Initializer#mixProjKernelAggregIniter(ArrayList, ArrayList)
+	 */
+	public static Initializer mixProjKernelAggregIniter(
+			ProjKernel[] projKernels, float gamma, double ... relativeRatios)
+	{
+		return mixProjKernelAggregIniter(
+				projKernels,  
+				CpuUtil.repeatedArray(gamma, projKernels.length),
+				relativeRatios);
 	}
 }

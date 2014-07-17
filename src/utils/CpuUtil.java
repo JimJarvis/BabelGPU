@@ -22,6 +22,16 @@ public class CpuUtil
 	}
 	
 	/**
+	 * Make a repeated array of floats
+	 */
+	public static float[] repeatedArray(float f, int len)
+	{
+		float[] ans = new float[len];
+		for (int i = 0; i < len; ++ i)		ans[i] = f;
+		return ans;
+	}
+	
+	/**
 	 * @return ArrayList wrapper around this array
 	 */
 	public static <T> ArrayList<T> toList(T ... arr) 

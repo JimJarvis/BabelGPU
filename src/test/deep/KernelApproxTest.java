@@ -166,21 +166,15 @@ public class KernelApproxTest
 
 		FloatMat a = new FloatMat(27, 5);
 		Initializer.resetRand();
-		ArrayList<Initializer> initers = new ArrayList<>();
-		//		initers.add(Initializer.laplacianIniter(.5));
-		//		initers.add(Initializer.gaussianIniter(.5));
-		//		initers.add(Initializer.cauchyIniter(.5));
-		//		initers.add(Initializer.gaussianIniter(.5));
-		initers.add(Initializer.fillIniter(10));
-		initers.add(Initializer.fillIniter(20));
-		initers.add(Initializer.fillIniter(30));
-		initers.add(Initializer.fillIniter(40));
-		ArrayList<Double> ratios = new ArrayList<>();
-		ratios.add(4.);
-		ratios.add(2.);
-		ratios.add(4.);
-		ratios.add(3.);
-		Initializer.mixProjKernelAggregIniter(initers, ratios).init(a);
+		Initializer.mixProjKernelAggregIniter(
+				new Initializer[] {
+						Initializer.fillIniter(10),
+						Initializer.fillIniter(20),
+						Initializer.fillIniter(30),
+						Initializer.fillIniter(40)
+				}, 
+				4, 2, 4, 3)
+				.init(a);
 		PP.p(a);
 	}
 }
