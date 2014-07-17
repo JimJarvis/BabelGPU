@@ -8,6 +8,11 @@ import gpu.Thrust;
  */
 public class SumTUnit extends TerminalUnit
 {
+	public SumTUnit(String name, InletUnit inlet, boolean hasBias)
+	{
+		super(name, inlet, hasBias);
+	}
+
 	public SumTUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);

@@ -22,9 +22,9 @@ public class FourierProjectUnit extends ComputeUnit
 	 * 'hasBias' must be true because the last column U[0, 2*pi] needs to be added
 	 * @param projIniter use a projKernelIniter instead of a pure distrIniter
 	 */
-	public FourierProjectUnit(String name, int outDim, Initializer projIniter)
+	public FourierProjectUnit(String name, InletUnit inlet, int outDim, Initializer projIniter)
 	{
-		super(name, outDim, true);
+		super(name, inlet, outDim, true);
 		this.projIniter = projIniter;
 	}
 	

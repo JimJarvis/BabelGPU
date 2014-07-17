@@ -25,8 +25,8 @@ public class DeepFactory
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerDims.length; i++)
 		{
-			units.add( new LinearUnit("", layerDims[i], initers[i]) );
-			units.add(new SigmoidUnit(""));
+			units.add(new LinearUnit("", inlet, layerDims[i], initers[i]) );
+			units.add(new SigmoidUnit("", inlet));
 		}
 		units.add(new SquareErrorTUnit("", inlet));
 
@@ -79,11 +79,11 @@ public class DeepFactory
 		int i;
 		for (i = 0; i < layerDims.length - 1; i++)
 		{
-			units.add(new FourierProjectUnit("", layerDims[i], projIniters[i]));
+			units.add(new FourierProjectUnit("", inlet, layerDims[i], projIniters[i]));
 			// scalor = sqrt(2/D) where D is #new features
-			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i])));
+			units.add(new CosineUnit("", inlet, (float) Math.sqrt(2.0 / layerDims[i])));
 		}
-		units.add(new LinearUnit("", layerDims[i], lastLinearIniter));
+		units.add(new LinearUnit("", inlet, layerDims[i], lastLinearIniter));
 		units.add(new SparseCrossEntropyTUnit("", inlet));
 		return 
 			new DeepNet("FourierProjectionNet", inlet, units).genDefaultUnitName();
@@ -107,9 +107,9 @@ public class DeepFactory
 		ElementComputeUnit eleUnit;
 		for (i = 0; i < layerDims.length; i++)
 		{
-			units.add(new FourierProjectUnit("", layerDims[i], projIniters[i]));
+			units.add(new FourierProjectUnit("", inlet, layerDims[i], projIniters[i]));
 			// scalor = sqrt(2/D) where D is #new features
-			eleUnit = new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i]));
+			eleUnit = new CosineUnit("", inlet, (float) Math.sqrt(2.0 / layerDims[i]));
 			eleUnit.setMergeIO(true);
 			units.add(eleUnit);
 		}
@@ -123,7 +123,7 @@ public class DeepFactory
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerDims.length; i++)
-			units.add( new LinearUnit("", layerDims[i], initer) );
+			units.add( new LinearUnit("", inlet, layerDims[i], initer) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
 		return 
@@ -142,7 +142,7 @@ public class DeepFactory
 	{
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (int i = 0; i < layerN; i++)
-			units.add( defaultElementComputeCtor(pureClass, scalor) );
+			units.add( defaultElementComputeCtor(pureClass, inlet, scalor) );
 		units.add(defaultTerminalCtor(inlet, terminalClass));
 
 		return 
@@ -166,10 +166,12 @@ public class DeepFactory
 	
 	// Helper to construct pure compute layers
 	private static ElementComputeUnit defaultElementComputeCtor(
-			Class<? extends ElementComputeUnit> pureClass, float scalor)
+			Class<? extends ElementComputeUnit> pureClass, InletUnit inlet, float scalor)
 	{
 		try {
-			return pureClass.getConstructor(String.class, float.class).newInstance("", scalor);
+			return pureClass.getConstructor(
+					String.class, InletUnit.class, float.class)
+					.newInstance("", inlet, scalor);
 		}
 		catch (Exception e)
 		{

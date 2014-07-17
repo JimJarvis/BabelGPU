@@ -5,14 +5,17 @@ import gpu.*;
 
 public abstract class ComputeUnit extends Unit
 {
-	public ComputeUnit next = null;
-	public ComputeUnit prev = null;
+	public ComputeUnit next;
+	public ComputeUnit prev;
+	public InletUnit inlet;
+
+	protected LearningPlan learningPlan;
+
 	protected int outDim;
 	// Do we include bias units?
 	protected boolean hasBias;
 	// Do we store input/output data separately?
 	protected boolean mergeIO = false;
-	protected LearningPlan learningPlan;
 
 	/**
 	 * ALWAYS equal to prev.output
@@ -23,18 +26,19 @@ public abstract class ComputeUnit extends Unit
 	 */
 	public DataUnit output;
 	
-	public ComputeUnit(String name)
+	public ComputeUnit(String name, InletUnit inlet)
 	{
 		super(name);
+		this.inlet = inlet;
 	}
 	
 	/**
 	 * @param outDim the dimension of the output (transformed) data
 	 * @param hasBias if true, the actual outDim will be your input + 1
 	 */
-	public ComputeUnit(String name, int outDim, boolean hasBias)
+	public ComputeUnit(String name, InletUnit inlet, int outDim, boolean hasBias)
 	{
-		super(name);
+		this(name, inlet);
 		this.hasBias = hasBias;
 		this.outDim = hasBias ? outDim + 1 : outDim;
 	}
@@ -42,9 +46,9 @@ public abstract class ComputeUnit extends Unit
 	/**
 	 * Default hasBias = true, the actual outDim will be your input + 1
 	 */
-	public ComputeUnit(String name, int outDim)
+	public ComputeUnit(String name, InletUnit inlet, int outDim)
 	{
-		this(name, outDim, true);
+		this(name, inlet, outDim, true);
 	}
 	
 	/**

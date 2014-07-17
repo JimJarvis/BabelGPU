@@ -5,14 +5,14 @@ import gpu.GpuBlas;
 
 public class LinearUnit extends ParamComputeUnit
 {
-	public LinearUnit(String name, int outDim, boolean hasBias, Initializer initer)
+	public LinearUnit(String name, InletUnit inlet, int outDim, boolean hasBias, Initializer initer)
 	{
-		super(name, outDim, hasBias, initer);
+		super(name, inlet, outDim, hasBias, initer);
 	}
 
-	public LinearUnit(String name, int outDim, Initializer wInitializer)
+	public LinearUnit(String name, InletUnit inlet, int outDim, Initializer wInitializer)
 	{
-		super(name, outDim, wInitializer);
+		super(name, inlet, outDim, wInitializer);
 	}
 	
 	@Override

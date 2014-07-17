@@ -57,13 +57,13 @@ public class CombinedTest
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		for (i = 0; i < projDims.length; i++)
 		{
-			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2)));
+			units.add(new FourierProjectUnit("", inlet, projDims[i], Initializer.gaussianProjKernelIniter(2)));
 			// scalor = sqrt(2/D) where D is #new features
-			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / projDims[i])));
-    		units.add(new LinearUnit("", linearDims[i] / 2, Initializer.uniformRandIniter(1)));
-			units.add(new FourierProjectUnit("", projDims[i], Initializer.gaussianProjKernelIniter(2)));
-			units.add(new SigmoidUnit(""));
-    		units.add(new LinearUnit("", linearDims[i], Initializer.uniformRandIniter(1)));
+			units.add(new CosineUnit("", inlet, (float) Math.sqrt(2.0 / projDims[i])));
+    		units.add(new LinearUnit("", inlet, linearDims[i] / 2, Initializer.uniformRandIniter(1)));
+			units.add(new FourierProjectUnit("", inlet, projDims[i], Initializer.gaussianProjKernelIniter(2)));
+			units.add(new SigmoidUnit("", inlet));
+    		units.add(new LinearUnit("", inlet, linearDims[i], Initializer.uniformRandIniter(1)));
 		}
 		units.add(new SparseCrossEntropyTUnit("", inlet));
 		DeepNet net = new DeepNet("DebugFourierNet", inlet, units).genDefaultUnitName();

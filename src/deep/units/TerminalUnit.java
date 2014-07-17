@@ -10,10 +10,6 @@ import deep.DeepException;
 public abstract class TerminalUnit extends ComputeUnit
 {
 	/**
-	 * Gold standard, normally the correct labels -> sparse 1-0 matrix
-	 */
-	public InletUnit inlet; // will give us gold labels
-	/**
 	 * Pure loss function
 	 */
 	protected float lossPure = 0;
@@ -32,13 +28,12 @@ public abstract class TerminalUnit extends ComputeUnit
 	
 	public TerminalUnit(String name, InletUnit inlet, boolean hasBias)
 	{
-		super(name, 1, hasBias);
-		this.inlet = inlet;
+		super(name, inlet, 1, hasBias);
 	}
 	
 	public TerminalUnit(String name, InletUnit inlet)
 	{
-		this(name, inlet, true);
+		this(name, inlet,  true);
 	}
 	
 	@Override

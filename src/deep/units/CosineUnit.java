@@ -4,19 +4,19 @@ import gpu.*;
 
 public class CosineUnit extends ElementComputeUnit
 {
-	public CosineUnit(String name, boolean hasBias, float scalor)
+	public CosineUnit(String name, InletUnit inlet, boolean hasBias, float scalor)
 	{
-		super(name, hasBias, scalor);
+		super(name, inlet, hasBias, scalor);
 	}
 
-	public CosineUnit(String name, float scalor)
+	public CosineUnit(String name, InletUnit inlet, float scalor)
 	{
-		super(name, scalor);
+		super(name, inlet, scalor);
 	}
 	
-	public CosineUnit(String name)
+	public CosineUnit(String name, InletUnit inlet)
 	{
-		super(name);
+		super(name, inlet);
 	}
 
 	@Override

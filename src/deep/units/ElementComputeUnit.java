@@ -15,23 +15,23 @@ public abstract class ElementComputeUnit extends ComputeUnit
 	 * @param hasBias see ComputeUnit
 	 * @param scalor default = 1 multiply every element by scalor to 'output'
 	 */
-	public ElementComputeUnit(String name, boolean hasBias, float scalor)
+	public ElementComputeUnit(String name, InletUnit inlet, boolean hasBias, float scalor)
 	{
-		super(name, -1, hasBias);
+		super(name, inlet, -1, hasBias);
 		this.scalor = scalor;
 	}
 	
-	public ElementComputeUnit(String name, float scalor)
+	public ElementComputeUnit(String name, InletUnit inlet, float scalor)
 	{
-		this(name, true, scalor);
+		this(name, inlet, true, scalor);
 	}
 	
 	/**
 	 * Default scalor = 1
 	 */
-	public ElementComputeUnit(String name)
+	public ElementComputeUnit(String name, InletUnit inlet)
 	{
-		this(name, true, 1);
+		this(name, inlet, true, 1);
 	}
 
 

@@ -5,6 +5,11 @@ import gpu.*;
 // terminal unit
 public class SquareErrorTUnit extends TerminalUnit
 {
+	public SquareErrorTUnit(String name, InletUnit inlet, boolean hasBias)
+	{
+		super(name, inlet, hasBias);
+	}
+
 	public SquareErrorTUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);

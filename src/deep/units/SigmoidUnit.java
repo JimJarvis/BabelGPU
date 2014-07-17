@@ -4,19 +4,19 @@ import gpu.*;
 
 public class SigmoidUnit extends ElementComputeUnit
 {
-	public SigmoidUnit(String name, boolean hasBias, float scalor)
+	public SigmoidUnit(String name, InletUnit inlet, boolean hasBias, float scalor)
 	{
-		super(name, hasBias, scalor);
+		super(name, inlet, hasBias, scalor);
 	}
 
-	public SigmoidUnit(String name, float scalor)
+	public SigmoidUnit(String name, InletUnit inlet, float scalor)
 	{
-		super(name, scalor);
+		super(name, inlet, scalor);
 	}
 	
-	public SigmoidUnit(String name)
+	public SigmoidUnit(String name, InletUnit inlet)
 	{
-		super(name);
+		super(name, inlet);
 	}
 
 	@Override

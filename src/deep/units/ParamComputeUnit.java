@@ -12,9 +12,9 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	 * @param initer parameter W initializer
 	 * @param hasBias see ComputeUnit
 	 */
-	public ParamComputeUnit(String name, int outDim, boolean hasBias, Initializer initer)
+	public ParamComputeUnit(String name, InletUnit inlet, int outDim, boolean hasBias, Initializer initer)
 	{
-		super(name, outDim, hasBias);
+		super(name, inlet, outDim, hasBias);
 		this.initer = initer;
 	}
 	
@@ -22,17 +22,17 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	 * @param outDim output dimension from this computing unit
 	 * @param initer parameter W initializer
 	 */
-	public ParamComputeUnit(String name, int outDim, Initializer initer)
+	public ParamComputeUnit(String name, InletUnit inlet, int outDim, Initializer initer)
 	{
-		this(name, outDim, true, initer);
+		this(name, inlet, outDim, true, initer);
 	}
 	
 	/**
 	 * Default: init W to all zero
 	 */
-	public ParamComputeUnit(String name, int outDim)
+	public ParamComputeUnit(String name, InletUnit inlet, int outDim)
 	{
-		this(name, outDim, true, Initializer.fillIniter(0));
+		this(name, inlet, outDim, true, Initializer.fillIniter(0));
 	}
 	
 	@Override
