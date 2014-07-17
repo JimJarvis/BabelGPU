@@ -104,11 +104,14 @@ public class DeepFactory
 		
 		ArrayList<ComputeUnit> units = new ArrayList<>();
 		int i;
+		ElementComputeUnit eleUnit;
 		for (i = 0; i < layerDims.length; i++)
 		{
 			units.add(new FourierProjectUnit("", layerDims[i], projIniters[i]));
 			// scalor = sqrt(2/D) where D is #new features
-			units.add(new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i])));
+			eleUnit = new CosineUnit("", (float) Math.sqrt(2.0 / layerDims[i]));
+			eleUnit.setMergeIO(true);
+			units.add(eleUnit);
 		}
 		units.add(new ForwardOnlyTUnit(""));
 		return 
