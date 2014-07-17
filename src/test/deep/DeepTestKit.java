@@ -61,7 +61,7 @@ public class DeepTestKit
 
 		dummyLabels = CpuUtil.randInts(batchSize, outDim);
 		
-		return new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize)
+		return new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize, true)
 		{
 			{
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
@@ -117,7 +117,7 @@ public class DeepTestKit
 	// Produce an artificial Inlet with uniform input and gold
 	public static InletUnit uniformInlet(final float inputVal, final float goldVal)
 	{
-		return new InletUnit("Uniform Inlet", changeDim(inDim), batchSize)
+		return new InletUnit("Uniform Inlet", changeDim(inDim), batchSize, true)
 		{
 			{
 				this.goldMat = new FloatMat(changeDim(outDim), batchSize);

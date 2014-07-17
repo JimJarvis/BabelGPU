@@ -25,10 +25,17 @@ public abstract class InletUnit extends DataUnit
 	 * Construct a new 'data' matrix with row == 'dim' and col == 'batchSize'
 	 * @param dim raw row dimension (may include extra bias row)
 	 * NOTE: you're responsible for adding an extra row for bias here
+	 * @param actuallyAlloc true to actually allocate memory for 'data'. 
+	 * false to fill 'data' with a dummy FloatMat that only has row/col dim info
+	 * @see FloatMat#createDummyMat(int, int)
 	 */
-	public InletUnit(String name, int dim, int batchSize)
+	public InletUnit(String name, int dim, int batchSize, boolean actuallyAlloc)
 	{
-		super(name, null, new FloatMat(dim, batchSize), null);
+		super(name, null, 
+				actuallyAlloc ? 
+    				new FloatMat(dim, batchSize) : 
+    				FloatMat.createDummyMat(dim, batchSize), 
+				null);
 	}
 	
 	/**

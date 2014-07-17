@@ -103,8 +103,8 @@ public class GpuBlas
 		Pointer py = y.toDevice();
 		// Here is an inconsistency in the API
 		// m and n are the original row/col dimension
-		int m = A.getOriginalRow();
-		int n = A.getOriginalCol();
+		int m = A.originalRow();
+		int n = A.originalCol();
 		
 		cublasSgemv(handle, A.getOp(),
 				m, n, 

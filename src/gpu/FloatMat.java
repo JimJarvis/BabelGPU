@@ -137,6 +137,18 @@ public class FloatMat
 		this.hostMode = other.hostMode;
 	}
 	
+	/**
+	 * Useful in places where row/col info needs to be retrieved first, 
+	 * while the FloatMat itself can be instantiated later.
+	 * @return a dummy FloatMat with no host/device data, only dim info
+	 */
+	public static FloatMat createDummyMat(int row, int col)
+	{
+		FloatMat dummy = new FloatMat();
+		dummy.initDim(row, col);
+		return dummy;
+	}
+	
 	// Ctor helper
 	private void initDim(int row, int col)
 	{
@@ -188,7 +200,7 @@ public class FloatMat
 	/**
 	 * Invariant to transpose
 	 */
-	public int getOriginalRow()
+	public int originalRow()
 	{
 		return op == CUBLAS_OP_N ? row : col;
 	}
@@ -196,7 +208,7 @@ public class FloatMat
 	/**
 	 * Invariant to transpose
 	 */
-	public int getOriginalCol()
+	public int originalCol()
 	{
 		return op == CUBLAS_OP_N ? col : row;
 	}
