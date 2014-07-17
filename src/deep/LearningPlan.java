@@ -92,4 +92,18 @@ public class LearningPlan implements Iterable<Integer>
 			public void remove() { }
 		};
 	}
+	
+	public String toString()
+	{
+		return String.format(
+				"LearningPlan["
+				+ "LR = %.3f\n"
+				+ "Reg = %.3f\n"
+				+ "TotalSampleSize = %d\n"
+				+ "doneSampleSize = %d\n"
+				+ "curBatchSize = %d\n" 
+				+ "TotalEpochs = %d\n"
+				+ "curEpoch = %d]",
+				lr, reg, totalSampleSize, doneSampleSize, curBatchSize, totalEpochs, curEpoch);
+	}
 }
