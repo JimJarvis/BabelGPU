@@ -1,6 +1,8 @@
 package utils;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class CpuUtil
@@ -17,6 +19,24 @@ public class CpuUtil
 		for (int i = 0 ; i < len ; i ++)
 			objs[i] = obj;
 		return objs;
+	}
+	
+	/**
+	 * @return ArrayList wrapper around this array
+	 */
+	public static <T> ArrayList<T> toList(T ... arr) 
+	{
+		return new ArrayList<T>(Arrays.asList(arr));
+	}
+	
+	/**
+	 * @return primitive array
+	 */
+	public static <T> T[] toArray(ArrayList<T> list)
+	{
+		T[] arr = (T[]) new Object[list.size()];
+		list.toArray(arr);
+		return arr;
 	}
 	
 	/**
