@@ -156,31 +156,31 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Reset all parameters, loss, inlet and LearningPlan
 	 * Mostly for debugging purpose
 	 * @see #prepareNextEpoch()
-	 * @see #resetLoss()
+	 * @see #clearLoss()
 	 */
 	public void resetAll()
 	{
 		Initializer.resetRand();
 		for (ParamUnit w : terminal.getParams())
 			w.reInit();
-		this.resetLoss();
 		this.prepareNextEpoch();
 	}
 	
 	/**
-	 * Reset LearningPlan and inlet
+	 * Reset LearningPlan, inlet and loss
 	 * Should be used in real training loop
 	 */
 	public void prepareNextEpoch()
 	{ 
 		learningPlan.reset();
 		inlet.reset();
+		this.clearLoss();
 	}
 	
 	/**
 	 * @see TerminalUnit#clearLoss()
 	 */
-	public void resetLoss()
+	public void clearLoss()
 	{
 		this.terminal.clearLoss();
 	}
