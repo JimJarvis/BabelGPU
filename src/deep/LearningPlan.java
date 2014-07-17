@@ -48,7 +48,7 @@ public class LearningPlan implements Iterable<Integer>
 	}
 	
 	/**
-	 * Prepare for re-run
+	 * Prepare for the next epoch
 	 */
 	public void reset()
 	{ 

@@ -147,33 +147,43 @@ public class DeepNet implements Iterable<ComputeUnit>
     			backprop();
     		}
     		
-    		reset();
+    		prepareNextEpoch();
 		}
 	}
 	
 	/**
-	 * Prepare a network for re-run
-	 * @param all if true, reset the parameters as well. 
-	 * If false, only reset terminal loss, learningPlan and inlet to prepare for the next epoch. 
-	 * Default false
+	 * Prepare a network for a complete re-run
+	 * Reset all parameters, loss, inlet and LearningPlan
+	 * Mostly for debugging purpose
+	 * @see #prepareNextEpoch()
+	 * @see #resetLoss()
 	 */
-	public void reset(boolean all)
+	public void resetAll()
 	{
-		if (all)
-		{
-			Initializer.resetRand();
-			for (ParamUnit w : terminal.getParams())
-				w.reInit();
-		}
-		terminal.clearLoss();
+		Initializer.resetRand();
+		for (ParamUnit w : terminal.getParams())
+			w.reInit();
+		this.resetLoss();
+		this.prepareNextEpoch();
+	}
+	
+	/**
+	 * Reset LearningPlan and inlet
+	 * Should be used in real training loop
+	 */
+	public void prepareNextEpoch()
+	{ 
 		learningPlan.reset();
 		inlet.reset();
 	}
 	
 	/**
-	 * @see DeepNet#reset(boolean)
+	 * @see TerminalUnit#clearLoss()
 	 */
-	public void reset() { this.reset(false); }
+	public void resetLoss()
+	{
+		this.terminal.clearLoss();
+	}
 	
 	/**
 	 * @return total loss function value = pure + reg
@@ -355,7 +365,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 	this.setBias(hasBias); // all have bias units
 	 	
 		this.setup(learningPlan);
-		this.reset(true); inlet.nextBatch();
+		this.resetAll(); inlet.nextBatch();
 		
 		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) terminal.getParams().clone();
 		// We also do gradient checking for pure computing networks that have no parameters
@@ -422,7 +432,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 				for (int perturb : new int[] {-1, 1})
 				{
     				// Re-init everything as the exact gradient initialization
-					this.reset(true); inlet.nextBatch();
+					this.resetAll(); inlet.nextBatch();
     				
             		// Perturb -EPS
             		w.data().incrSingle(idx, perturb * EPS);
