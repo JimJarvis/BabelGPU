@@ -33,27 +33,13 @@ public class DataUnit extends Unit
 	 * @return data.row
 	 */
 	public int dim() { return data.row; }
-
-	/**
-	 * Specified in the global learningPlan
-	 * Last batch might have fewer columns than all the previous ones
-	 * If set to -1 in learningPlan, return data.col
-	 */
-	public int batchSize() 
-	{	
-		int batch = this.parent.learningPlan.curBatchSize;
-		if (batch <= 0)
-			return this.parent.learningPlan.curBatchSize = this.data.col;
-		else
-			return batch;
-	}
 	
 	/**
 	 * Should use this to access 'data' field
 	 */
 	public FloatMat data()
 	{
-		int batchSize = this.batchSize();
+		int batchSize = this.parent.inlet.batchSize();
 		return data != null && batchSize < data.col ? 
 				this.data.createColOffset(0, batchSize) : this.data;
 	}
@@ -63,7 +49,7 @@ public class DataUnit extends Unit
 	 */
 	public FloatMat gradient()
 	{
-		int batchSize = this.batchSize();
+		int batchSize = this.parent.inlet.batchSize();
 		return gradient != null && batchSize  < data.col ? 
 				this.gradient.createColOffset(0, batchSize) : this.gradient;
 	}

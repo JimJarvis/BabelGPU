@@ -45,12 +45,6 @@ public class ParamUnit extends DataUnit
 		throw new DeepException("ParamUnit doesn't have 'dim'. Use data.row instead");
 	}
 	
-	@Override
-	public final int batchSize()
-	{
-		throw new DeepException("ParamUnit doesn't have 'batchSize', use data.col instead");
-	}
-	
 	/**
 	 * Simply 'data'. No colOffset
 	 */

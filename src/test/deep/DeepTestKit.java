@@ -90,6 +90,8 @@ public class DeepTestKit
 			}
 			@Override
 			public void reset() { }
+			@Override
+			public int batchSize() { return batchSize; }
 		};
 	}
 	
@@ -136,6 +138,8 @@ public class DeepTestKit
 			}
 			@Override
 			public void reset() { }
+			@Override
+			public int batchSize() { return batchSize; }
 		};
 	}
 	

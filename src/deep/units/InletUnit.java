@@ -3,15 +3,18 @@ package deep.units;
 import com.googlecode.javacpp.IntPointer;
 
 import deep.DeepException;
+import deep.DeepNet;
 import gpu.FloatMat;
 
 public abstract class InletUnit extends DataUnit
 {
 	public FloatMat goldMat;
 	public IntPointer goldLabels;
+	public final int MaxBatchSize;
 	
 	/**
 	 * Inlet doesn't have gradient
+	 * maxBatchSize == data.col
 	 * @param data mustn't be null. Include the extra row for bias if necessary
 	 */
 	public InletUnit(String name, FloatMat data)
@@ -19,23 +22,26 @@ public abstract class InletUnit extends DataUnit
 		super(name, null, data, null);
 		if (data == null)
 			throw new DeepException("Inlet data mustn't be null");
+		this.MaxBatchSize = data.col;
 	}
 
 	/**
 	 * Construct a new 'data' matrix with row == 'dim' and col == 'batchSize'
 	 * @param dim raw row dimension (may include extra bias row)
+	 * @param MaxBatchSize for initiating (gpu alloc) 'output' in the Net.
 	 * NOTE: you're responsible for adding an extra row for bias here
 	 * @param actuallyAlloc true to actually allocate memory for 'data'. 
 	 * false to fill 'data' with a dummy FloatMat that only has row/col dim info
 	 * @see FloatMat#createDummyMat(int, int)
 	 */
-	public InletUnit(String name, int dim, int batchSize, boolean actuallyAlloc)
+	public InletUnit(String name, int dim, int MaxBatchSize, boolean actuallyAlloc)
 	{
 		super(name, null, 
 				actuallyAlloc ? 
-    				new FloatMat(dim, batchSize) : 
-    				FloatMat.createDummyMat(dim, batchSize), 
+						new FloatMat(dim, MaxBatchSize) :
+						FloatMat.createDummyMat(dim, MaxBatchSize), 
 				null);
+		this.MaxBatchSize = MaxBatchSize;
 	}
 	
 	/**
@@ -46,12 +52,17 @@ public abstract class InletUnit extends DataUnit
 	{
 		this.parent = parent;
 	}
+	
+	/**
+	 * Will be called every time AFTER each 'nextBatch' to determine 
+	 * how many cols actually need to be used. 
+	 */
+	public abstract int batchSize();
 
 	/**
-	 * Update 'data' field
-	 * NOTE: 'data' must not have useless columns.
-	 * If the last batch has size less than previous batches, use {@link FloatMat#createColOffset}. 
-	 * Each column will be updated to LearningPlan as batchSize
+	 * Update 'data' field 
+	 * Should be called right after {@link DeepNet#hasNext()}
+	 * @see #batchSize() set batchSize right after
 	 */
 	public abstract void nextBatch();
 

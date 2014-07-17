@@ -21,7 +21,7 @@ public class SparseCrossEntropyTUnit extends TerminalUnit
 	{
 		if (!doesCalcLoss)	return 0;
 		
-		int batch = input.batchSize();
+		int batch = inlet.batchSize();
 		if (tmp_outLogProb == null)
 			tmp_outLogProb = new FloatMat(batch, 1);
 

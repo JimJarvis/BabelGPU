@@ -19,11 +19,6 @@ public class LearningPlan implements Iterable<Integer>
 	 */
 	public int doneSampleSize = 0;
 	public int curEpoch = 0;
-	/**
-	 * size of the batch just processed
-	 * If set to negative or 0, infer curBatchSize from DataUnit.data.col
-	 */
-	public int curBatchSize = -1;
 	
 	public LearningPlan() {};
 	
@@ -101,9 +96,8 @@ public class LearningPlan implements Iterable<Integer>
 				+ "Reg = %.3f\n"
 				+ "TotalSampleSize = %d\n"
 				+ "doneSampleSize = %d\n"
-				+ "curBatchSize = %d\n" 
 				+ "TotalEpochs = %d\n"
 				+ "curEpoch = %d]",
-				lr, reg, totalSampleSize, doneSampleSize, curBatchSize, totalEpochs, curEpoch);
+				lr, reg, totalSampleSize, doneSampleSize, totalEpochs, curEpoch);
 	}
 }

@@ -95,7 +95,7 @@ public abstract class TerminalUnit extends ComputeUnit
 	/**
 	 * If there's a summation, then the backward gradient should be dividied by batchSize
 	 */
-	protected float batchNormalizer() {	return 1f / input.batchSize();	}
+	protected float batchNormalizer() {	return 1f / inlet.batchSize();	}
 	
 	public float lossTotal() { return lossPure() + lossReg() ;	}
 	
@@ -139,7 +139,7 @@ public abstract class TerminalUnit extends ComputeUnit
 	
 	protected void updateLearningPlan()
 	{
-		this.learningPlan.doneSampleSize += input.batchSize();
+		this.learningPlan.doneSampleSize += inlet.batchSize();
 	}
 	
 	private FloatMat tmp_data_sqs[];  // hold temp squared values
