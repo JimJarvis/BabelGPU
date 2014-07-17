@@ -176,6 +176,32 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public void reset() { this.reset(false); }
 	
 	/**
+	 * @return total loss function value = pure + reg
+	 */
+	public float lossTotal()
+	{
+		return this.terminal.lossTotal();
+	}
+
+	/**
+	 * @return pure loss function value is without reg
+	 */
+	public float lossPure()
+	{
+		return this.terminal.lossPure();
+	}
+	
+	/**
+	 * Sometimes in training, we only care about the gradient updates, 
+	 * not the actual loss value. 
+	 * Turn off the loss calculation might save a lot of time.
+	 */
+	public void setCalcLoss(boolean doesCalcLoss)
+	{
+		this.terminal.setCalcLoss(doesCalcLoss);
+	}
+	
+	/**
 	 * Fill all compute units with default generated name
 	 * @return this
 	 */
