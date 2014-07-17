@@ -5,26 +5,28 @@ import gpu.FloatMat;
 
 public class DataUnit extends Unit
 {
-    protected FloatMat data = null;
-    protected FloatMat gradient = null;
+    protected FloatMat data;
+    protected FloatMat gradient;
+    protected ComputeUnit parent;
     
     /**
      *  Dummy placeholder: if gradient == FloatMat.DUMMY, 
      *  we calculate but don't store the gradient
      */
-	public DataUnit(String name, FloatMat data, FloatMat gradient)
+	public DataUnit(String name, ComputeUnit parent, FloatMat data, FloatMat gradient)
 	{
 		super(name);
 		this.data = data;
 		this.gradient = gradient;
+		this.parent = parent;
 	}
 
 	/**
 	 * Ctor for units without gradient
 	 */
-	public DataUnit(String name, FloatMat data)
+	public DataUnit(String name, ComputeUnit parent, FloatMat data)
 	{
-		this(name, data, null);
+		this(name, parent, data, null);
 	}
 	
 	/**
@@ -39,14 +41,11 @@ public class DataUnit extends Unit
 	 */
 	public int batchSize() 
 	{	
-		int batchSize;
-		if (learningPlan == null)
-			batchSize = data.col;
-		else if (learningPlan.curBatchSize <= 0)
-			batchSize = learningPlan.curBatchSize = data.col;
+		int batch = this.parent.learningPlan.curBatchSize;
+		if (batch <= 0)
+			return this.parent.learningPlan.curBatchSize = this.data.col;
 		else
-			batchSize = learningPlan.curBatchSize;
-		return batchSize;
+			return batch;
 	}
 	
 	/**

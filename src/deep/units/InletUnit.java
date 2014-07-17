@@ -16,7 +16,7 @@ public abstract class InletUnit extends DataUnit
 	 */
 	public InletUnit(String name, FloatMat data)
 	{
-		super(name, data, null);
+		super(name, null, data, null);
 		if (data == null)
 			throw new DeepException("Inlet data mustn't be null");
 	}
@@ -28,7 +28,16 @@ public abstract class InletUnit extends DataUnit
 	 */
 	public InletUnit(String name, int dim, int batchSize)
 	{
-		super(name, new FloatMat(dim, batchSize), null);
+		super(name, null, new FloatMat(dim, batchSize), null);
+	}
+	
+	/**
+	 * Link this InletUnit to a parent ComputeUnit
+	 * Should be done before setup
+	 */
+	public void setParent(ComputeUnit parent)
+	{
+		this.parent = parent;
 	}
 
 	/**

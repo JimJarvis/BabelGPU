@@ -5,17 +5,14 @@ import gpu.FloatMat;
 
 public class ParamUnit extends DataUnit
 {
-	private ParamComputeUnit parent;
-	
 	/**
 	 * Unless in debug mode, we don't explicitly store the parameter gradient
 	 * @param parent the ParamComputeUnit that uses this parameter
 	 */
 	public ParamUnit(String name, ParamComputeUnit parent, int row, int col)
 	{
-		super(name, new FloatMat(row, col));
+		super(name, parent, new FloatMat(row, col));
 		setDummyGradient();
-		this.parent = parent;
 	}
 	
 	/**
@@ -35,16 +32,6 @@ public class ParamUnit extends DataUnit
 	public ParamUnit(String name, int row, int col)
 	{
 		this(name, null, row, col);
-	}
-	
-	/**
-	 * Shallow copy
-	 */
-	public ParamUnit(ParamUnit other)
-	{
-		super(other.name, other.data, other.gradient);
-		this.debug = other.debug;
-		this.parent = other.parent;
 	}
 	
 	/**
@@ -83,6 +70,6 @@ public class ParamUnit extends DataUnit
 	{ 
 		if (parent == null)
 			throw new DeepException("Cannot reinitialize this parameter: parent null");
-		parent.reInit();
+		((ParamComputeUnit) parent).reInit();
 	}
 }

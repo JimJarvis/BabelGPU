@@ -1,5 +1,6 @@
 package deep.units;
 
+import deep.LearningPlan;
 import gpu.*;
 
 public abstract class ComputeUnit extends Unit
@@ -11,6 +12,7 @@ public abstract class ComputeUnit extends Unit
 	protected boolean hasBias;
 	// Do we store input/output data separately?
 	protected boolean mergeIO = false;
+	protected LearningPlan learningPlan;
 
 	/**
 	 * ALWAYS equal to prev.output
@@ -73,9 +75,17 @@ public abstract class ComputeUnit extends Unit
 			this.output = this.input;
 		else
 		{
-			this.output = new DataUnit("out[" + this.name + "]", new FloatMat(outDim, input.batchSize()));
+			this.output = new DataUnit("out[" + this.name + "]", this, new FloatMat(outDim, input.batchSize()));
 			this.output.initGradient();
 		}
+	}
+	
+	/**
+	 * Do this BEFORE setup
+	 */
+	public void setLearningPlan(LearningPlan learningPlan)
+	{
+		this.learningPlan = learningPlan;
 	}
 	
 	/**

@@ -26,23 +26,13 @@ public class DeepNet implements Iterable<ComputeUnit>
 		this.terminal = (TerminalUnit) units[units.length - 1];
 		this.inlet = inlet;
 		head.input = inlet;
+		this.inlet.setParent(head);
 		chain(units);
 	}
 	
 	public DeepNet(String name, InletUnit inlet, ArrayList<ComputeUnit> units)
 	{
 		this(name, inlet, units.toArray(new ComputeUnit[units.size()]));
-	}
-
-	/**
-	 * If the network between head and terminal is already chained
-	 */
-	public DeepNet(String name, ComputeUnit head, TerminalUnit terminal)
-	{
-		this.name = name;
-		this.head = head;
-		this.terminal = terminal;
-		this.inlet = (InletUnit) head.input;
 	}
 
 	public static void chain(ComputeUnit... units)
@@ -64,6 +54,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 	{
 		if (!setup)
 		{
+			setLearningPlan(learningPlan);
+
 			for (ComputeUnit unit : this)
     			unit.setup();
 			
@@ -76,8 +68,6 @@ public class DeepNet implements Iterable<ComputeUnit>
     				if (unit instanceof ParamComputeUnit)
     					break;
     			}
-
-			setLearningPlan(learningPlan);
 			
 			setup = true;
 		}
@@ -103,14 +93,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	{
 		this.learningPlan = learningPlan;
 		for (ComputeUnit unit : this)
-		{
 			unit.setLearningPlan(learningPlan);
-			unit.input.setLearningPlan(learningPlan);
-			if (unit.output != null)
-    			unit.output.setLearningPlan(learningPlan);
-			if (unit instanceof ParamComputeUnit)
-				((ParamComputeUnit) unit).W.setLearningPlan(learningPlan);
-		}
 	}
 	
 	/**
