@@ -113,7 +113,7 @@ public class DeepFactory
 			eleUnit.setMergeIO(true);
 			units.add(eleUnit);
 		}
-		units.add(new ForwardOnlyTUnit(""));
+		units.add(new ForwardOnlyTUnit("", inlet));
 		return 
 			new DeepNet("FourierProjectionNet(foward-only)", inlet, units).genDefaultUnitName();
 	}

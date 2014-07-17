@@ -8,9 +8,9 @@ import deep.DeepException;
  */
 public class ForwardOnlyTUnit extends TerminalUnit
 {
-	public ForwardOnlyTUnit(String name)
+	public ForwardOnlyTUnit(String name, InletUnit inlet)
 	{
-		super(name, null);
+		super(name, inlet);
 	}
 	
 	@Override
