@@ -19,7 +19,6 @@ public class GpuTestKit
 	public static void systemInit()
 	{
 		GpuBlas.init();
-		GpuUtil.enableExceptions();
 		PP.setPrecision(3);
 		PP.setScientific(true);
 	}

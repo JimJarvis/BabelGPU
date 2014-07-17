@@ -37,7 +37,6 @@ public class DeepTestKit
 	public static void systemInit()
 	{
 		GpuBlas.init();
-		GpuUtil.enableExceptions();
 		grand = new GpuRand(GpuRand.SEED);
 		rand = new Random(GpuRand.SEED);
 	}

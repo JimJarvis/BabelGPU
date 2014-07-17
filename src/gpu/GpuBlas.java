@@ -25,6 +25,7 @@ public class GpuBlas
 			handle = new cublasHandle();
 			cublasCreate(handle);
 		}
+		GpuUtil.enableExceptions();
 	}
 
 	/**
