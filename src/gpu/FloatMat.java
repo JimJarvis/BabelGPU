@@ -529,7 +529,16 @@ public class FloatMat
 	 */
 	public String toString()
 	{
-		return PP.mat2str(this.deflatten());
+		if (this.device == null && this.hostArray == null)
+		{
+			// Everything's null, this is a dummy mat
+			if (this.hostBuffer == null) 
+				return String.format("DummyMat[row = %d, col = %d]", row, col);
+			else
+				throw new GpuException("FloatMat buffer mode doesn't support toString()");
+		}
+		else
+    		return PP.mat2str(this.deflatten());
 	}
 
 	/**
