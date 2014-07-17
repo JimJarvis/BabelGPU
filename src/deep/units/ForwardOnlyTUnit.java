@@ -27,7 +27,7 @@ public class ForwardOnlyTUnit extends TerminalUnit
 	}
 
 	@Override
-	protected float forward_terminal() { return 0; }
+	protected float forward_terminal(boolean doesCalcLoss) { return 0; }
 
 	@Override
 	public final void backward()

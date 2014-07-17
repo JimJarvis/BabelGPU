@@ -17,10 +17,11 @@ public class SparseCrossEntropyTUnit extends TerminalUnit
 	private FloatMat tmp_outLogProb;
 	
 	@Override
-	protected float forward_terminal()
+	protected float forward_terminal(boolean doesCalcLoss)
 	{
+		if (!doesCalcLoss)	return 0;
+		
 		int batch = input.batchSize();
-
 		if (tmp_outLogProb == null)
 			tmp_outLogProb = new FloatMat(batch, 1);
 

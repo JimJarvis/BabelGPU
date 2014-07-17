@@ -23,8 +23,9 @@ public class SumTUnit extends TerminalUnit
 	}
 
 	@Override
-	protected float forward_terminal()
+	protected float forward_terminal(boolean doesCalcLoss)
 	{
+		if (!doesCalcLoss)	return 0;
 		return input.data().sum();
 	}
 

@@ -5,6 +5,8 @@ import gpu.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import deep.DeepException;
+
 public abstract class TerminalUnit extends ComputeUnit
 {
 	/**
@@ -23,6 +25,10 @@ public abstract class TerminalUnit extends ComputeUnit
 	 * Parameter list, in forward order
 	 */
 	protected ArrayList<ParamUnit> wList = null;
+	/**
+	 * During training, we might want to turn off loss calculation
+	 */
+	protected boolean doesCalcLoss = true;
 	
 	public TerminalUnit(String name, InletUnit inlet, boolean hasBias)
 	{
@@ -57,16 +63,17 @@ public abstract class TerminalUnit extends ComputeUnit
 			input.data().fillLastRow0();
 
 		// Will be implemented by subclasses
-		this.lossPure += forward_terminal();
+		this.lossPure += forward_terminal(this.doesCalcLoss);
 		
 		updateLearningPlan();  // incr curBatchSize
 	}
 
 	/**
 	 * Ensure that you call super.forward() first
+	 * @param doesCalcLoss if false, we don't explicitly calculate the loss
 	 * @return total pure loss to be updated (should NOT be normalized by batchSize)
 	 */
-	protected abstract float forward_terminal();
+	protected abstract float forward_terminal(boolean doesCalcLoss);
 	
 	/**
 	 * @return all paramUnit from previous ParamComputeUnit, in forward order
@@ -102,13 +109,20 @@ public abstract class TerminalUnit extends ComputeUnit
 	 */
 	public float lossPure()
 	{
+		if (!doesCalcLoss)
+			throw new DeepException("Loss is not being calculated");
 		return this.lossPure / learningPlan.doneSampleSize;
 	}
 	
 	/**
 	 * Loss due to regularization
 	 */
-	public float lossReg() {	return this.lossReg;	}
+	public float lossReg()
+	{	
+		if (!doesCalcLoss)
+			throw new DeepException("Loss is not being calculated");
+		return this.lossReg;
+	}
 
 	/**
 	 * Reset both lossPure and lossReg
@@ -117,6 +131,15 @@ public abstract class TerminalUnit extends ComputeUnit
 	{ 
 		this.lossPure = 0;
 		this.lossReg = 0;
+	}
+	
+	/**
+	 * During training, we might not need to calculate the loss explicitly
+	 * @param do we want to calculate it? Default = true
+	 */
+	public void setCalcLoss(boolean doesCalcLoss)
+	{
+		this.doesCalcLoss = doesCalcLoss;
 	}
 	
 	protected void updateLearningPlan()

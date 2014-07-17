@@ -19,29 +19,38 @@ public class CrossEntropyTUnit extends TerminalUnit
 	private FloatMat tmp_softmax = null;
 	
 	@Override
-	protected float forward_terminal()
+	protected float forward_terminal(boolean doesCalcLoss)
 	{
 		if (input.hasGradient())
 		{
     		Thrust.batch_softmax(input.data(), input.gradient(), hasBias);
     
-    		if (tmp_softmax == null)
-    			tmp_softmax = new FloatMat(input.data());
-    		Thrust.log(input.gradient(), tmp_softmax);
-    		if (hasBias)	tmp_softmax.fillLastRow0(); // because the last row would be log(0) -> NaN
-    
-    		// Cross entropy: - t * log(y) where 't' is target value, 'y' is actual output
-    		GpuBlas.dotMult(inlet.goldMat, tmp_softmax);
-    		return - tmp_softmax.sum();
+    		if (doesCalcLoss)
+    		{
+    			if (tmp_softmax == null)
+    				tmp_softmax = new FloatMat(input.data());
+
+    			Thrust.log(input.gradient(), tmp_softmax);
+    			if (hasBias)	tmp_softmax.fillLastRow0(); // because the last row would be log(0) -> NaN
+
+    			// Cross entropy: - t * log(y) where 't' is target value, 'y' is actual output
+    			GpuBlas.dotMult(inlet.goldMat, tmp_softmax);
+    			return - tmp_softmax.sum();
+    		}
 		}
 		else // If input doesn't have gradient, mutate input.data
 		{
 			Thrust.batch_softmax(input.data(), hasBias);
-			Thrust.log(input.data());
-			if (hasBias)	input.data().fillLastRow0();
-			GpuBlas.dotMult(inlet.goldMat, input.data());
-			return - input.data().sum();
+			
+			if (doesCalcLoss)
+			{
+    			Thrust.log(input.data());
+    			if (hasBias)	input.data().fillLastRow0();
+    			GpuBlas.dotMult(inlet.goldMat, input.data());
+    			return - input.data().sum();
+			}
 		}
+		return 0;  // if !doesCalcLoss
 	}
 
 	@Override
