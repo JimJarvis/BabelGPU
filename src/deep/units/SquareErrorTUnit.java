@@ -21,17 +21,19 @@ public class SquareErrorTUnit extends TerminalUnit
 	public float forward_terminal(boolean doesCalcLoss)
 	{
 		float norm = super.batchNormalizer();
+		FloatMat data = input.data();
+		FloatMat grad = input.gradient();
 		if (input.hasGradient())
 		{
 			// This is actually the backward step:
-			GpuBlas.add(input.data(), inlet.goldMat, input.gradient(), norm, -norm);
+			GpuBlas.add(data, inlet.goldMat, grad, norm, -norm);
 
 			if (doesCalcLoss)
 			{
 				if (tmp_y_minus_input_sq == null)
-					tmp_y_minus_input_sq = new FloatMat(input.data());
+					tmp_y_minus_input_sq = new FloatMat(data);
 
-				Thrust.square(input.gradient(), tmp_y_minus_input_sq);
+				Thrust.square(grad, tmp_y_minus_input_sq);
 
 				// we give back what we divide too much
 				// This amount will be used to update lossPure
@@ -43,7 +45,7 @@ public class SquareErrorTUnit extends TerminalUnit
 			if (doesCalcLoss)
 			{
 				// This is actually the backward step:
-				return GpuBlas.add(input.data(), inlet.goldMat, input.data(), norm, -norm)
+				return GpuBlas.add(data, inlet.goldMat, data, norm, -norm)
 						.square()
 						.sum() / (2 * norm * norm);
 			}

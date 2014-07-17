@@ -21,16 +21,18 @@ public class CrossEntropyTUnit extends TerminalUnit
 	@Override
 	protected float forward_terminal(boolean doesCalcLoss)
 	{
+		FloatMat data = input.data();
+		FloatMat grad = input.gradient();
 		if (input.hasGradient())
 		{
-    		Thrust.batch_softmax(input.data(), input.gradient(), hasBias);
+    		Thrust.batch_softmax(data, grad, hasBias);
     
     		if (doesCalcLoss)
     		{
     			if (tmp_softmax == null)
-    				tmp_softmax = new FloatMat(input.data());
+    				tmp_softmax = new FloatMat(data);
 
-    			Thrust.log(input.gradient(), tmp_softmax);
+    			Thrust.log(grad, tmp_softmax);
     			if (hasBias)	tmp_softmax.fillLastRow0(); // because the last row would be log(0) -> NaN
 
     			// Cross entropy: - t * log(y) where 't' is target value, 'y' is actual output
@@ -40,14 +42,14 @@ public class CrossEntropyTUnit extends TerminalUnit
 		}
 		else // If input doesn't have gradient, mutate input.data
 		{
-			Thrust.batch_softmax(input.data(), hasBias);
+			Thrust.batch_softmax(data, hasBias);
 			
 			if (doesCalcLoss)
 			{
-    			Thrust.log(input.data());
-    			if (hasBias)	input.data().fillLastRow0();
-    			GpuBlas.dotMult(inlet.goldMat, input.data());
-    			return - input.data().sum();
+    			Thrust.log(data);
+    			if (hasBias)	data.fillLastRow0();
+    			GpuBlas.dotMult(inlet.goldMat, data);
+    			return - data.sum();
 			}
 		}
 		return 0;  // if !doesCalcLoss
@@ -60,7 +62,8 @@ public class CrossEntropyTUnit extends TerminalUnit
 		{
     		// Gradient = 1/batch * (y - t)
     		float norm = super.batchNormalizer();
-    		GpuBlas.add(input.gradient(), inlet.goldMat, input.gradient(), norm, -norm);
+    		FloatMat grad = input.gradient();
+    		GpuBlas.add(grad, inlet.goldMat, grad, norm, -norm);
     
     		// NOTE: the gradient is incorrect if each column of 'gold' doesn't sum up to 1
     		// Debug ONLY

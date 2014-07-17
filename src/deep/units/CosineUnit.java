@@ -28,8 +28,9 @@ public class CosineUnit extends ElementComputeUnit
 	@Override
 	public void backward_element()
 	{
-		Thrust.sin(input.data(), input.gradient());
-		GpuBlas.scale(input.gradient(), -1);
+		FloatMat grad = input.gradient();
+		Thrust.sin(input.data(), grad);
+		GpuBlas.scale(grad, -1);
 	}
 
 }

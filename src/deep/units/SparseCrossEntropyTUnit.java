@@ -35,8 +35,9 @@ public class SparseCrossEntropyTUnit extends TerminalUnit
 		if (input.hasGradient())
 		{
     		// Gradient = 1/batch * (y - id)
-    		Thrust.batch_softmax_minus_id(input.data(), input.gradient(), inlet.goldLabels, hasBias);
-    		GpuBlas.scale(input.gradient(), super.batchNormalizer());
+			FloatMat grad = input.gradient();
+    		Thrust.batch_softmax_minus_id(input.data(), grad, inlet.goldLabels, hasBias);
+    		GpuBlas.scale(grad, super.batchNormalizer());
 		}
 	}
 
