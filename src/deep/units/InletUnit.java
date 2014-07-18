@@ -11,6 +11,11 @@ public abstract class InletUnit extends DataUnit
 	public FloatMat goldMat;
 	public IntPointer goldLabels;
 	public final int MaxBatchSize;
+	/**
+	 * Critical field: needed across all ComputeUnits in the entire net
+	 * updated by every call to nextBatch()
+	 */
+	public int batchSize = -1; 
 	
 	/**
 	 * Inlet doesn't have gradient
@@ -54,17 +59,20 @@ public abstract class InletUnit extends DataUnit
 	}
 	
 	/**
-	 * Will be called every time AFTER each 'nextBatch' to determine 
-	 * how many cols actually need to be used. 
+	 * @see #nextBatch_() public interface to the abstract method
+	 * Update the critical 'batchSize' field used across the entire net
 	 */
-	public abstract int batchSize();
+	public void nextBatch()
+	{
+		this.batchSize = this.nextBatch_();
+	}
 
 	/**
 	 * Update 'data' field 
-	 * Should be called right after {@link DeepNet#hasNext()}
-	 * @see #batchSize() set batchSize right after
+	 * Should be called right after {@link DeepNet#hasNext()} 
+	 * @return batch size of this batch, might be less than MaxBatchSize
 	 */
-	public abstract void nextBatch();
+	protected abstract int nextBatch_();
 
 	/**
 	 * Either load to 'goldMat' or 'goldLabels'

@@ -39,7 +39,7 @@ public class DataUnit extends Unit
 	 */
 	public FloatMat data()
 	{
-		int batchSize = this.parent.inlet.batchSize();
+		int batchSize = this.parent.inlet.batchSize;
 		return data != null && batchSize < data.col ? 
 				this.data.createColOffset(0, batchSize) : this.data;
 	}
@@ -49,7 +49,7 @@ public class DataUnit extends Unit
 	 */
 	public FloatMat gradient()
 	{
-		int batchSize = this.parent.inlet.batchSize();
+		int batchSize = this.parent.inlet.batchSize;
 		return gradient != null && batchSize  < data.col ? 
 				this.gradient.createColOffset(0, batchSize) : this.gradient;
 	}

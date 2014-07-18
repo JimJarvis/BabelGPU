@@ -18,7 +18,7 @@ public class DeepTestKit
 	// Input feature vector dimension
 	public static int inDim = 9;
 	// Number of training samples
-	public static int batchSize = 5;
+	public static int batch = 5;
 	// Output vector dimension
 	public static int outDim = 9;
 	// Test option: add bias?
@@ -27,7 +27,7 @@ public class DeepTestKit
 	public static float scalor = 3f;
 	// Regularization
 	public static float reg = 1.5f;
-	public static LearningPlan plan = new LearningPlan(2, reg, batchSize, 1);
+	public static LearningPlan plan = new LearningPlan(2, reg, batch, 1);
 	
 	public enum InletMode {	None, GoldSumTo1, GoldLabel	};
 	
@@ -53,17 +53,17 @@ public class DeepTestKit
 	public static InletUnit uniRandInlet(float inputLow, float inputHigh, float goldLow, float goldHigh, final InletMode mode)
 	{
 		dummyInput = 
-				CpuUtil.randFloatMat(changeDim(inDim), batchSize, inputLow, inputHigh);
+				CpuUtil.randFloatMat(changeDim(inDim), batch, inputLow, inputHigh);
 
 		dummyGold = 
-				CpuUtil.randFloatMat(changeDim(outDim), batchSize, goldLow, goldHigh);
+				CpuUtil.randFloatMat(changeDim(outDim), batch, goldLow, goldHigh);
 
-		dummyLabels = CpuUtil.randInts(batchSize, outDim);
+		dummyLabels = CpuUtil.randInts(batch, outDim);
 		
-		return new InletUnit("Dummy Inlet", changeDim(inDim) , batchSize, true)
+		return new InletUnit("Dummy Inlet", changeDim(inDim) , batch, true)
 		{
 			{
-				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
+				this.goldMat = new FloatMat(changeDim(outDim), batch);
 				this.goldMat.setHostArray(dummyGold);
 				this.goldMat.toDevice(true);
 				
@@ -82,16 +82,15 @@ public class DeepTestKit
 			@Override
 			public void nextGold() { }
 			@Override
-			public void nextBatch()
+			protected int nextBatch_()
 			{
 				this.data.setHostArray(dummyInput);
 				this.data.toDevice(true);
 				if (hasBias) this.data.fillLastRow1();
+				return DeepTestKit.batch;
 			}
 			@Override
 			public void reset() { }
-			@Override
-			public int batchSize() { return batchSize; }
 		};
 	}
 	
@@ -118,28 +117,27 @@ public class DeepTestKit
 	// Produce an artificial Inlet with uniform input and gold
 	public static InletUnit uniformInlet(final float inputVal, final float goldVal)
 	{
-		return new InletUnit("Uniform Inlet", changeDim(inDim), batchSize, true)
+		return new InletUnit("Uniform Inlet", changeDim(inDim), batch, true)
 		{
 			{
-				this.goldMat = new FloatMat(changeDim(outDim), batchSize);
+				this.goldMat = new FloatMat(changeDim(outDim), batch);
 				this.goldMat.fill(goldVal);
 				if (hasBias) this.goldMat.fillLastRow0();
 				this.goldLabels = 
-						Thrust.copy_host_to_device(CpuUtil.randInts(batchSize, outDim));
+						Thrust.copy_host_to_device(CpuUtil.randInts(batch, outDim));
 			}
 
 			@Override
 			public void nextGold() { }
 			@Override
-			public void nextBatch()
+			protected int nextBatch_()
 			{
 				this.data.fill(inputVal);
 				if (hasBias) this.data.fillLastRow1();
+				return DeepTestKit.batch;
 			}
 			@Override
 			public void reset() { }
-			@Override
-			public int batchSize() { return batchSize; }
 		};
 	}
 	
