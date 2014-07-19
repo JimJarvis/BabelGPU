@@ -1,7 +1,9 @@
 package test;
 
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -36,9 +38,8 @@ public class MiscTest
 //		PP.p(CpuUtil.randInts(20, 3, 8));
 //		for (Path p : FileUtil.listDir("src", true)) PP.p(p);
 		
-		FileUtil.move("shit/mover", FileUtil.join("shit6", "sub7"));
-		for (Path p : FileUtil.listDir("shit6", true)) PP.p(p);
-		
+//		FileUtil.move("shit/mover", FileUtil.join("shit6", "sub7"));
+		for (Path p : FileUtil.listDir("shit6", FileUtil.dirMatcher(true), true)) PP.p(p);
 		
 		PP.p("DONE");
 //		for (String line : FileUtil.iterable("../BabelGPU", "test.sh")) PP.p(line);

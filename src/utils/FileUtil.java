@@ -7,8 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+
 import static java.nio.file.FileVisitResult.*;
 import static java.nio.file.StandardCopyOption.*;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -158,9 +160,9 @@ public class FileUtil
 				(Files.isExecutable(p) ? EXE : 0);
 	}
 
-	public static boolean isDir(String dir)
+	public static boolean isDir(String dir, String... dir_)
 	{
-		return Files.isDirectory(path(dir));
+		return Files.isDirectory(path(dir, dir_));
 	}
 	
 	public static boolean exists(String file, String... file_)
@@ -289,13 +291,56 @@ public class FileUtil
 		}
 		catch (IOException e) { e.printStackTrace(); }
 	}
+	
+	/**
+	 * Always returns true, matches everything
+	 */
+	public static final PathMatcher DummyMatcher = 
+			new PathMatcher()
+			{
+				@Override
+				public boolean matches(Path path) { return true; }
+			};
+			
+	/**
+	 * @param dirOnly true matches only directories, false matches only non-dirs
+	 */
+	public static PathMatcher dirMatcher(final boolean dirOnly)
+	{
+		return new PathMatcher()
+		{
+			@Override
+			public boolean matches(Path path)
+			{
+				return Files.isDirectory(path) == dirOnly;
+			}
+		};
+	}
+	
 
 	/**
-	 * List the contents of a directory. Doesn't include itself
-	 * If not a dir, return empty list.
+	 * @param pattern if null or emptry string, matches everything 
+	 * NOTE: we replace all '*' with '**' because only double * works across dir boundaries. 
+	 * For ex, "*.txt" matches "dud.txt" but NOT "mydir/dud.txt"
+	 * @return Pattern matcher for a glob string
+	 */
+	public static PathMatcher globMatcher(String pattern)
+	{
+		if (pattern == null || pattern.isEmpty())
+			return DummyMatcher;
+
+		if (!pattern.contains("**") && !pattern.contains("\\*") && pattern.contains("*"))
+			pattern = pattern.replaceAll("\\*", "\\*\\*");
+		return FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+	}
+
+	/**
+	 * List the contents of a directory w.r.t. pattern. Doesn't include itself
+	 * If not a dir, return empty list. {@link http://docs.oracle.com/javase/tutorial/essential/io/find.html}
+	 * @param matcher glob pattern matcher. null to use 'DummyPathMatcher' that matches everything
 	 * @param deep whether or not we traverse the dir recursively. Default false
 	 */
-	public static ArrayList<Path> listDir(String dir, final boolean deep)
+	public static ArrayList<Path> listDir(String dir, final PathMatcher pathMatcher, final boolean deep)
 	{
 		final ArrayList<Path> list = new ArrayList<>(); 
 		if (!isDir(dir)) return list;
@@ -304,10 +349,12 @@ public class FileUtil
 			Files.walkFileTree(Paths.get(dir), new FileVisitor<Path>()
 				{
 				boolean isRootDir = true;
+				PathMatcher matcher = pathMatcher == null ? DummyMatcher : pathMatcher;
+				
 				@Override
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
 				{
-					if (!isRootDir) list.add(dir);
+					if (!isRootDir && matcher.matches(dir)) list.add(dir);
 					if (deep || isRootDir)
 					{
 						isRootDir = false;
@@ -320,13 +367,16 @@ public class FileUtil
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
 				{
-					list.add(file);
+					if (matcher.matches(file)) list.add(file);
 					return CONTINUE;
 				}
 
 				@Override
 				public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException
 				{
+					if (exc instanceof FileSystemLoopException) {
+		                System.err.println("cycle detected: " + file);
+		            }
 					return CONTINUE;
 				}
 
@@ -342,8 +392,20 @@ public class FileUtil
 	}
 	
 	/**
-	 * Recursive traversal default to false
-	 * @see #listDir(String, boolean) listDir(String, false)
+	 * List the contents of a directory w.r.t. pattern. Doesn't include itself
+	 * @param matcher glob string pattern. 'null' or empty string to match everything
+	 * @param deep whether or not we traverse the dir recursively. Default false
+	 * @see #listDir(String, PathMatcher, boolean)
 	 */
-	public static ArrayList<Path> listDir(String dir) {	 return listDir(dir, false);	}
+	public static ArrayList<Path> listDir(String dir, String pattern, boolean deep)
+	{
+		return listDir(dir, globMatcher(pattern), deep);
+	}
+	
+	
+	/**
+	 * Recursive traversal default to false. Matches everything
+	 * @see #listDir(String, String, boolean) listDir(dir, null, false)
+	 */
+	public static ArrayList<Path> listDir(String dir) {	 return listDir(dir, DummyMatcher, false);	}
 }
