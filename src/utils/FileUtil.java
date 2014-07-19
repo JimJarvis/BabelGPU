@@ -170,6 +170,38 @@ public class FileUtil
 		return Files.exists(path(file, file_));
 	}
 	
+	public static String makeDir(String dir, String... dir_)
+	{
+		try {
+			return Files.createDirectories(path(dir, dir_)).toString();
+		}
+		catch (IOException e) { e.printStackTrace(); return null; }
+	}
+
+	/**
+	 * Make temporary directory
+	 * @return temporary dir path
+	 */
+	public static String makeTempDir(String prefix, String dir, String... dir_)
+	{
+		try {
+			return Files.createTempDirectory(path(dir, dir_), prefix).toString();
+		}
+		catch (IOException e) { e.printStackTrace(); return null; }
+	}
+	
+	/**
+	 * Make temporary file
+	 * @return temporary file path
+	 */
+	public static String makeTempFile(String prefix, String suffix, String dir, String... dir_)
+	{
+		try {
+			return Files.createTempFile(path(dir, dir_), prefix, suffix).toString();
+		}
+		catch (IOException e) { e.printStackTrace(); return null; }
+	}
+	
 	/**
 	 * Recursive copying. 
 	 * If both source and target are files, copy and rename. 
@@ -316,7 +348,6 @@ public class FileUtil
 			}
 		};
 	}
-	
 
 	/**
 	 * @param pattern if null or emptry string, matches everything 
@@ -340,9 +371,9 @@ public class FileUtil
 	 * @param matcher glob pattern matcher. null to use 'DummyPathMatcher' that matches everything
 	 * @param deep whether or not we traverse the dir recursively. Default false
 	 */
-	public static ArrayList<Path> listDir(String dir, final PathMatcher pathMatcher, final boolean deep)
+	public static ArrayList<String> listDir(String dir, final PathMatcher pathMatcher, final boolean deep)
 	{
-		final ArrayList<Path> list = new ArrayList<>(); 
+		final ArrayList<String> list = new ArrayList<>(); 
 		if (!isDir(dir)) return list;
 		try
 		{
@@ -354,7 +385,7 @@ public class FileUtil
 				@Override
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
 				{
-					if (!isRootDir && matcher.matches(dir)) list.add(dir);
+					if (!isRootDir && matcher.matches(dir)) list.add(dir.toString());
 					if (deep || isRootDir)
 					{
 						isRootDir = false;
@@ -367,7 +398,7 @@ public class FileUtil
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
 				{
-					if (matcher.matches(file)) list.add(file);
+					if (matcher.matches(file)) list.add(file.toString());
 					return CONTINUE;
 				}
 
@@ -397,7 +428,7 @@ public class FileUtil
 	 * @param deep whether or not we traverse the dir recursively. Default false
 	 * @see #listDir(String, PathMatcher, boolean)
 	 */
-	public static ArrayList<Path> listDir(String dir, String pattern, boolean deep)
+	public static ArrayList<String> listDir(String dir, String pattern, boolean deep)
 	{
 		return listDir(dir, globMatcher(pattern), deep);
 	}
@@ -407,5 +438,5 @@ public class FileUtil
 	 * Recursive traversal default to false. Matches everything
 	 * @see #listDir(String, String, boolean) listDir(dir, null, false)
 	 */
-	public static ArrayList<Path> listDir(String dir) {	 return listDir(dir, DummyMatcher, false);	}
+	public static ArrayList<String> listDir(String dir) {	 return listDir(dir, DummyMatcher, false);	}
 }

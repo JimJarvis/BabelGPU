@@ -39,7 +39,10 @@ public class MiscTest
 //		for (Path p : FileUtil.listDir("src", true)) PP.p(p);
 		
 //		FileUtil.move("shit/mover", FileUtil.join("shit6", "sub7"));
-		for (Path p : FileUtil.listDir("shit6", FileUtil.dirMatcher(true), true)) PP.p(p);
+		for (String p : FileUtil.listDir("shit6", "*.txt", true)) PP.p(p);
+		FileUtil.makeDir("kirito");
+		FileUtil.makeTempDir("kirito", "");
+		FileUtil.makeTempFile("kirito", ".txt", "");
 		
 		PP.p("DONE");
 //		for (String line : FileUtil.iterable("../BabelGPU", "test.sh")) PP.p(line);
