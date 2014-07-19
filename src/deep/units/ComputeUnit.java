@@ -79,7 +79,10 @@ public abstract class ComputeUnit extends Unit
 			this.output = this.input;
 		else
 		{
-			this.output = new DataUnit("out[" + this.name + "]", this, new FloatMat(outDim, inlet.MaxBatchSize));
+			this.output = new DataUnit(
+					"Data[out]#" + this.name, 
+					this, 
+					new FloatMat(outDim, inlet.MaxBatchSize));
 			this.output.initGradient();
 		}
 	}

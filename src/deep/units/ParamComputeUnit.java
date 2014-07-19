@@ -45,7 +45,9 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	protected void setupW()
 	{
 		this.initer.setBias(hasBias);
-		this.W = new ParamUnit("W[" + this.name + "]", this);
+		this.W = new ParamUnit(
+				"Param#" + this.name,
+				this);
 		reInit();
 		if (debug)
 			this.W.initGradient();
