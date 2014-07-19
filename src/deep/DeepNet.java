@@ -158,7 +158,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * @see #prepareNextEpoch()
 	 * @see #clearLoss()
 	 */
-	public void resetAll()
+	public void reset()
 	{
 		Initializer.resetRand();
 		for (ParamUnit w : terminal.getParams())
@@ -365,7 +365,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 	this.setBias(hasBias); // all have bias units
 	 	
 		this.setup(learningPlan);
-		this.resetAll(); inlet.nextBatch();
+		this.reset(); inlet.nextBatch();
 		
 		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) terminal.getParams().clone();
 		// We also do gradient checking for pure computing networks that have no parameters
@@ -432,7 +432,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 				for (int perturb : new int[] {-1, 1})
 				{
     				// Re-init everything as the exact gradient initialization
-					this.resetAll(); inlet.nextBatch();
+					this.reset(); inlet.nextBatch();
     				
             		// Perturb -EPS
             		w.data().incrSingle(idx, perturb * EPS);
