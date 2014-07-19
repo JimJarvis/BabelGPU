@@ -7,22 +7,13 @@ public class ParamUnit extends DataUnit
 {
 	/**
 	 * Unless in debug mode, we don't explicitly store the parameter gradient
+	 * Instantiate a new FloatMat with (row, col)
 	 * @param parent the ParamComputeUnit that uses this parameter
 	 */
 	public ParamUnit(String name, ParamComputeUnit parent, int row, int col)
 	{
 		super(name, parent, new FloatMat(row, col));
 		setDummyGradient();
-	}
-	
-	/**
-	 * Infer row/col dimensions from 'parent' ParamComputeUnit
-	 * rowDim = parent.outDim
-	 * colDim = parent.input.dim
-	 */
-	public ParamUnit(String name, ParamComputeUnit parent)
-	{
-		this(name, parent, parent.outDim, parent.input.dim());
 	}
 	
 	/**
