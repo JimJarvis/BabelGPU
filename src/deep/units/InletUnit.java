@@ -65,6 +65,8 @@ public abstract class InletUnit extends DataUnit
 	public void nextBatch()
 	{
 		this.batchSize = this.nextBatch_();
+		if (this.batchSize <= 0)
+			throw new DeepException("InletUnit should not yield batchSize " + batchSize);
 	}
 
 	/**
