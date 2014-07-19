@@ -1,10 +1,6 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -14,6 +10,10 @@ import static java.nio.file.StandardCopyOption.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * Arg idiom: (String file, String... file_) means join the sub-paths. 'file_' is optional. 
+ * Ex: ('rootdir', 'curdir', 'myfile') => 'rootdir/curdir/myfile'
+ */
 public class FileUtil
 {
 	/**
@@ -22,6 +22,66 @@ public class FileUtil
 	public static final int READ = 4;
 	public static final int WRITE = 2;
 	public static final int EXE = 1;
+	
+	/**
+	 * @return file path
+	 * @see Paths#get(String, String...)
+	 */
+	public static Path path(String file, String... file_)	
+	{
+		// Shorthand for FileSystems.getDefault().getPath()
+		return Paths.get(file, file_);
+	}
+	
+	/**
+	 * @return joined path
+	 */
+	public static String join(String file, String... file_)
+	{
+		return path(file, file_).toString();
+	}
+	
+	/**
+	 * Mimics python pickle
+	 * Dump an object to a specified file
+	 */
+	public static <T extends Serializable> void dump(T obj, String file, String... file_)
+	{
+		ObjectOutputStream oos = null;
+		try
+		{
+			oos = new ObjectOutputStream(new FileOutputStream(join(file, file_)));
+			oos.writeObject(obj);
+		}
+		catch (IOException e) { e.printStackTrace(); }
+		finally {	quietClose(oos);  }
+	}
+
+	/**
+	 * Mimics python pickle 
+	 * Load an object from a specified file
+	 */
+	public static <T extends Serializable> T load(String file, String... file_)
+	{
+        ObjectInputStream ois = null;
+		try
+		{
+			ois = new ObjectInputStream(new FileInputStream(join(file, file_)));
+			T obj = (T) ois.readObject();
+			return obj;
+		}
+		catch (Exception e) { e.printStackTrace(); return null; }
+		finally {	quietClose(ois);  }
+	}
+	
+	/**
+	 * Close a resource without throwing exception explicitly
+	 */
+	public static void quietClose(Closeable stream)
+	{
+		try { stream.close(); }
+		catch (IOException e) { e.printStackTrace(); }
+	}
 	
 	/**
 	 * Reads a file line by line, works in for-each loop
@@ -65,24 +125,6 @@ public class FileUtil
 				};
 			}
 		};
-	}
-	
-	/**
-	 * @return file path
-	 * @see Paths#get(String, String...)
-	 */
-	public static Path path(String file, String... file_)	
-	{
-		// Shorthand for FileSystems.getDefault().getPath()
-		return Paths.get(file, file_);
-	}
-	
-	/**
-	 * @return joined path
-	 */
-	public static String join(String file, String... file_)
-	{
-		return path(file, file_).toString();
 	}
 	
 	/**

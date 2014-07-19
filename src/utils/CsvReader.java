@@ -4,8 +4,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import utils.Pickle;
-
 /**
  * Read comma separated files into matrices/vectors. <br>
  * Each column is comma-separated. Each row occupies a new line. <br>
@@ -205,7 +203,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<int[][]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{
@@ -223,7 +221,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<int[]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{
@@ -387,7 +385,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<float[][]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{
@@ -404,7 +402,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<float[]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{
@@ -568,7 +566,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<double[][]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{
@@ -585,7 +583,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<double[]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{
@@ -750,7 +748,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<String[][]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{
@@ -767,7 +765,7 @@ public class CsvReader
 	{
 		if (fileExtension(fileName).equals("dat"))
 		{
-			return new Pickle<String[]>().load(fileName);
+			return FileUtil.load(fileName);
 		}
 		else // "txt"
 		{

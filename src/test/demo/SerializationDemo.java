@@ -1,11 +1,9 @@
 package test.demo;
 
 import gpu.FloatMat;
+
 import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import utils.PP;
-import utils.Pickle;
+import utils.*;
 
 public class SerializationDemo
 {
@@ -49,15 +47,14 @@ public class SerializationDemo
 	public static void main(String[] args) throws IOException
 	{
 		Dummy dum = new Dummy(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
-		Pickle<Dummy> pickle = new Pickle<>();
-		pickle.dump(dum, fileName);
+		FileUtil.dump(dum, fileName);
 		PP.p("original:\n", dum);
 		PP.p("Dump to file", fileName);
 		PP.p("Load from file");
-		dum = pickle.load(fileName);
+		dum = FileUtil.load(fileName);
 		PP.p("loaded back:\n", dum);
 		
-		Files.delete(FileSystems.getDefault().getPath("", fileName));
+		FileUtil.delete(fileName);
 		PP.p("Deleted", fileName);
 	}
 
