@@ -4,6 +4,11 @@ import java.util.Iterator;
 
 public class LearningPlan implements Iterable<Integer>
 {
+	String name;
+	/**
+	 * Path to directory to store everything
+	 */
+	String dir;
 	/**
 	 * Learning rate
 	 */
@@ -22,8 +27,10 @@ public class LearningPlan implements Iterable<Integer>
 	
 	public LearningPlan() {};
 	
-	public LearningPlan(float lr, float reg, int totalSampleSize, int totalEpochs)
+	public LearningPlan(String name, String dir, float lr, float reg, int totalSampleSize, int totalEpochs)
 	{
+		this.name = name;
+		this.dir = dir;
 		this.lr = lr;
 		this.reg = reg;
 		this.totalSampleSize = totalSampleSize;
@@ -32,10 +39,12 @@ public class LearningPlan implements Iterable<Integer>
 	
 	/**
 	 * Copy ctor
+	 * 'name' won't be copied
 	 * NOTE: variable states like curXXX aren't copied
 	 */
 	public LearningPlan(LearningPlan other)
 	{
+		this.dir = other.dir;
 		this.lr = other.lr;
 		this.reg = other.reg;
 		this.totalSampleSize = other.totalSampleSize;
