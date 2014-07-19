@@ -1,5 +1,6 @@
 package deep;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class LearningPlan implements Iterable<Integer>
@@ -19,11 +20,15 @@ public class LearningPlan implements Iterable<Integer>
 	public float reg;
 	public int totalSampleSize;
 	public int totalEpochs;
+	public int curEpoch = 0;
 	/**
 	 * number of samples already processed
 	 */
 	public int doneSampleSize = 0;
-	public int curEpoch = 0;
+	/**
+	 * Records the performance (loss function value) from each epoch
+	 */
+	public ArrayList<Float> record = new ArrayList<>();
 	
 	public LearningPlan() {};
 	
@@ -54,7 +59,7 @@ public class LearningPlan implements Iterable<Integer>
 	/**
 	 * Prepare for the next epoch
 	 */
-	public void reset()
+	public void prepareNextEpoch()
 	{ 
 		this.doneSampleSize = 0; 
 	}
@@ -97,16 +102,13 @@ public class LearningPlan implements Iterable<Integer>
 		};
 	}
 	
+	@Override
 	public String toString()
 	{
-		return String.format(
-				"LearningPlan["
-				+ "LR = %.3f\n"
-				+ "Reg = %.3f\n"
-				+ "TotalSampleSize = %d\n"
-				+ "doneSampleSize = %d\n"
-				+ "TotalEpochs = %d\n"
-				+ "curEpoch = %d]",
-				lr, reg, totalSampleSize, doneSampleSize, totalEpochs, curEpoch);
+		return "LearningPlan [name=" + name + ", \ndir=" + dir + ", \nlr=" + lr
+				+ ", \nreg=" + reg + ", \ntotalSampleSize=" + totalSampleSize
+				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + curEpoch
+				+ ", \ndoneSampleSize=" + doneSampleSize + ", \nrecord="
+				+ record + "]";
 	}
 }

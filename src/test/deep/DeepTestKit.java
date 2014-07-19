@@ -91,7 +91,7 @@ public class DeepTestKit
 				return DeepTestKit.batch;
 			}
 			@Override
-			public void reset() { }
+			public void prepareNextEpoch() { }
 		};
 	}
 	
@@ -138,7 +138,7 @@ public class DeepTestKit
 				return DeepTestKit.batch;
 			}
 			@Override
-			public void reset() { }
+			public void prepareNextEpoch() { }
 		};
 	}
 	

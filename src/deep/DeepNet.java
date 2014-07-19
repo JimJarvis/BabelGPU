@@ -172,8 +172,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 */
 	public void prepareNextEpoch()
 	{ 
-		learningPlan.reset();
-		inlet.reset();
+		learningPlan.prepareNextEpoch();
+		inlet.prepareNextEpoch();
 		this.clearLoss();
 	}
 	

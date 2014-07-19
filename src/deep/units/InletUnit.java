@@ -84,5 +84,5 @@ public abstract class InletUnit extends DataUnit
 	/**
 	 * Reset the inlet stream to prepare for the next epoch from start
 	 */
-	public abstract void reset();
+	public abstract void prepareNextEpoch();
 }
