@@ -48,7 +48,7 @@ public class LinearUnit extends ParamComputeUnit
 		if (W.hasGradient())
 		{
     		// update W with reg
-    		float lr = learningPlan.lr;
+    		float lr = learningPlan.lrStart;
     		// In debug mode, we explicitly store the parameter gradient
     		if (debug)
     		{

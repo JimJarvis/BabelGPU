@@ -5,38 +5,34 @@ import java.util.Iterator;
 
 public class LearningPlan implements Iterable<Integer>
 {
-	String name;
-	/**
-	 * Path to directory to store everything
+	/*
+	 * Permanent section
 	 */
-	String dir;
-	/**
-	 * Learning rate
-	 */
-	public float lr;
-	/**
-	 * Regularization
-	 */
-	public float reg;
+	public String name;
+	public String dir; // Path to directory to store everything
+	public float lrStart; // Start learning rate
+	public float reg; // Regularization
 	public int totalSampleSize;
 	public int totalEpochs;
+	
+	/*
+	 * Varying section
+	 */
+	public float lr; // current lr
 	public int curEpoch = 0;
-	/**
-	 * number of samples already processed
-	 */
+	// number of samples already processed
 	public int doneSampleSize = 0;
-	/**
-	 * Records the performance (loss function value) from each epoch
-	 */
+	// Records the performance (loss function value) from each epoch
 	public ArrayList<Float> record = new ArrayList<>();
 	
 	public LearningPlan() {};
 	
-	public LearningPlan(String name, String dir, float lr, float reg, int totalSampleSize, int totalEpochs)
+	public LearningPlan(String name, String dir, float lrStart, float reg, int totalSampleSize, int totalEpochs)
 	{
 		this.name = name;
 		this.dir = dir;
-		this.lr = lr;
+		this.lrStart = lrStart;
+		this.lr = lrStart;
 		this.reg = reg;
 		this.totalSampleSize = totalSampleSize;
 		this.totalEpochs = totalEpochs;
@@ -45,12 +41,12 @@ public class LearningPlan implements Iterable<Integer>
 	/**
 	 * Copy ctor
 	 * 'name' won't be copied
-	 * NOTE: variable states like curXXX aren't copied
+	 * Varying states like curXXX aren't copied
 	 */
 	public LearningPlan(LearningPlan other)
 	{
 		this.dir = other.dir;
-		this.lr = other.lr;
+		this.lrStart = other.lrStart;
 		this.reg = other.reg;
 		this.totalSampleSize = other.totalSampleSize;
 		this.totalEpochs = other.totalEpochs;
@@ -105,7 +101,7 @@ public class LearningPlan implements Iterable<Integer>
 	@Override
 	public String toString()
 	{
-		return "LearningPlan [name=" + name + ", \ndir=" + dir + ", \nlr=" + lr
+		return "LearningPlan [name=" + name + ", \ndir=" + dir + ", \nlr=" + lrStart
 				+ ", \nreg=" + reg + ", \ntotalSampleSize=" + totalSampleSize
 				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + curEpoch
 				+ ", \ndoneSampleSize=" + doneSampleSize + ", \nrecord="
