@@ -35,6 +35,10 @@ public class DeepNet implements Iterable<ComputeUnit>
 		this(name, inlet, units.toArray(new ComputeUnit[units.size()]));
 	}
 
+	/**
+	 * Ctor helper
+	 * Set 'prev' and 'next' links. 
+	 */
 	public static void chain(ComputeUnit... units)
 	{
 		int len = units.length;
@@ -45,34 +49,9 @@ public class DeepNet implements Iterable<ComputeUnit>
 		}
 	}
 
-	/**
-	 * This function call will only setup once and do nothing later
-	 * Any non-ParamComputeUnit before the first ParamComputeUnit doesn't need to calculate gradient
-	 * We explicitly disable it.
-	 */
-	public void setup(LearningPlan learningPlan)
-	{
-		if (!setup)
-		{
-			setLearningPlan(learningPlan);
-
-			for (ComputeUnit unit : this)
-    			unit.setup();
-			
-			// Explicitly disable gradient calculation in the first few non-paramComputeUnit
-			if (!debug)
-    			for (ComputeUnit unit : this)
-    			{
-    				// SetNoGradient for all non-paramComputeUnits and the first paramComputeUnit
-    				unit.input.setNoGradient();
-    				if (unit instanceof ParamComputeUnit)
-    					break;
-    			}
-			
-			setup = true;
-		}
-	}
-
+	//**************************************************/
+	//******************* Main training entry *******************/
+	//**************************************************/
 	public void forwprop()
 	{
 		for (ComputeUnit unit : this)
@@ -84,57 +63,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (ComputeUnit unit : unitIter(false))
 			unit.backward();
 	}
-	
-	/**
-	 * Must be called after setup()
-	 * @param learningPlan applies to all ComputeUnits and DataUnits
-	 */
-	public void setLearningPlan(LearningPlan learningPlan)
-	{
-		this.learningPlan = learningPlan;
-		for (ComputeUnit unit : this)
-			unit.setLearningPlan(learningPlan);
-	}
-	
-	/**
-	 * Set one initializer for all ParamComputeUnit 
-	 */
-	public void setInitializer(Initializer initer)
-	{
-		for (ComputeUnit unit : this)
-			if (unit instanceof ParamComputeUnit)
-				((ParamComputeUnit) unit).initer = initer;
-	}
-	
-	/**
-	 * Must be called BEFORE setup() !!
-	 */
-	public void setBias(boolean hasBias)
-	{
-		for (ComputeUnit unit : this)
-			unit.setBias(hasBias);
-	}
-	
-	/**
-	 * If debug mode enabled, we explicitly store the parameter gradient
-	 */
-	public void enableDebug(boolean debug)
-	{
-		this.debug = debug;
-		for (ComputeUnit unit : this)
-			unit.enableDebug(debug);
-	}
-	public void enableDebug() {	this.enableDebug(true); }
-	
-	/**
-	 * While curTrainSize < totalTrainSize in learningPlan
-	 * Every terminal will update the curTrainSize
-	 */
-	public boolean hasNext()
-	{
-		return learningPlan.doneSampleSize < learningPlan.totalSampleSize;
-	}
-	
+
 	/**
 	 * Iterate over epochs. 
 	 * At the end of every epoch, prepareNextEpoch()
@@ -173,15 +102,35 @@ public class DeepNet implements Iterable<ComputeUnit>
 		setup(learningPlan);
 		for (int epoch : this.epochIter())
 		{
-    		while (this.hasNext())
-    		{
-    			inlet.nextBatch();
-    			forwprop();
-    			backprop();
-    		}
+			while (this.hasNext())
+			{
+				inlet.nextBatch();
+				forwprop();
+				backprop();
+			}
 		}
 	}
-	
+
+	/**
+	 * While curTrainSize < totalTrainSize in learningPlan
+	 * Every terminal will update the curTrainSize
+	 */
+	public boolean hasNext()
+	{
+		return learningPlan.doneSampleSize < learningPlan.totalSampleSize;
+	}
+
+	/**
+	 * Reset LearningPlan, inlet and loss
+	 * Should be used in real training loop
+	 */
+	public void prepareNextEpoch()
+	{ 
+		learningPlan.prepareNextEpoch();
+		inlet.prepareNextEpoch();
+		this.clearLoss();
+	}
+
 	/**
 	 * Prepare a network for a complete re-run
 	 * Reset all parameters, loss, inlet and LearningPlan
@@ -197,17 +146,111 @@ public class DeepNet implements Iterable<ComputeUnit>
 		this.prepareNextEpoch();
 	}
 	
+	// ******************** Training setups ********************/
 	/**
-	 * Reset LearningPlan, inlet and loss
-	 * Should be used in real training loop
+	 * This function call will only setup once and do nothing later
+	 * Any non-ParamComputeUnit before the first ParamComputeUnit doesn't need to calculate gradient
+	 * We explicitly disable it.
 	 */
-	public void prepareNextEpoch()
-	{ 
-		learningPlan.prepareNextEpoch();
-		inlet.prepareNextEpoch();
-		this.clearLoss();
+	public void setup(LearningPlan learningPlan)
+	{
+		if (!setup)
+		{
+			setLearningPlan(learningPlan);
+
+			for (ComputeUnit unit : this)
+    			unit.setup();
+			
+			// Explicitly disable gradient calculation in the first few non-paramComputeUnit
+			if (!debug)
+    			for (ComputeUnit unit : this)
+    			{
+    				// SetNoGradient for all non-paramComputeUnits and the first paramComputeUnit
+    				unit.input.setNoGradient();
+    				if (unit instanceof ParamComputeUnit)
+    					break;
+    			}
+			
+			setup = true;
+		}
 	}
-	
+
+	/**
+	 * Must be called after setup()
+	 * @param learningPlan applies to all ComputeUnits and DataUnits
+	 */
+	public void setLearningPlan(LearningPlan learningPlan)
+	{
+		this.learningPlan = learningPlan;
+		for (ComputeUnit unit : this)
+			unit.setLearningPlan(learningPlan);
+	}
+
+	/**
+	 * Set one initializer for all ParamComputeUnit 
+	 */
+	public void setInitializer(Initializer initer)
+	{
+		for (ComputeUnit unit : this)
+			if (unit instanceof ParamComputeUnit)
+				((ParamComputeUnit) unit).initer = initer;
+	}
+
+	/**
+	 * Must be called BEFORE setup() !!
+	 */
+	public void setBias(boolean hasBias)
+	{
+		for (ComputeUnit unit : this)
+			unit.setBias(hasBias);
+	}
+
+	/**
+	 * Fill all compute units with default generated name
+	 * @return this
+	 */
+	public DeepNet genDefaultUnitName()
+	{
+		HashMap<String, Integer> map = new HashMap<>();
+		String className;
+		for (ComputeUnit unit : this)
+		{
+			className = unit.getClass().getSimpleName();
+			// className always ends with 'Unit'
+			className = className.substring(0, className.length() - 4);
+			Integer idx = map.get(className);
+			if (idx == null)
+			{
+				map.put(className, 1);
+				idx = 1;
+			}
+			else // use the last index + 1
+				map.put(className, ++ idx);
+			unit.name = String.format("%s{%d}", className, idx);
+		}
+		return this;
+	}
+
+	/**
+	 * @return param list in forward order
+	 */
+	public ArrayList<ParamUnit> getParams()
+	{
+		return this.terminal.getParams();
+	}
+
+	/**
+	 * @return a new HashMap that maps name to ComputeUnit
+	 */
+	public HashMap<String, ComputeUnit> getUnitMap()
+	{
+		HashMap<String, ComputeUnit> unitMap = new HashMap<>();
+		for (ComputeUnit unit : this)
+			unitMap.put(unit.name, unit);
+		return unitMap;
+	}
+
+	// ******************** Deals with loss function ********************/
 	/**
 	 * @see TerminalUnit#clearLoss()
 	 */
@@ -240,51 +283,6 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public void setCalcLoss(boolean doesCalcLoss)
 	{
 		this.terminal.setCalcLoss(doesCalcLoss);
-	}
-	
-	/**
-	 * Fill all compute units with default generated name
-	 * @return this
-	 */
-	public DeepNet genDefaultUnitName()
-	{
-		HashMap<String, Integer> map = new HashMap<>();
-		String className;
-		for (ComputeUnit unit : this)
-		{
-			className = unit.getClass().getSimpleName();
-			// className always ends with 'Unit'
-			className = className.substring(0, className.length() - 4);
-			Integer idx = map.get(className);
-			if (idx == null)
-			{
-				map.put(className, 1);
-				idx = 1;
-			}
-			else // use the last index + 1
-				map.put(className, ++ idx);
-			unit.name = String.format("%s{%d}", className, idx);
-		}
-		return this;
-	}
-	
-	/**
-	 * @return a new HashMap that maps name to ComputeUnit
-	 */
-	public HashMap<String, ComputeUnit> getUnitMap()
-	{
-		HashMap<String, ComputeUnit> unitMap = new HashMap<>();
-		for (ComputeUnit unit : this)
-			unitMap.put(unit.name, unit);
-		return unitMap;
-	}
-	
-	/**
-	 * @return param list in forward order
-	 */
-	public ArrayList<ParamUnit> getParams()
-	{
-		return this.terminal.getParams();
 	}
 	
 	// ******************** Enable forward/backward iteration ********************/
@@ -332,6 +330,18 @@ public class DeepNet implements Iterable<ComputeUnit>
 		return this.unitIter(true).iterator();
 	}
 	
+	/**
+	 * If debug mode enabled, we explicitly store the parameter gradient
+	 */
+	public void enableDebug(boolean debug)
+	{
+		this.debug = debug;
+		for (ComputeUnit unit : this)
+			unit.enableDebug(debug);
+	}
+
+	public void enableDebug() {	this.enableDebug(true); }
+
 	// ******************** DEBUG only ********************/
 	public void runDebug(LearningPlan learningPlan, boolean hasBias)
 	{
