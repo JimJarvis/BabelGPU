@@ -1,7 +1,6 @@
 package deep;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class LearningPlan
 {
@@ -9,6 +8,7 @@ public class LearningPlan
 	 * Permanent section
 	 */
 	public String name;
+	public DeepNet net;
 	public String dir; // Path to directory to store everything
 	public float lrStart; // Start learning rate
 	public float reg; // Regularization
@@ -53,10 +53,13 @@ public class LearningPlan
 	}
 	
 	/**
-	 * Prepare for the next epoch
+	 * Prepare for the next epoch. 
+	 * Update 'record' with latest performance measure. 
 	 */
 	public void prepareNextEpoch()
 	{ 
+		if (net.doesCalcLoss())
+    		record.add(net.lossPure());
 		this.doneSampleSize = 0; 
 	}
 	
@@ -92,5 +95,13 @@ public class LearningPlan
 				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + doneEpoch
 				+ ", \ndoneSampleSize=" + doneSampleSize + ", \nrecord="
 				+ record + "]";
+	}
+	
+	/**
+	 * Dynamic learning rate scheme
+	 */
+	static abstract class LrScheme
+	{
+		
 	}
 }

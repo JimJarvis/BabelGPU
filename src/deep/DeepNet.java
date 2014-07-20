@@ -205,6 +205,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public void setLearningPlan(LearningPlan learningPlan)
 	{
 		this.learningPlan = learningPlan;
+		this.learningPlan.net = this;
 		for (ComputeUnit unit : this)
 			unit.setLearningPlan(learningPlan);
 	}
@@ -273,7 +274,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		return unitMap;
 	}
 
-	// ******************** Deals with loss function ********************/
+	// ******************** Deals with loss function and Terminal ********************/
 	/**
 	 * @see TerminalUnit#clearLoss()
 	 */
@@ -307,6 +308,11 @@ public class DeepNet implements Iterable<ComputeUnit>
 	{
 		this.terminal.setCalcLoss(doesCalcLoss);
 	}
+	
+	/**
+	 * Are we calculating loss in Terminal?
+	 */
+	public boolean doesCalcLoss() {	return this.terminal.doesCalcLoss;	}
 	
 	// ******************** Enable forward/backward iteration ********************/
 	/**

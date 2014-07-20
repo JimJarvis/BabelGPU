@@ -24,7 +24,7 @@ public abstract class TerminalUnit extends ComputeUnit
 	/**
 	 * During training, we might want to turn off loss calculation
 	 */
-	protected boolean doesCalcLoss = true;
+	public boolean doesCalcLoss = true;
 	
 	public TerminalUnit(String name, InletUnit inlet, boolean hasBias)
 	{
