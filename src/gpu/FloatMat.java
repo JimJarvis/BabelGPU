@@ -3,7 +3,7 @@ package gpu;
 import java.nio.FloatBuffer;
 
 import gpu.NativeStruct.FloatDevicePointer;
-import utils.CpuUtil.Coord;
+import utils.MiscUtil.Coord;
 import utils.*;
 import jcuda.Pointer;
 import jcuda.Sizeof;
@@ -546,7 +546,7 @@ public class FloatMat
 	 */
 	public Coord toCoord(int idx)
 	{
-		return CpuUtil.toCoord(row, idx);
+		return MiscUtil.toCoord(row, idx);
 	}
 	
 	/**
@@ -557,14 +557,14 @@ public class FloatMat
 	{
 		if (i < 0)	i += this.row;
 		if (j < 0)	j += this.col;
-		return CpuUtil.toIndex(row, i, j);
+		return MiscUtil.toIndex(row, i, j);
 	}
 	/**
 	 * Transform a 2D coordinate to index (column major)
 	 */
 	public int toIndex(Coord c)
 	{
-		return CpuUtil.toIndex(row, c);
+		return MiscUtil.toIndex(row, c);
 	}
 	
 	// ******************** Interface to Thrust API ****************** /

@@ -5,6 +5,7 @@ import gpu.FloatMat;
 import java.util.ArrayList;
 
 import utils.CpuUtil;
+import utils.MiscUtil;
 import deep.units.*;
 
 /**
@@ -59,7 +60,7 @@ public class DeepFactory
 	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer initer)
 	{
 		return simpleSigmoidNet(inlet, layerDims, 
-				CpuUtil.repeatedArray(initer, layerDims.length));
+				MiscUtil.repeatedArray(initer, layerDims.length));
 	}
 	
 	/**

@@ -1,6 +1,5 @@
 package deep.units;
 
-import utils.PP;
 import gpu.*;
 import deep.DeepException;
 import deep.Initializer;

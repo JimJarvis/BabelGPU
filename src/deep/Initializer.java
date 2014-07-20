@@ -3,6 +3,7 @@ package deep;
 import java.util.ArrayList;
 
 import utils.CpuUtil;
+import utils.MiscUtil;
 import gpu.*;
 import deep.units.ParamUnit;
 
@@ -315,7 +316,7 @@ public abstract class Initializer
 	{
 		return mixProjKernelAggregIniter(
 				projKernels,  
-				CpuUtil.repeatedArray(gamma, projKernels.length),
+				MiscUtil.repeatedArray(gamma, projKernels.length),
 				relativeRatios);
 	}
 }
