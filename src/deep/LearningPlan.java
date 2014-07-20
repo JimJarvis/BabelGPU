@@ -14,6 +14,7 @@ public class LearningPlan
 	public float reg; // Regularization
 	public int totalSampleSize;
 	public int totalEpochs;
+	public LrScheme lrScheme;
 	
 	/*
 	 * Varying section
@@ -95,13 +96,5 @@ public class LearningPlan
 				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + doneEpoch
 				+ ", \ndoneSampleSize=" + doneSampleSize + ", \nrecord="
 				+ record + "]";
-	}
-	
-	/**
-	 * Dynamic learning rate scheme
-	 */
-	static abstract class LrScheme
-	{
-		
 	}
 }
