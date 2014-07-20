@@ -81,14 +81,14 @@ public class DeepNet implements Iterable<ComputeUnit>
 					@Override
 					public boolean hasNext()
 					{
-						return lp.curEpoch < lp.totalEpochs;
+						return lp.doneEpoch < lp.totalEpochs;
 					}
 					@Override
 					public Integer next()
 					{
-						if (lp.curEpoch != 0)
+						if (lp.doneEpoch != 0)
 							DeepNet.this.prepareNextEpoch();
-						return lp.curEpoch ++;
+						return lp.doneEpoch ++;
 					}
 					@Override
 					public void remove() {}
@@ -155,7 +155,8 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Prepare a network for a complete re-run
 	 * Reset all parameters, loss, inlet and LearningPlan
 	 * Mostly for debugging purpose
-	 * @see #prepareNextEpoch()
+	 * @see LearningPlan#reset()
+	 * @see InletUnit#prepareNextEpoch()
 	 * @see #clearLoss()
 	 */
 	public void reset()
@@ -163,7 +164,9 @@ public class DeepNet implements Iterable<ComputeUnit>
 		Initializer.resetRand();
 		for (ParamUnit w : terminal.getParams())
 			w.reInit();
-		this.prepareNextEpoch();
+		learningPlan.reset();
+		inlet.prepareNextEpoch();
+		this.clearLoss();
 	}
 	
 	// ******************** Training setups ********************/

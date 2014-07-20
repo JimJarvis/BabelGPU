@@ -19,7 +19,7 @@ public class LearningPlan
 	 * Varying section
 	 */
 	public float lr; // current lr
-	public int curEpoch = 0;
+	public int doneEpoch = 0;
 	// number of samples already processed
 	public int doneSampleSize = 0;
 	// Records the performance (loss function value) from each epoch
@@ -41,7 +41,7 @@ public class LearningPlan
 	/**
 	 * Copy ctor
 	 * 'name' won't be copied
-	 * Varying states like curXXX aren't copied
+	 * Varying states won't copied
 	 */
 	public LearningPlan(LearningPlan other)
 	{
@@ -58,6 +58,17 @@ public class LearningPlan
 	public void prepareNextEpoch()
 	{ 
 		this.doneSampleSize = 0; 
+	}
+	
+	/**
+	 * Reset for a complete re-run
+	 */
+	public void reset()
+	{
+		this.doneEpoch = 0;
+		this.doneSampleSize = 0;
+		this.lr = lrStart;
+		this.record.clear();
 	}
 	
 	/**
@@ -78,7 +89,7 @@ public class LearningPlan
 	{
 		return "LearningPlan [name=" + name + ", \ndir=" + dir + ", \nlr=" + lrStart
 				+ ", \nreg=" + reg + ", \ntotalSampleSize=" + totalSampleSize
-				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + curEpoch
+				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + doneEpoch
 				+ ", \ndoneSampleSize=" + doneSampleSize + ", \nrecord="
 				+ record + "]";
 	}
