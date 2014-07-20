@@ -15,41 +15,61 @@ public abstract class LrScheme
 	public abstract float updateEpoch(LearningPlan plan);
 	
 	/**
-	 * Preset learning scheme
+	 * @return Preset learning scheme: never decay, do nothing
 	 */
-	public static final LrScheme ConstantDecayScheme = 
-			new LrScheme()
+	public static LrScheme dummyScheme()
+	{
+		return new LrScheme() {
+			@Override
+			public float updateEpoch(LearningPlan plan) { return plan.lr; }
+			@Override
+			public float updateBatch(LearningPlan plan) { return plan.lr; }
+		};
+	}
+	
+	/**
+	 * @return Preset learning scheme: decay over every minibatch. 
+	 */
+	public static LrScheme constantDecayScheme()
+	{
+		return new LrScheme() {
+			@Override
+			public float updateEpoch(LearningPlan plan)
 			{
-				@Override
-				public float updateEpoch(LearningPlan plan)
-				{
-					return 0;
-				}
-				
-				@Override
-				public float updateBatch(LearningPlan plan)
-				{
-					return 0;
-				}
-			};
+				return plan.lr;
+			}
+			@Override
+			public float updateBatch(LearningPlan plan)
+			{
+				float epochFraction = 
+						(plan.doneEpoch * plan.totalSampleSize + plan.doneSampleSize) / plan.totalEpochs;
+				return plan.lrStart / (1 + epochFraction);
+			}
+		};
+	}
 
 	/**
-	 * Preset learning scheme
+	 * @return Preset learning scheme: 
+	 * let L2 = heldout loss of this epoch, and 
+	 * let L1 = heldout loss of the last epoch
+	 * In order to keep the same learning rate, we require that L2 >= L1(1+eps) 
+	 * So, if L2 < L1(1+eps), we should decay the learning rate. 
+	 * Equivalently, we decay if L2/L1 - 1 > -eps (because L1 is negative, change inequality direction) 
+	 * if L2 < L1, then L2/L1 > 1 then L2/L1 - 1 > 0, which is unacceptable, perform decay!
 	 */
-	public static final LrScheme EpochDecayScheme = 
-			new LrScheme()
+	public static LrScheme epochDecayScheme(float improvementTol, float decayRate)
+	{
+		return new LrScheme() {
+			@Override
+			public float updateEpoch(LearningPlan plan)
 			{
-				
-				@Override
-				public float updateEpoch(LearningPlan plan)
-				{
-					return 0;
-				}
-				
-				@Override
-				public float updateBatch(LearningPlan plan)
-				{
-					return 0;
-				}
-			};
+				return 0;
+			}
+			@Override
+			public float updateBatch(LearningPlan plan)
+			{
+				return 0;
+			}
+		};
+	}
 }

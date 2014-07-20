@@ -14,7 +14,7 @@ public class LearningPlan
 	public float reg; // Regularization
 	public int totalSampleSize;
 	public int totalEpochs;
-	public LrScheme lrScheme;
+	public LrScheme lrScheme = LrScheme.dummyScheme();
 	
 	/*
 	 * Varying section
