@@ -59,14 +59,18 @@ public abstract class InletUnit extends DataUnit
 	}
 	
 	/**
+	 * Update the critical 'batchSize' field used across the entire net. 
+	 * Update learningPlan.doneSampleSize
+	 * @return this.batchSize
 	 * @see #nextBatch_() public interface to the abstract method
-	 * Update the critical 'batchSize' field used across the entire net
 	 */
-	public void nextBatch()
+	public int nextBatch()
 	{
 		this.batchSize = this.nextBatch_();
 		if (this.batchSize <= 0)
 			throw new DeepException("InletUnit should not yield batchSize " + batchSize);
+		this.parent.learningPlan.doneSampleSize += this.batchSize;
+		return this.batchSize;
 	}
 
 	/**

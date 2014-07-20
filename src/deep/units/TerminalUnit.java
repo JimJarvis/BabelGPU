@@ -59,8 +59,6 @@ public abstract class TerminalUnit extends ComputeUnit
 
 		// Will be implemented by subclasses
 		this.lossPure += forward_terminal(this.doesCalcLoss);
-		
-		updateLearningPlan();  // incr curBatchSize
 	}
 
 	/**
@@ -135,11 +133,6 @@ public abstract class TerminalUnit extends ComputeUnit
 	public void setCalcLoss(boolean doesCalcLoss)
 	{
 		this.doesCalcLoss = doesCalcLoss;
-	}
-	
-	protected void updateLearningPlan()
-	{
-		this.learningPlan.doneSampleSize += inlet.batchSize;
 	}
 	
 	private FloatMat tmp_data_sqs[];  // hold temp squared values

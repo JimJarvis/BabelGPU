@@ -66,12 +66,12 @@ public class DeepNet implements Iterable<ComputeUnit>
 
 	/**
 	 * Iterate over epochs. 
-	 * At the end of every epoch, prepareNextEpoch()
+	 * At the end of every epoch, {@link #prepareNextEpoch()}
+	 * @return current epoch index
 	 */
 	public Iterable<Integer> epochIter()
 	{
-		return new Iterable<Integer>()
-		{
+		return new Iterable<Integer>() {
 			@Override
 			public Iterator<Integer> iterator()
 			{
@@ -96,28 +96,48 @@ public class DeepNet implements Iterable<ComputeUnit>
 			}
 		};
 	}
+	
+	/**
+	 * Iterate over mini-batches within one epoch until totalSampleSize is exhausted
+	 * @return learningPlan.doneSampleSize
+	 */
+	public Iterable<Integer> batchIter()
+	{
+		return new Iterable<Integer>() {
+			@Override
+			public Iterator<Integer> iterator()
+			{		
+				return new Iterator<Integer>()
+				{
+					LearningPlan lp = DeepNet.this.learningPlan;
+					@Override
+					public boolean hasNext()
+					{
+						return lp.doneSampleSize < lp.totalSampleSize;
+					}
+					@Override
+					public Integer next()
+					{
+						inlet.nextBatch();
+						return lp.doneSampleSize;
+					}
+					@Override
+					public void remove() { }
+				};
+			}
+		};
+	}
 
+	@SuppressWarnings("unused")
 	public void run(LearningPlan learningPlan)
 	{
 		setup(learningPlan);
 		for (int epoch : this.epochIter())
-		{
-			while (this.hasNext())
+			for (int doneSample : this.batchIter())
 			{
-				inlet.nextBatch();
 				forwprop();
 				backprop();
 			}
-		}
-	}
-
-	/**
-	 * While curTrainSize < totalTrainSize in learningPlan
-	 * Every terminal will update the curTrainSize
-	 */
-	public boolean hasNext()
-	{
-		return learningPlan.doneSampleSize < learningPlan.totalSampleSize;
 	}
 
 	/**
@@ -358,11 +378,10 @@ public class DeepNet implements Iterable<ComputeUnit>
 			inlet.initGradient();
 
 		int i = 1;
-		while (this.hasNext())
+		for (int doneSample : this.batchIter())
 		{
 			PP.pSectionLine("-", 70);
 			PP.p("Iteration", i++, "reading inlet");
-			inlet.nextBatch();
 			PP.pTitledSectionLine("FORWARD");
 			forwprop();
 			printDebug(true);

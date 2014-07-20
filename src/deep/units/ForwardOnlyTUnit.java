@@ -21,10 +21,7 @@ public class ForwardOnlyTUnit extends TerminalUnit
 	}
 	
 	@Override
-	public final void forward()
-	{ 
-		super.updateLearningPlan();
-	}
+	public final void forward() { }
 
 	@Override
 	protected float forward_terminal(boolean doesCalcLoss) { return 0; }
