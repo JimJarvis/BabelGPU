@@ -81,7 +81,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 
 	public void backprop()
 	{
-		for (ComputeUnit unit : iterable(false))
+		for (ComputeUnit unit : unitIter(false))
 			unit.backward();
 	}
 	
@@ -134,11 +134,44 @@ public class DeepNet implements Iterable<ComputeUnit>
 	{
 		return learningPlan.doneSampleSize < learningPlan.totalSampleSize;
 	}
+	
+	/**
+	 * Iterate over epochs. 
+	 * At the end of every epoch, prepareNextEpoch()
+	 */
+	public Iterable<Integer> epochIter()
+	{
+		return new Iterable<Integer>()
+		{
+			@Override
+			public Iterator<Integer> iterator()
+			{
+				return new Iterator<Integer>()
+				{
+					LearningPlan lp = DeepNet.this.learningPlan;
+					@Override
+					public boolean hasNext()
+					{
+						return lp.curEpoch < lp.totalEpochs;
+					}
+					@Override
+					public Integer next()
+					{
+						if (lp.curEpoch != 0)
+							DeepNet.this.prepareNextEpoch();
+						return lp.curEpoch ++;
+					}
+					@Override
+					public void remove() {}
+				};
+			}
+		};
+	}
 
 	public void run(LearningPlan learningPlan)
 	{
 		setup(learningPlan);
-		for (int epoch : this.learningPlan)
+		for (int epoch : this.epochIter())
 		{
     		while (this.hasNext())
     		{
@@ -146,8 +179,6 @@ public class DeepNet implements Iterable<ComputeUnit>
     			forwprop();
     			backprop();
     		}
-    		
-    		prepareNextEpoch();
 		}
 	}
 	
@@ -257,47 +288,48 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 	
 	// ******************** Enable forward/backward iteration ********************/
-	public Iterable<ComputeUnit> iterable(final boolean forward)
+	/**
+	 * Iterate over all ComputeUnits in forward or backward order
+	 */
+	public Iterable<ComputeUnit> unitIter(final boolean forward)
 	{
 		return new Iterable<ComputeUnit>()
 		{
 			public Iterator<ComputeUnit> iterator()
 			{
-				return DeepNet.this.iterator(forward);
+				return new Iterator<ComputeUnit>()
+				{
+					ComputeUnit unitptr;
+					{
+						unitptr = forward ? 
+								DeepNet.this.head : DeepNet.this.terminal;
+					}
+
+					@Override
+					public boolean hasNext() { return unitptr != null; }
+
+					ComputeUnit tmpptr;
+					@Override
+					public ComputeUnit next()
+					{
+						tmpptr = unitptr;
+						unitptr = forward ? unitptr.next : unitptr.prev;
+						return tmpptr;
+					}
+
+					public void remove() { }
+				};
 			}
 		};
 	}
 
+	/**
+	 * Iterate over ComputeUnits in forward order
+	 */
 	@Override
 	public Iterator<ComputeUnit> iterator()
 	{
-		return iterator(true);
-	}
-
-	public Iterator<ComputeUnit> iterator(final boolean forward)
-	{
-		return new Iterator<ComputeUnit>()
-		{
-			ComputeUnit unitptr;
-			{
-				unitptr = forward ? 
-						DeepNet.this.head : DeepNet.this.terminal;
-			}
-
-			@Override
-			public boolean hasNext() { return unitptr != null; }
-
-			ComputeUnit tmpptr;
-			@Override
-			public ComputeUnit next()
-			{
-				tmpptr = unitptr;
-				unitptr = forward ? unitptr.next : unitptr.prev;
-				return tmpptr;
-			}
-
-			public void remove() { }
-		};
+		return this.unitIter(true).iterator();
 	}
 	
 	// ******************** DEBUG only ********************/
@@ -334,7 +366,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	public void printDebug(boolean forward)
 	{
-		for (ComputeUnit unit : this.iterable(forward))
+		for (ComputeUnit unit : this.unitIter(forward))
 		{
 			PP.p(unit.name);
 			PP.p("input", unit.input.data().row, "*", unit.input.data().col, ":", unit.input, "\n");
