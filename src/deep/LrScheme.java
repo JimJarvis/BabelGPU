@@ -5,17 +5,17 @@ public abstract class LrScheme extends LearningPlan.Scheme
 	/**
 	 * Public main interface
 	 */
-	public final float updateBatch()
+	public final void updateBatch()
 	{
-		return this.updateBatch_(this.plan);
+		this.plan.lr = this.updateBatch_(this.plan);
 	}
 
 	/**
 	 * Public main interface
 	 */
-	public final float updateEpoch()
+	public final void updateEpoch()
 	{
-		return this.updateEpoch_(this.plan);
+		this.plan.lr = this.updateEpoch_(this.plan);
 	}
 	
 	/**
@@ -65,7 +65,7 @@ public abstract class LrScheme extends LearningPlan.Scheme
 			public float updateBatch_(LearningPlan plan)
 			{
 				float epochFraction = 
-						(plan.doneEpoch * plan.totalSampleSize + plan.doneSampleSize) / plan.totalEpochs;
+						(1f * plan.curEpoch * plan.totalSampleSize + plan.doneSampleSize) / plan.totalSampleSize;
 				return plan.lrStart / (1 + epochFraction);
 			}
 		};
