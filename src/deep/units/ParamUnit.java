@@ -49,6 +49,16 @@ public class ParamUnit extends DataUnit
 	public FloatMat gradient() { return this.gradient; }
 	
 	/**
+	 * Copies ONLY the FloatMat 'data'
+	 */
+	public void copyDataFrom(ParamUnit other)
+	{
+		if (this.data.row != other.data.row || this.data.col != other.data.col)
+			throw new DeepException("Cannot copy data from a different dimension.");
+		this.data.copyFrom(other.data);
+	}
+	
+	/**
 	 * Reinitialize this parameter with parent's initer
 	 */
 	public void reInit()

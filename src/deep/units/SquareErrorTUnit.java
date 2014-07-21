@@ -16,7 +16,7 @@ public class SquareErrorTUnit extends TerminalUnit
 	}
 
 	@Override
-	public float forward_terminal(boolean doesCalcLoss)
+	protected float forward_terminal(boolean doesCalcLoss)
 	{
 		float norm = super.batchNormalizer();
 		FloatMat data = input.data();
