@@ -2,6 +2,7 @@ package deep;
 
 import gpu.FloatMat;
 import gpu.GpuBlas;
+import gpu.Thrust;
 
 import java.util.*;
 
@@ -18,6 +19,9 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	private boolean setup = false; // should only setup once
 	private boolean debug = false; // the whole net is in debug mode
+
+	// Parameter list in forward order: for updating regularization term
+	protected ArrayList<ParamUnit> paramList = null;
 
 	public DeepNet(String name, InletUnit inlet, ComputeUnit... units)
 	{
@@ -162,7 +166,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	public void reset()
 	{
 		Initializer.resetRand();
-		for (ParamUnit w : terminal.getParams())
+		for (ParamUnit w : this.getParams())
 			w.reInit();
 		learningPlan.reset();
 		inlet.prepareNextEpoch();
@@ -256,14 +260,6 @@ public class DeepNet implements Iterable<ComputeUnit>
 	}
 
 	/**
-	 * @return param list in forward order
-	 */
-	public ArrayList<ParamUnit> getParams()
-	{
-		return this.terminal.getParams();
-	}
-
-	/**
 	 * @return a new HashMap that maps name to ComputeUnit
 	 */
 	public HashMap<String, ComputeUnit> getUnitMap()
@@ -313,6 +309,26 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Are we calculating loss in Terminal?
 	 */
 	public boolean doesCalcLoss() {	return this.terminal.doesCalcLoss;	}
+	
+	// ******************** Regularization ********************/
+	/**
+	 * @return all ParamUnit from all ParamComputeUnits, in forward order
+	 */
+	public ArrayList<ParamUnit> getParams()
+	{
+		// Make sure we get the latest list of params
+		// a non-empty paramList with null entries means the parameters aren't set yet
+		if (paramList != null && paramList.size() != 0 && paramList[0] != null)
+			return paramList;
+		
+		paramList = new ArrayList<>();
+		for (ComputeUnit unit : this)
+			if (unit instanceof ParamComputeUnit)
+				paramList.add(((ParamComputeUnit) unit).W);
+		return paramList;
+	}
+	
+	
 	
 	// ******************** Enable forward/backward iteration ********************/
 	/**
@@ -383,7 +399,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 	this.printDebug(true);
 		
 		// Handle debug networks that have no params
-		if (terminal.getParams().size() == 0)
+		if (this.getParams().size() == 0)
 			inlet.initGradient();
 
 		int i = 1;
@@ -437,7 +453,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		this.setup(learningPlan);
 		this.reset(); inlet.nextBatch();
 		
-		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) terminal.getParams().clone();
+		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) this.getParams().clone();
 		// We also do gradient checking for pure computing networks that have no parameters
 		boolean hasParams = params.size() != 0;
 		
@@ -473,11 +489,11 @@ public class DeepNet implements Iterable<ComputeUnit>
 			
 			mat = new FloatMat(w.data());
 			mat.copyFrom(w.data());
-			totalDataAbsSum += mat.abs().sum(); // mat is mutated
+			totalDataAbsSum += mat.abs_sum(); // mat is mutated
 
 			mat.copyFrom(w.gradient());
 			totalSize += mat.size() - (hasBias ? mat.row : 0);
-			totalGradAbsSum += mat.clone().abs().sum();
+			totalGradAbsSum += mat.abs_sum();
 			propGrad[i ++] = mat;
 		}
 		
@@ -535,7 +551,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		// Compare difference
 		float absErr = 0;
 		for (i = 0 ; i < propGrad.length; i ++)
-			absErr += GpuBlas.add(propGrad[i], goldGrad[i], 1, -1).abs().sum();
+			absErr += GpuBlas.add(propGrad[i], goldGrad[i], 1, -1).abs_sum();
 		float avgAbsErr = absErr / totalSize;
 		
 		float avgAbsVal = (hasParams ? totalGradAbsSum : totalDataAbsSum) / totalSize;

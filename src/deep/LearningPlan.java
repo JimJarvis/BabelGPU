@@ -14,7 +14,8 @@ public class LearningPlan
 	public float reg; // Regularization
 	public int totalSampleSize;
 	public int totalEpochs;
-	public LrScheme lrScheme = LrScheme.dummyScheme();
+	public LrScheme lrScheme;
+	public RegScheme regScheme;
 	
 	/*
 	 * Varying section
@@ -37,6 +38,10 @@ public class LearningPlan
 		this.reg = reg;
 		this.totalSampleSize = totalSampleSize;
 		this.totalEpochs = totalEpochs;
+
+		// Default schemes
+		this.setLrScheme(LrScheme.dummyScheme());
+		this.setRegScheme(RegScheme.squareSumScheme());
 	}
 	
 	/**
@@ -51,6 +56,9 @@ public class LearningPlan
 		this.reg = other.reg;
 		this.totalSampleSize = other.totalSampleSize;
 		this.totalEpochs = other.totalEpochs;
+		
+		this.setLrScheme(other.lrScheme);
+		this.setRegScheme(other.regScheme);
 	}
 	
 	/**
@@ -87,7 +95,44 @@ public class LearningPlan
 	 * Do we use regularization?
 	 */
 	public boolean hasReg() { return this.reg > 0; }
+	
+	// ******************** Schemes ********************/
+	/**
+	 * NOTE: do not set the public field directly!!!
+	 */
+	public void setRegScheme(RegScheme scheme)
+	{
+		this.regScheme = scheme;
+		this.linkScheme(scheme);
+	}
 
+	/**
+	 * NOTE: do not set the public field directly!!!
+	 */
+	public void setLrScheme(LrScheme scheme)
+	{
+		this.lrScheme = scheme;
+		this.linkScheme(scheme);
+	}
+	
+	private void linkScheme(Scheme scheme)
+	{
+		scheme.linkPlan(this);
+	}
+	
+	/**
+	 * A scheme (learning rate scheme, regularization scheme) 
+	 * should be linked to a LearningPlan
+	 */
+	static abstract class Scheme
+	{
+		protected LearningPlan plan;
+		public void linkPlan(LearningPlan plan)
+		{
+			this.plan = plan;
+		}
+	}
+	
 	@Override
 	public String toString()
 	{

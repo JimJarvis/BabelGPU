@@ -1,18 +1,39 @@
 package deep;
 
-public abstract class LrScheme
+public abstract class LrScheme extends LearningPlan.Scheme
 {
+	/**
+	 * Public main interface
+	 */
+	public final float updateBatch()
+	{
+		return this.updateBatch_(this.plan);
+	}
+
+	/**
+	 * Public main interface
+	 */
+	public final float updateEpoch()
+	{
+		return this.updateEpoch_(this.plan);
+	}
+	
 	/**
 	 * Update learning rate between mini-batches
 	 * @return new learning rate
 	 */
-	public abstract float updateBatch(LearningPlan plan);
+	public abstract float updateBatch_(LearningPlan plan);
 
 	/**
 	 * Update learning rate over epochs 
 	 * @return new learning rate
 	 */
-	public abstract float updateEpoch(LearningPlan plan);
+	public abstract float updateEpoch_(LearningPlan plan);
+	
+	/**
+	 * @return default lr: doesn't change
+	 */
+	public float defaultLr() {	return plan.lr;	}
 	
 	/**
 	 * @return Preset learning scheme: never decay, do nothing
@@ -21,9 +42,11 @@ public abstract class LrScheme
 	{
 		return new LrScheme() {
 			@Override
-			public float updateEpoch(LearningPlan plan) { return plan.lr; }
+			public float updateEpoch_(LearningPlan plan)
+			{ return this.defaultLr(); }
 			@Override
-			public float updateBatch(LearningPlan plan) { return plan.lr; }
+			public float updateBatch_(LearningPlan plan)
+			{ return this.defaultLr(); }
 		};
 	}
 	
@@ -34,12 +57,12 @@ public abstract class LrScheme
 	{
 		return new LrScheme() {
 			@Override
-			public float updateEpoch(LearningPlan plan)
+			public float updateEpoch_(LearningPlan plan)
 			{
-				return plan.lr;
+				return this.defaultLr();
 			}
 			@Override
-			public float updateBatch(LearningPlan plan)
+			public float updateBatch_(LearningPlan plan)
 			{
 				float epochFraction = 
 						(plan.doneEpoch * plan.totalSampleSize + plan.doneSampleSize) / plan.totalEpochs;
@@ -49,6 +72,7 @@ public abstract class LrScheme
 	}
 
 	/**
+	 * TODO
 	 * @return Preset learning scheme: 
 	 * let L2 = heldout loss of this epoch, and 
 	 * let L1 = heldout loss of the last epoch
@@ -61,14 +85,14 @@ public abstract class LrScheme
 	{
 		return new LrScheme() {
 			@Override
-			public float updateEpoch(LearningPlan plan)
+			public float updateEpoch_(LearningPlan plan)
 			{
 				return 0;
 			}
 			@Override
-			public float updateBatch(LearningPlan plan)
+			public float updateBatch_(LearningPlan plan)
 			{
-				return 0;
+				return this.defaultLr();
 			}
 		};
 	}
