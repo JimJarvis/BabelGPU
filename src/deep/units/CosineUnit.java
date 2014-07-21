@@ -20,17 +20,16 @@ public class CosineUnit extends ElementComputeUnit
 	}
 
 	@Override
-	public void forward_element()
+	public void forward_element(float scalor)
 	{
-		Thrust.cos(input.data(), output.data());
+		Thrust.cos(input.data(), output.data(), 1, 0, scalor);
 	}
 
 	@Override
 	public void backward_element()
 	{
 		FloatMat grad = input.gradient();
-		Thrust.sin(input.data(), grad);
-		GpuBlas.scale(grad, -1);
+		Thrust.sin(input.data(), grad, 1, 0, -1);
 	}
 
 }

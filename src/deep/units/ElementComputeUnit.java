@@ -51,12 +51,10 @@ public abstract class ElementComputeUnit extends ComputeUnit
 	@Override
 	public final void forward()
 	{
-		forward_element();
-		if (scalor != 1)
-			GpuBlas.scale(output.data(), scalor);
+		forward_element(this.scalor);
 	}
 	
-	public abstract void forward_element();
+	public abstract void forward_element(float scalor);
 	
 	/**
 	 * 'final' ensures that subclass cannot directly override backward()
