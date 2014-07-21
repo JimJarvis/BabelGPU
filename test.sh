@@ -12,8 +12,8 @@ units="test.deep.ElementComputeTest"
 units="test.deep.CombinedTest"
 units="test.deep.KernelApproxTest"
 units="test.gpu.SoftmaxTest"
+units="test.deep.LearningTest"
 units=$allunits
-
 
 cp gpu_src/*.h bin/gpu/
 mkdir -p bin/matlab_test/
