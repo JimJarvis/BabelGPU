@@ -1,6 +1,10 @@
 package deep;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
+import utils.CpuUtil;
+import utils.PP;
 
 public class LearningPlan
 {
@@ -21,7 +25,7 @@ public class LearningPlan
 	 * Varying section
 	 */
 	public float lr; // current lr
-	public int doneEpoch = 0;
+	public int curEpoch = 0;
 	// number of samples already processed
 	public int doneSampleSize = 0;
 	// Records the performance (loss function value) from each epoch
@@ -64,11 +68,19 @@ public class LearningPlan
 	/**
 	 * Prepare for the next epoch. 
 	 * Update 'record' with latest performance measure. 
+	 * Update best ParamList in net. 
+	 * Update last-epoch ParamList in net. 
 	 */
 	public void prepareNextEpoch()
 	{ 
 		if (net.doesCalcLoss())
-    		record.add(net.lossPure());
+		{
+			float loss = net.lossPure();
+			record.add(loss);
+			if (CpuUtil.equal(loss, Collections.min(record), 1e-8))
+				net.recordBestParams();
+		}
+		this.lrScheme.updateEpoch();
 		this.doneSampleSize = 0; 
 	}
 	
@@ -77,7 +89,7 @@ public class LearningPlan
 	 */
 	public void reset()
 	{
-		this.doneEpoch = 0;
+		this.curEpoch = 0;
 		this.doneSampleSize = 0;
 		this.lr = lrStart;
 		this.record.clear();
@@ -138,7 +150,7 @@ public class LearningPlan
 	{
 		return "LearningPlan [name=" + name + ", \ndir=" + dir + ", \nlr=" + lrStart
 				+ ", \nreg=" + reg + ", \ntotalSampleSize=" + totalSampleSize
-				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + doneEpoch
+				+ ", \ntotalEpochs=" + totalEpochs + ", \ncurEpoch=" + curEpoch
 				+ ", \ndoneSampleSize=" + doneSampleSize + ", \nrecord="
 				+ record + "]";
 	}

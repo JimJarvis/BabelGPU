@@ -1,8 +1,6 @@
 package deep;
 
-import gpu.FloatMat;
-import gpu.GpuBlas;
-import gpu.Thrust;
+import gpu.*;
 
 import java.util.*;
 
@@ -21,7 +19,11 @@ public class DeepNet implements Iterable<ComputeUnit>
 	private boolean debug = false; // the whole net is in debug mode
 
 	// Parameter list in forward order: for updating regularization term
-	protected ArrayList<ParamUnit> paramList = null;
+	protected ParamList paramList = null;
+	// Best parameter data so far
+	protected ParamList bestParamList = null;
+	// From last epoch
+	protected ParamList lastEpochParamList = null;
 
 	public DeepNet(String name, InletUnit inlet, ComputeUnit... units)
 	{
@@ -81,18 +83,23 @@ public class DeepNet implements Iterable<ComputeUnit>
 			{
 				return new Iterator<Integer>()
 				{
-					LearningPlan lp = DeepNet.this.learningPlan;
+					LearningPlan plan = DeepNet.this.learningPlan;
+					boolean first = true;
 					@Override
 					public boolean hasNext()
 					{
-						return lp.doneEpoch < lp.totalEpochs;
+						if (!first)
+						{
+							DeepNet.this.prepareNextEpoch();
+							++ plan.curEpoch;
+						}
+						first = false;
+						return plan.curEpoch < plan.totalEpochs;
 					}
 					@Override
 					public Integer next()
 					{
-						if (lp.doneEpoch != 0)
-							DeepNet.this.prepareNextEpoch();
-						return lp.doneEpoch ++;
+						return plan.curEpoch;
 					}
 					@Override
 					public void remove() {}
@@ -103,7 +110,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 	
 	/**
 	 * Iterate over mini-batches within one epoch until totalSampleSize is exhausted
-	 * @return learningPlan.doneSampleSize
+	 * @return learningPlan.doneSampleSize right after nextBatch()
 	 */
 	public Iterable<Integer> batchIter()
 	{
@@ -113,17 +120,18 @@ public class DeepNet implements Iterable<ComputeUnit>
 			{		
 				return new Iterator<Integer>()
 				{
-					LearningPlan lp = DeepNet.this.learningPlan;
+					LearningPlan plan = DeepNet.this.learningPlan;
 					@Override
 					public boolean hasNext()
 					{
-						return lp.doneSampleSize < lp.totalSampleSize;
+						return plan.doneSampleSize < plan.totalSampleSize;
 					}
 					@Override
 					public Integer next()
 					{
 						inlet.nextBatch();
-						return lp.doneSampleSize;
+						learningPlan.lrScheme.updateBatch();
+						return plan.doneSampleSize;
 					}
 					@Override
 					public void remove() { }
@@ -197,7 +205,8 @@ public class DeepNet implements Iterable<ComputeUnit>
     				if (unit instanceof ParamComputeUnit)
     					break;
     			}
-			
+
+			getParams(); // refresh param-list
 			setup = true;
 		}
 	}
@@ -270,6 +279,64 @@ public class DeepNet implements Iterable<ComputeUnit>
 		return unitMap;
 	}
 
+	// ******************** ParamList management ********************/
+	/**
+	 * set this.paramList
+	 * @return all ParamUnit from all ParamComputeUnits, in forward order
+	 */
+	public ParamList getParams()
+	{
+		// Make sure we get the latest list of params
+		// a non-empty paramList with null entries means the parameters aren't set yet
+		if (paramList != null && paramList.size() != 0 && paramList[0] != null)
+			return paramList;
+		
+		return this.paramList = new ParamList(this);
+	}
+	
+	/**
+	 * Copy the current params to bestParamList if this is indeed the best epoch. 
+	 * Best param units are deep copies of paramList, and their names suffixed by '_best'
+	 * @see LearningPlan#prepareNextEpoch()
+	 */
+	public void recordBestParams()
+	{
+		if (bestParamList == null)
+			bestParamList = new ParamList(getParams(), "_best");
+		else
+			bestParamList.copyDataFrom(paramList);
+	}
+	
+	/**
+	 * Restore this.paramList from the best
+	 */
+	public void restoreBestParams()
+	{
+		this.paramList.copyDataFrom(bestParamList);
+	}
+	
+	/**
+	 * Copy the current params to bestParamList if this is indeed the best epoch. 
+	 * Best param units are deep copies of paramList, and their names suffixed by '_best'
+	 * @see LearningPlan#prepareNextEpoch()
+	 */
+	public void recordLastEpochParams()
+	{
+		if (lastEpochParamList == null)
+			lastEpochParamList = new ParamList(getParams(), "_last");
+		else
+		// Copies data over
+			lastEpochParamList.copyDataFrom(paramList);
+	}
+	
+	/**
+	 * Restore this.paramList from the previous epoch
+	 */
+	public void restoreLastEpochParams()
+	{
+		this.paramList.copyDataFrom(lastEpochParamList);
+	}
+
 	// ******************** Deals with loss function and Terminal ********************/
 	/**
 	 * @see TerminalUnit#clearLoss()
@@ -309,26 +376,6 @@ public class DeepNet implements Iterable<ComputeUnit>
 	 * Are we calculating loss in Terminal?
 	 */
 	public boolean doesCalcLoss() {	return this.terminal.doesCalcLoss;	}
-	
-	// ******************** Regularization ********************/
-	/**
-	 * @return all ParamUnit from all ParamComputeUnits, in forward order
-	 */
-	public ArrayList<ParamUnit> getParams()
-	{
-		// Make sure we get the latest list of params
-		// a non-empty paramList with null entries means the parameters aren't set yet
-		if (paramList != null && paramList.size() != 0 && paramList[0] != null)
-			return paramList;
-		
-		paramList = new ArrayList<>();
-		for (ComputeUnit unit : this)
-			if (unit instanceof ParamComputeUnit)
-				paramList.add(((ParamComputeUnit) unit).W);
-		return paramList;
-	}
-	
-	
 	
 	// ******************** Enable forward/backward iteration ********************/
 	/**
