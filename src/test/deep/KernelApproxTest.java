@@ -90,7 +90,9 @@ public class KernelApproxTest
 			PP.setPrecision(2); 
 
 			double avgPercentErr = sumErr / sumVal * 100;
+			PP.setScientific(true);
 			PP.p("Average absolute error =", sumErr / pairN);
+			PP.setScientific(false);
 			PP.p("Average percent error =", avgPercentErr , "%\n");
 			assertEquals(this.kernelType + " FAILS", avgPercentErr, 0, TOL);
 			PP.setPrecision(); // reset printer options
@@ -127,7 +129,7 @@ public class KernelApproxTest
 			@Override
 			public double computeExact(FloatMat origCol1, FloatMat origCol2)
 			{
-				double norm = GpuBlas.add( origCol1, origCol2, diffOrig, 1, -1).abs().sum();
+				double norm = GpuBlas.add( origCol1, origCol2, diffOrig, 1, -1).abs_sum();
     			return Math.exp(- gamma * norm);
 			}
 		}.test(false);

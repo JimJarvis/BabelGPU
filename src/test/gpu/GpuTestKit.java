@@ -69,7 +69,7 @@ public class GpuTestKit
 	{
 		FloatMat diffMat = new FloatMat(x);
 		GpuBlas.add(x, gold, diffMat , 1, -1);
-		float diff = diffMat .abs().sum() / diffMat .size();
+		float diff = diffMat.abs_sum() / diffMat .size();
 		diffMat.destroy();
 		return diff;
 	}
