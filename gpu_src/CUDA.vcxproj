@@ -164,7 +164,7 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <AdditionalOptions>-Xcompiler "/wd4819" -Xcompiler "/wd4267" -Xcompiler "/wd4244" </AdditionalOptions>
+      <AdditionalOptions>-Xcompiler "/wd4819" -Xcompiler "/wd4267" -Xcompiler "/wd4244"  -Xcompiler "/wd4305"</AdditionalOptions>
       <CodeGeneration>compute_30,sm_30</CodeGeneration>
     </CudaCompile>
   </ItemDefinitionGroup>

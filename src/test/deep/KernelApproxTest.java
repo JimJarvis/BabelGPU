@@ -147,7 +147,7 @@ public class KernelApproxTest
 			{
 				return GpuBlas.add( origCol1, origCol2, diffOrig, 1, -1)
 						.square()
-						.reciprocal(gamma, 1)
+						.reciprocal(gamma, 1, 1)
 						.product();
 			}
 		}.test(false);

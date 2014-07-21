@@ -584,9 +584,9 @@ public class FloatMat
 	/**
 	 * exp(a * x + b)
 	 */
-	public FloatMat exp(float a, float b)
+	public FloatMat exp(float a, float b, float m)
 	{
-		Thrust.exp(this, a, b); return this;
+		Thrust.exp(this, a, b, m); return this;
 	}
 	public FloatMat exp()
 	{
@@ -596,9 +596,9 @@ public class FloatMat
 	/**
 	 * log(a * x + b)
 	 */
-	public FloatMat log(float a, float b)
+	public FloatMat log(float a, float b, float m)
 	{
-		Thrust.log(this, a, b); return this;
+		Thrust.log(this, a, b, m); return this;
 	}
 	public FloatMat log()
 	{
@@ -608,9 +608,9 @@ public class FloatMat
 	/**
 	 * cos(a * x + b)
 	 */
-	public FloatMat cos(float a, float b)
+	public FloatMat cos(float a, float b, float m)
 	{
-		Thrust.cos(this, a, b); return this;
+		Thrust.cos(this, a, b, m); return this;
 	}
 	public FloatMat cos()
 	{
@@ -620,9 +620,9 @@ public class FloatMat
 	/**
 	 * sin(a * x + b)
 	 */
-	public FloatMat sin(float a, float b)
+	public FloatMat sin(float a, float b, float m)
 	{
-		Thrust.sin(this, a, b); return this;
+		Thrust.sin(this, a, b, m); return this;
 	}
 	public FloatMat sin()
 	{
@@ -632,9 +632,9 @@ public class FloatMat
 	/**
 	 * abs(a * x + b)
 	 */
-	public FloatMat abs(float a, float b)
+	public FloatMat abs(float a, float b, float m)
 	{
-		Thrust.abs(this, a, b); return this;
+		Thrust.abs(this, a, b, m); return this;
 	}
 	public FloatMat abs()
 	{
@@ -644,9 +644,9 @@ public class FloatMat
 	/**
 	 * sqrt(a * x + b)
 	 */
-	public FloatMat sqrt(float a, float b)
+	public FloatMat sqrt(float a, float b, float m)
 	{
-		Thrust.sqrt(this, a, b); return this;
+		Thrust.sqrt(this, a, b, m); return this;
 	}
 	public FloatMat sqrt()
 	{
@@ -656,9 +656,9 @@ public class FloatMat
 	/**
 	 * (a * x + b)^2
 	 */
-	public FloatMat square(float a, float b)
+	public FloatMat square(float a, float b, float m)
 	{
-		Thrust.square(this, a, b); return this;
+		Thrust.square(this, a, b, m); return this;
 	}
 	public FloatMat square()
 	{
@@ -668,9 +668,9 @@ public class FloatMat
 	/**
 	 * (a * x + b)^3
 	 */
-	public FloatMat cube(float a, float b)
+	public FloatMat cube(float a, float b, float m)
 	{
-		Thrust.cube(this, a, b); return this;
+		Thrust.cube(this, a, b, m); return this;
 	}
 	public FloatMat cube()
 	{
@@ -680,9 +680,9 @@ public class FloatMat
 	/**
 	 * 1 / (a * x + b)
 	 */
-	public FloatMat reciprocal(float a, float b)
+	public FloatMat reciprocal(float a, float b, float m)
 	{
-		Thrust.reciprocal(this, a, b); return this;
+		Thrust.reciprocal(this, a, b, m); return this;
 	}
 	public FloatMat reciprocal()
 	{
@@ -692,9 +692,9 @@ public class FloatMat
 	/**
 	 * (a * x + b) ^p
 	 */
-	public FloatMat pow(float p, float a, float b)
+	public FloatMat pow(float p, float a, float b, float m)
 	{
-		Thrust.pow(this, p, a, b); return this;
+		Thrust.pow(this, p, a, b, m); return this;
 	}
 	public FloatMat pow(float p)
 	{
@@ -712,25 +712,13 @@ public class FloatMat
 	/**
 	 * Sigmoid(a * x + b)
 	 */
-	public FloatMat sigmoid(float a, float b)
+	public FloatMat sigmoid(float a, float b, float m)
 	{
-		Thrust.sigmoid(this, a, b); return this;
+		Thrust.sigmoid(this, a, b, m); return this;
 	}
 	public FloatMat sigmoid()
 	{
 		Thrust.sigmoid(this); return this;
-	}
-	
-	/**
-	 * x .* (1 - x)
-	 */
-	public FloatMat sigmoid_deriv(float a, float b)
-	{
-		Thrust.sigmoid_deriv(this, a, b); return this;
-	}
-	public FloatMat sigmoid_deriv()
-	{
-		Thrust.sigmoid_deriv(this); return this;
 	}
 	
 	public float max()

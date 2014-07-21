@@ -23,34 +23,14 @@
 using namespace thrust;
 
 // Macro defines functors for linear transformations inside an elementary unary function
-// Ftype: float or double
-// for example, functor: exp(x) 
-// functor_1: exp(x + b) 
-// functor_2: exp(a * x)
-// functor_3: exp(a*x + b)
-// default a = 1 and b = 0
+// for example, functor: m * exp(a * x + b) 
+// default m = 1, a = 1 and b = 0
 #define GEN_linear_functor(name) \
-	template <typename T> \
+template <typename T> \
 struct functor_##name{ \
-	__host__ __device__ T operator()(const T& x) const { return name(x); } \
-}; \
-	template <typename T> \
-struct functor_##name##_1{ \
-	const T b; \
-	functor_##name##_1(T _b = 0) : b(_b) {} \
-	__host__ __device__ T operator()(const T& x) const { return name(x + b); } \
-}; \
-	template <typename T> \
-struct functor_##name##_2{ \
-	const T a; \
-	functor_##name##_2(T _a = 1) : a(_a) {} \
-	__host__ __device__ T operator()(const T& x) const { return name(a * x); } \
-}; \
-	template <typename T> \
-struct functor_##name##_3{ \
-	const T a, b; \
-	functor_##name##_3(T _a = 1, T _b = 0) : a(_a), b(_b) {} \
-	__host__ __device__ T operator()(const T& x) const { return name(a * x + b); } \
+	const T a, b, m; \
+	functor_##name(T _a = 1, T _b = 0, T _m = 1) : a(_a), b(_b), m(_m) {} \
+	__host__ __device__ T operator()(const T& x) const { return m * name(a * x + b); } \
 };
 
 // Macro defines corresponding thrust::transform for various linear unary functors
@@ -59,56 +39,26 @@ struct functor_##name##_3{ \
 GEN_linear_functor(name); \
 template <typename T> \
 inline void gpu_##name(device_ptr<T> begin, int size, \
-								device_ptr<T> out, T a = 1, T b = 0) \
+								device_ptr<T> out, T a = 1, T b = 0, T m = 1) \
 { \
-if (a == 1 && b == 0) \
-	transform(begin, begin + size, out, functor_##name<T>()); \
-	else if (a == 1) \
-	transform(begin, begin + size, out, functor_##name##_1<T>(b)); \
-	else if (b == 0) \
-	transform(begin, begin + size, out, functor_##name##_2<T>(a)); \
-	else \
-	transform(begin, begin + size, out, functor_##name##_3<T>(a, b)); \
+	transform(begin, begin + size, out, functor_##name<T>(a, b, m)); \
 } \
 /* Overload in == out */ \
 template <typename T> \
-inline void gpu_##name(device_ptr<T> begin, int size, T a = 1, T b = 0) \
+inline void gpu_##name(device_ptr<T> begin, int size, T a = 1, T b = 0, T m = 1) \
 { \
-	gpu_##name<T>(begin, size, begin, a, b); \
+	gpu_##name<T>(begin, size, begin, a, b, m); \
 }
-
 
 // Macro defines functors for linear transformations inside a binary function
 // T: float or double
-// for example, functor: pow(x, p) 
-// functor_1: pow(x + b, p) 
-// functor_2: pow(a * x, p)
-// functor_3: pow(a*x + b, p)
-// default a = 1 and b = 0
+// for example, functor: m * pow(a*x+b, p)
 #define GEN_linear_functor_2(name) \
 template <typename T> \
 struct functor_##name{ \
-	const T p; \
-	functor_##name(T _p) : p(_p) {} \
-	__host__ __device__ T operator()(const T& x) const { return name(x, p); } \
-}; \
-template <typename T> \
-struct functor_##name##_1{ \
-	const T p, b; \
-	functor_##name##_1(T _p, T _b = 0) : p(_p), b(_b) {} \
-	__host__ __device__ T operator()(const T& x) const { return name(x + b, p); } \
-}; \
-template <typename T> \
-struct functor_##name##_2{ \
-	const T p, a; \
-	functor_##name##_2(T _p, T _a = 1) : p(_p), a(_a) {} \
-	__host__ __device__ T operator()(const T& x) const { return name(a * x, p); } \
-}; \
-template <typename T> \
-struct functor_##name##_3{ \
-	const T p, a, b; \
-	functor_##name##_3(T _p, T _a = 1, T _b = 0) : p(_p), a(_a), b(_b) {} \
-	__host__ __device__ T operator()(const T& x) const { return name(a * x + b, p); } \
+	const T p, a, b, m; \
+	functor_##name(T _p, T _a = 1, T _b = 0, T _m = 0) : p(_p), a(_a), b(_b), m(_m) {} \
+	__host__ __device__ T operator()(const T& x) const { return m * name(a * x + b, p); } \
 };
 
 // Macro defines corresponding thrust::transform for various linear binary functors
@@ -117,22 +67,15 @@ struct functor_##name##_3{ \
 GEN_linear_functor_2(name); \
 template <typename T> \
 inline void gpu_##name(device_ptr<T> begin, int size, \
-								device_ptr<T> out, T p, T a = 1, T b = 0) \
+								device_ptr<T> out, T p, T a = 1, T b = 0, T m = 1) \
 { \
-if (a == 1 && b == 0) \
-	transform(begin, begin + size, out, functor_##name<T>(p)); \
-	else if (a == 1) \
-	transform(begin, begin + size, out, functor_##name##_1<T>(p, b)); \
-	else if (b == 0) \
-	transform(begin, begin + size, out, functor_##name##_2<T>(p, a)); \
-	else \
-	transform(begin, begin + size, out, functor_##name##_3<T>(p, a, b)); \
+	transform(begin, begin + size, out, functor_##name<T>(p, a, b, m)); \
 } \
 /* Overload in == out */	\
 template <typename T> \
-inline void gpu_##name(device_ptr<T> begin, int size, T p, T a = 1, T b = 0) \
+inline void gpu_##name(device_ptr<T> begin, int size, T p, T a = 1, T b = 0, T m = 1) \
 { \
-	gpu_##name<T>(begin, size, begin, p, a, b); \
+	gpu_##name<T>(begin, size, begin, p, a, b, m); \
 }
 
 namespace MyGpu
@@ -159,7 +102,6 @@ namespace MyGpu
 	GEN_transf(fabs); // abs()
 	GEN_transf(floor);
 	GEN_transf(ceil);
-	GEN_transf(); // gpu__float(), for plain linear transformation
 
 	// Generate binary transform functions
 	GEN_transf_2(pow);
@@ -209,6 +151,33 @@ namespace MyGpu
 	GEN_transf(laplacian);
 	GEN_transf(signum);
 
+	// Special GEN_transf case: linear functor
+	template <typename T>
+	struct functor_linear
+	{
+		const T a, b;
+		functor_linear(T _a = 1, T _b = 0) : a(_a), b(_b) {}
+		__host__ __device__ T operator()(const T& x) const { return a * x + b; }
+	};
+	template <typename T>
+	inline void gpu_linear(device_ptr<T> begin, int size,
+		device_ptr<T> out, T a = 1, T b = 0)
+	{
+		if (a == 1 && b == 0) // trivial linear, don't launch anything
+		{
+			if (begin != out) // simply copy
+				thrust::copy_n(begin, size, out);
+			// else do nothing
+		}
+		else
+			transform(begin, begin + size, out, functor_linear<T>(a, b));
+	}
+	/* Overload in == out */ 
+	template <typename T> 
+	inline void gpu_linear(device_ptr<T> begin, int size, T a = 1, T b = 0)
+	{
+		gpu_linear<T>(begin, size, begin, a, b);
+	}
 
 	///////***** OTHER functions *****///////
 	template <typename T>
@@ -347,7 +316,7 @@ namespace MyGpu
 		T mx = gpu_max<T>(begin, size);
 		gpu_exp<T>(begin, size, out, 1, -mx); 
 		T s = gpu_sum<T>(out, size);
-		gpu_<T>(out, size, 1.0 / s, 0);
+		gpu_linear<T>(out, size, 1.0 / s, 0);
 	} 
 	/*Overload: in == out*/ 
 	template <typename T>
@@ -377,7 +346,7 @@ namespace MyGpu
 	{ 
 		T mx = gpu_max<T>(begin, size); 
 		T expSum = thrust::transform_reduce(begin, begin + size, 
-											functor_exp_1<T>(-mx), 0.0, thrust::plus<T>());
+											functor_exp<T>(1, -mx), 0.0, thrust::plus<T>());
 		float sumLogProb = (begin[label] - mx) - log(expSum); 
 		outLogProb[0] = sumLogProb;
 		return sumLogProb;
@@ -416,7 +385,7 @@ namespace MyGpu
 
 		float logsum = log(
 			thrust::transform_reduce(begin, begin + size,
-			functor_exp_1<float>(-mx), 0.0, thrust::plus<float>()));
+			functor_exp<float>(1, -mx), 0.0, thrust::plus<float>()));
 
 		gpu_exp<float>(begin, size, 1, -(mx + logsum));
 		-- *(begin + id);  // when at id, x -= 1

@@ -19,195 +19,234 @@ public class Thrust
 {
 	static { Loader.load(); }
 	/**
-	 * exp(a * x + b)
+	 * m * exp(a * x + b)
 	 */
-	public static void exp(FloatMat x, float a, float b)
+	public static void exp(FloatMat x, float a, float b, float m)
 	{
-		gpu_exp(x.getThrustPointer(), x.size(), a, b);
+		gpu_exp(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void exp(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * exp(a * x + b)
+	 */
+	public static void exp(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_exp(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_exp(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void exp(FloatMat x) {  exp(x, 1, 0); }
-	public static void exp(FloatMat x, FloatMat out) {  exp(x, out, 1, 0); }
+	public static void exp(FloatMat x) {  exp(x, 1, 0, 1); }
+	public static void exp(FloatMat x, FloatMat out) {  exp(x, out, 1, 0, 1); }
 	
 	/**
-	 * ln(a * x + b)
+	 * m * ln(a * x + b)
 	 */
-	public static void log(FloatMat x, float a, float b)
+	public static void log(FloatMat x, float a, float b, float m)
 	{
-		gpu_log(x.getThrustPointer(), x.size(), a, b);
+		gpu_log(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void log(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * ln(a * x + b)
+	 */
+	public static void log(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_log(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_log(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void log(FloatMat x) {  log(x, 1, 0); }
-	public static void log(FloatMat x, FloatMat out) {  log(x, out, 1, 0); }
+	public static void log(FloatMat x) {  log(x, 1, 0, 1); }
+	public static void log(FloatMat x, FloatMat out) {  log(x, out, 1, 0, 1); }
 	
 	/**
-	 * cos(a * x + b)
+	 * m * cos(a * x + b)
 	 */
-	public static void cos(FloatMat x, float a, float b)
+	public static void cos(FloatMat x, float a, float b, float m)
 	{
-		gpu_cos(x.getThrustPointer(), x.size(), a, b);
+		gpu_cos(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void cos(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * cos(a * x + b)
+	 */
+	public static void cos(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_cos(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_cos(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void cos(FloatMat x) {  cos(x, 1, 0); }
-	public static void cos(FloatMat x, FloatMat out) {  cos(x, out, 1, 0); }
+	public static void cos(FloatMat x) {  cos(x, 1, 0, 1); }
+	public static void cos(FloatMat x, FloatMat out) {  cos(x, out, 1, 0, 1); }
 	
 	/**
-	 * sin(a * x + b)
+	 * m * sin(a * x + b)
 	 */
-	public static void sin(FloatMat x, float a, float b)
+	public static void sin(FloatMat x, float a, float b, float m)
 	{
-		gpu_sin(x.getThrustPointer(), x.size(), a, b);
+		gpu_sin(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void sin(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * sin(a * x + b)
+	 */
+	public static void sin(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_sin(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sin(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void sin(FloatMat x) {  sin(x, 1, 0); }
-	public static void sin(FloatMat x, FloatMat out) {  sin(x, out, 1, 0); }
+	public static void sin(FloatMat x) {  sin(x, 1, 0, 1); }
+	public static void sin(FloatMat x, FloatMat out) {  sin(x, out, 1, 0, 1); }
 	
 	/**
-	 * sqrt(a * x + b)
+	 * m * sqrt(a * x + b)
 	 */
-	public static void sqrt(FloatMat x, float a, float b)
+	public static void sqrt(FloatMat x, float a, float b, float m)
 	{
-		gpu_sqrt(x.getThrustPointer(), x.size(), a, b);
+		gpu_sqrt(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void sqrt(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * sqrt(a * x + b)
+	 */
+	public static void sqrt(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_sqrt(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sqrt(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void sqrt(FloatMat x) {  sqrt(x, 1, 0); }
-	public static void sqrt(FloatMat x, FloatMat out) {  sqrt(x, out, 1, 0); }
+	public static void sqrt(FloatMat x) {  sqrt(x, 1, 0, 1); }
+	public static void sqrt(FloatMat x, FloatMat out) {  sqrt(x, out, 1, 0, 1); }
 	
 	/**
-	 * (a * x + b) ^p
+	 * m * (a * x + b) ^p
 	 */
-	public static void pow(FloatMat x, float p, float a, float b)
+	public static void pow(FloatMat x, float p, float a, float b, float m)
 	{
-		gpu_pow(x.getThrustPointer(), x.size(), p, a, b);
+		gpu_pow(x.getThrustPointer(), x.size(), p, a, b, m);
 	}
-	public static void pow(FloatMat x,  FloatMat out, float p, float a, float b)
+	/**
+	 * m * (a * x + b) ^p
+	 */
+	public static void pow(FloatMat x,  FloatMat out, float p, float a, float b, float m)
 	{
-		gpu_pow(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b);
+		gpu_pow(x.getThrustPointer(), x.size(), out.getThrustPointer(), p, a, b, m);
 	}
-	public static void pow(FloatMat x, float p) {  pow(x, p, 1, 0); }
-	public static void pow(FloatMat x, FloatMat out, float p) {  pow(x, out, p, 1, 0); }
+	public static void pow(FloatMat x, float p) {  pow(x, p, 1, 0, 1); }
+	public static void pow(FloatMat x, FloatMat out, float p) {  pow(x, out, p, 1, 0, 1); }
 	
 	/**
-	 * (a * x + b)^2
+	 * m * (a * x + b)^2
 	 */
-	public static void square(FloatMat x, float a, float b)
+	public static void square(FloatMat x, float a, float b, float m)
 	{
-		gpu_square(x.getThrustPointer(), x.size(), a, b);
+		gpu_square(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void square(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * (a * x + b)^2
+	 */
+	public static void square(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_square(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_square(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void square(FloatMat x) {  square(x, 1, 0); }
-	public static void square(FloatMat x, FloatMat out) {  square(x, out, 1, 0); }
+	public static void square(FloatMat x) {  square(x, 1, 0, 1); }
+	public static void square(FloatMat x, FloatMat out) {  square(x, out, 1, 0, 1); }
 
 	/**
-	 * (a * x + b)^3
+	 * m * (a * x + b)^3
 	 */
-	public static void cube(FloatMat x, float a, float b)
+	public static void cube(FloatMat x, float a, float b, float m)
 	{
-		gpu_cube(x.getThrustPointer(), x.size(), a, b);
+		gpu_cube(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void cube(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * (a * x + b)^3
+	 */
+	public static void cube(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_cube(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_cube(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void cube(FloatMat x) {  cube(x, 1, 0); }
-	public static void cube(FloatMat x, FloatMat out) {  cube(x, out, 1, 0); }
+	public static void cube(FloatMat x) {  cube(x, 1, 0, 1); }
+	public static void cube(FloatMat x, FloatMat out) {  cube(x, out, 1, 0, 1); }
 	
 	/**
-	 * 1 / (a * x + b)
+	 * m * 1 / (a * x + b)
 	 */
-	public static void reciprocal(FloatMat x, float a, float b)
+	public static void reciprocal(FloatMat x, float a, float b, float m)
 	{
-		gpu_reciprocal(x.getThrustPointer(), x.size(), a, b);
+		gpu_reciprocal(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void reciprocal(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * 1 / (a * x + b)
+	 */
+	public static void reciprocal(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_reciprocal(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_reciprocal(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void reciprocal(FloatMat x) {  reciprocal(x, 1, 0); }
-	public static void reciprocal(FloatMat x, FloatMat out) {  reciprocal(x, out, 1, 0); }
+	public static void reciprocal(FloatMat x) {  reciprocal(x, 1, 0, 1); }
+	public static void reciprocal(FloatMat x, FloatMat out) {  reciprocal(x, out, 1, 0, 1); }
 	
 	/**
 	 * (a * x + b)
 	 */
 	public static void linear(FloatMat x, float a, float b)
 	{
-		gpu_(x.getThrustPointer(), x.size(), a, b);
+		gpu_linear(x.getThrustPointer(), x.size(), a, b);
 	}
+	/**
+	 * (a * x + b)
+	 */
 	public static void linear(FloatMat x,  FloatMat out, float a, float b)
 	{
-		gpu_(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_linear(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
 	}
 	
 	/**
-	 * |a * x + b|
+	 * m * |a * x + b|
 	 */
-	public static void abs(FloatMat x, float a, float b)
+	public static void abs(FloatMat x, float a, float b, float m)
 	{
-		gpu_fabs(x.getThrustPointer(), x.size(), a, b);
+		gpu_fabs(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void abs(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * |a * x + b|
+	 */
+	public static void abs(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_fabs(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_fabs(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void abs(FloatMat x) {  abs(x, 1, 0); }
-	public static void abs(FloatMat x, FloatMat out) {  abs(x, out, 1, 0); }
+	public static void abs(FloatMat x) {  abs(x, 1, 0, 1); }
+	public static void abs(FloatMat x, FloatMat out) {  abs(x, out, 1, 0, 1); }
 	
 	/**
-	 * Sigmoid(a * x + b)
+	 * m * Sigmoid(a * x + b)
 	 */
-	public static void sigmoid(FloatMat x, float a, float b)
+	public static void sigmoid(FloatMat x, float a, float b, float m)
 	{
-		gpu_sigmoid(x.getThrustPointer(), x.size(), a, b);
+		gpu_sigmoid(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void sigmoid(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * Sigmoid(a * x + b)
+	 */
+	public static void sigmoid(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_sigmoid(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sigmoid(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void sigmoid(FloatMat x) {  sigmoid(x, 1, 0); }
-	public static void sigmoid(FloatMat x, FloatMat out) {  sigmoid(x, out, 1, 0); }
+	public static void sigmoid(FloatMat x) {  sigmoid(x, 1, 0, 1); }
+	public static void sigmoid(FloatMat x, FloatMat out) {  sigmoid(x, out, 1, 0, 1); }
 	
 	/**
-	 * sigmoid_deriv(a * x + b):  x .* (1 - x)
+	 * m * sigmoid_deriv(a * x + b):  x .* (1 - x)
 	 */
-	public static void sigmoid_deriv(FloatMat x, float a, float b)
+	public static void sigmoid_deriv(FloatMat x, float a, float b, float m)
 	{
-		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), a, b);
+		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), a, b, m);
 	}
-	public static void sigmoid_deriv(FloatMat x,  FloatMat out, float a, float b)
+	/**
+	 * m * sigmoid_deriv(a * x + b):  x .* (1 - x)
+	 */
+	public static void sigmoid_deriv(FloatMat x,  FloatMat out, float a, float b, float m)
 	{
-		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b);
+		gpu_sigmoid_deriv(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
 	}
-	public static void sigmoid_deriv(FloatMat x) {  sigmoid_deriv(x, 1, 0); }
-	public static void sigmoid_deriv(FloatMat x, FloatMat out) {  sigmoid_deriv(x, out, 1, 0); }
+	public static void sigmoid_deriv(FloatMat x) {  sigmoid_deriv(x, 1, 0, 1); }
+	public static void sigmoid_deriv(FloatMat x, FloatMat out) {  sigmoid_deriv(x, out, 1, 0, 1); }
 	
 	/**
 	 * Generate standard Laplacian distribution from uniform i.i.d
 	 */
 	public static void laplacian(FloatMat x)
 	{
-		gpu_laplacian(x.getThrustPointer(), x.size(), 1, 0);
+		gpu_laplacian(x.getThrustPointer(), x.size(), 1, 0, 1);
 	}
 	public static void laplacian(FloatMat x, FloatMat out)
 	{
-		gpu_laplacian(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+		gpu_laplacian(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0, 1);
 	}
 	
 	/**
@@ -215,11 +254,11 @@ public class Thrust
 	 */
 	public static void cauchy(FloatMat x)
 	{
-		gpu_cauchy(x.getThrustPointer(), x.size(), 1, 0);
+		gpu_cauchy(x.getThrustPointer(), x.size(), 1, 0, 1);
 	}
 	public static void cauchy(FloatMat x, FloatMat out)
 	{
-		gpu_cauchy(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0);
+		gpu_cauchy(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0, 1);
 	}
 	
 	public static float sum(FloatMat x)

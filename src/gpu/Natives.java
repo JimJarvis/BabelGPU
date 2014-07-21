@@ -15,107 +15,107 @@ public class Natives
 	
 	// Exp and logs
 	/**
-	 * exp(a*x + b) in place, or with an output pointer
+	 * m * exp(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_exp(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_exp(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_exp(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_exp(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
 	/**
-	 * ln(a*x + b) in place, or with an output pointer
+	 * m * ln(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_log(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_log(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_log(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_log(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
 	/**
-	 * log10(a*x + b) in place, or with an output pointer
+	 * m * log10(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_log10(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_log10(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_log10(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_log10(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
 	/**
-	 * sqrt(a*x + b) in place, or with an output pointer
+	 * m * sqrt(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_sqrt(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_sqrt(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_sqrt(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_sqrt(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
 	/**
-	 * (a*x + b) ^p in place, or with an output pointer
+	 * m * (a*x + b) ^p in place, or with an output pointer
 	 */
-    public static native void gpu_pow(@ByVal FloatDevicePointer begin, int size, float p, float a, float b);
-    public static native void gpu_pow(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float p, float a, float b);
+    public static native void gpu_pow(@ByVal FloatDevicePointer begin, int size, float p, float a, float b, float m);
+    public static native void gpu_pow(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float p, float a, float b, float m);
     
     /**
-	 * (a*x + b)^2 in place, or with an output pointer
+	 * m * (a*x + b)^2 in place, or with an output pointer
      */
-    public static native void gpu_square(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_square(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_square(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_square(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
     /**
-	 * (a*x + b)^3 in place, or with an output pointer
+	 * m * (a*x + b)^3 in place, or with an output pointer
      */
-    public static native void gpu_cube(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_cube(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_cube(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_cube(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
     /**
-	 * 1/(a*x + b) in place, or with an output pointer
+	 * m * 1/(a*x + b) in place, or with an output pointer
      */
-    public static native void gpu_reciprocal(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_reciprocal(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_reciprocal(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_reciprocal(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
     // trigs
 	/**
-	 * sin(a*x + b) in place, or with an output pointer
+	 * m * sin(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_sin(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_sin(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_sin(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_sin(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
 	/**
-	 * cos(a*x + b) in place, or with an output pointer
+	 * m * cos(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_cos(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_cos(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_cos(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_cos(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
 	/**
-	 * tan(a*x + b) in place, or with an output pointer
+	 * m * tan(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_tan(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_tan(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_tan(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_tan(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
     /**
      * a * x + b linear transformation in place, or with an output pointer
      */
-    public static native void gpu_(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_linear(@ByVal FloatDevicePointer begin, int size, float a, float b);
+    public static native void gpu_linear(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
 
     /**
-	 * abs(a*x + b) in place, or with an output pointer
+	 * m * abs(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_fabs(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_fabs(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_fabs(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_fabs(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
     /**
-	 * sigmoid(a*x + b) in place, or with an output pointer
+	 * m * sigmoid(a*x + b) in place, or with an output pointer
 	 */
-    public static native void gpu_sigmoid(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_sigmoid(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_sigmoid(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_sigmoid(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
     /**
-	 * sigmoid_deriv(a*x + b) <=> x .* (1 - x) in place, or with an output pointer
+	 * m * sigmoid_deriv(a*x + b) <=> x .* (1 - x) in place, or with an output pointer
 	 */
-    public static native void gpu_sigmoid_deriv(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_sigmoid_deriv(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_sigmoid_deriv(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_sigmoid_deriv(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
     /**
      * Generate Laplacian distribution from a uniform rand i.i.d
      */
-    public static native void gpu_laplacian(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_laplacian(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_laplacian(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_laplacian(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
 
     /**
      * Generate Cauchy distribution from a uniform rand i.i.d
      */
-    public static native void gpu_cauchy(@ByVal FloatDevicePointer begin, int size, float a, float b);
-    public static native void gpu_cauchy(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b);
+    public static native void gpu_cauchy(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_cauchy(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
     // other
     public static native float gpu_max(@ByVal FloatDevicePointer begin, int size);

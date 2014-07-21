@@ -43,7 +43,6 @@ public class MiscTest
 		FloatMat c = new FloatMat(6, 1, false);
 		PP.p(GpuBlas.dotMult(a, b, c));
 		a = new FloatMat(A);
-		PP.p(a.sigmoid_deriv());
 		
 		PP.setSep("\n");
 		Thrust.set_last_row_one(b);
