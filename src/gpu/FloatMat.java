@@ -753,6 +753,30 @@ public class FloatMat
 		return Thrust.product(this);
 	}
 	
+	/**
+	 * NOTE: doesn't mutate data
+	 */
+	public float abs_sum()
+	{
+		return Thrust.abs_sum(this);
+	}
+
+	/**
+	 * NOTE: doesn't mutate data
+	 */
+	public float square_sum()
+	{
+		return Thrust.square_sum(this);
+	}
+
+	/**
+	 * NOTE: doesn't mutate data
+	 */
+	public float log_sum()
+	{
+		return Thrust.log_sum(this);
+	}
+	
 	public FloatMat sort()
 	{
 		Thrust.sort(this);	return this;

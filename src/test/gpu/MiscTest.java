@@ -19,7 +19,6 @@ public class MiscTest
 		GpuUtil.synchronize();
 		t.readFromLast();
 		
-		System.exit(0);
 		float A[] = new float[] {1, 2, 3, 4, 5, 6};
 		float B[][] = new float[][] {{1, 10, 6},
 												{2, 20, -2},
@@ -29,6 +28,12 @@ public class MiscTest
 		FloatMat b = new FloatMat(B.clone());
 		FloatMat m = b.clone();
 		FloatMat a = new FloatMat(A.clone());
+		PP.p(Thrust.square_sum(a));
+		PP.p(Thrust.square_sum(b));
+		PP.p(Thrust.abs_sum(a));
+		PP.p(Thrust.abs_sum(b));
+		
+		System.exit(0);
 		
 		PP.p(GpuBlas.dotMult(a, b));
 		PP.p(b.reciprocal());

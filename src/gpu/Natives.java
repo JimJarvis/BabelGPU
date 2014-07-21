@@ -126,6 +126,10 @@ public class Natives
     
     // Sum of log(x)
     public static native float gpu_log_sum(@ByVal FloatDevicePointer begin, int size);
+    // Sum of x^2
+    public static native float gpu_square_sum(@ByVal FloatDevicePointer begin, int size);
+    // Sum of |x|
+    public static native float gpu_abs_sum(@ByVal FloatDevicePointer begin, int size);
     
     /**
      * Element-wise multiplication

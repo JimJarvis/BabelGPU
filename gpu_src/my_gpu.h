@@ -383,6 +383,7 @@ namespace MyGpu
 		return sumLogProb;
 	}
 
+	///////***** transform_reduce: op + sum *****///////
 	// Sum of log of correct label probability
 	// input: a float array computed by softmax()
 	template <typename T>
@@ -390,6 +391,20 @@ namespace MyGpu
 	{
 		return thrust::transform_reduce(begin, begin + size,
 										functor_log<T>(), 0.0, thrust::plus<T>());
+	}
+
+	template <typename T>
+	inline T gpu_square_sum(device_ptr<T> begin, int size)
+	{
+		return thrust::transform_reduce(begin, begin + size,
+										functor_square<T>(), 0.0, thrust::plus<T>());
+	}
+
+	template <typename T>
+	inline T gpu_abs_sum(device_ptr<T> begin, int size)
+	{
+		return thrust::transform_reduce(begin, begin + size,
+										functor_fabs<T>(), 0.0, thrust::plus<T>());
 	}
 
 	// softmax(alpha_vec) - I [y==j]

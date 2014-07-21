@@ -242,12 +242,19 @@ public class Thrust
 		return gpu_min(x.getThrustPointer(), x.size());
 	}
 	  
-    /**
-     * @return sum of log(x)
-     */
     public static float log_sum(FloatMat x)
     {
     	return Natives.gpu_log_sum(x.getThrustPointer(), x.size());
+    }
+
+    public static float square_sum(FloatMat x)
+    {
+    	return Natives.gpu_square_sum(x.getThrustPointer(), x.size());
+    }
+
+    public static float abs_sum(FloatMat x)
+    {
+    	return Natives.gpu_abs_sum(x.getThrustPointer(), x.size());
     }
 	
 	/**
