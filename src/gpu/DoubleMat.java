@@ -11,8 +11,9 @@ import static jcuda.runtime.JCuda.*;
 import static jcuda.jcublas.cublasOperation.*;
 
 /**
- * Struct around a matrix with row/col dimension info
- * HostMode: either hostArray or hostBuffer. hostArray has priority.
+ * @deprecated
+ * Will be reconstructed from FloatMat later. 
+ * Only a placeholder now for GpuBlas. 
  */
 public class DoubleMat
 {
@@ -451,132 +452,5 @@ public class DoubleMat
 			thrustPtr = new DoubleDevicePointer(this.device);
 		}
 		return thrustPtr;
-	}
-	
-	/**
-	 * exp(a * x + b)
-	 */
-	public DoubleMat exp(double a, double b)
-	{
-		Thrust.exp(this, a, b); return this;
-	}
-	public DoubleMat exp()
-	{
-		Thrust.exp(this); return this;
-	}
-	
-	/**
-	 * log(a * x + b)
-	 */
-	public DoubleMat log(double a, double b)
-	{
-		Thrust.log(this, a, b); return this;
-	}
-	public DoubleMat log()
-	{
-		Thrust.log(this); return this;
-	}
-	
-	/**
-	 * cos(a * x + b)
-	 */
-	public DoubleMat cos(double a, double b)
-	{
-		Thrust.cos(this, a, b); return this;
-	}
-	public DoubleMat cos()
-	{
-		Thrust.cos(this); return this;
-	}
-	
-	/**
-	 * sin(a * x + b)
-	 */
-	public DoubleMat sin(double a, double b)
-	{
-		Thrust.sin(this, a, b); return this;
-	}
-	public DoubleMat sin()
-	{
-		Thrust.sin(this); return this;
-	}
-	
-	/**
-	 * sqrt(a * x + b)
-	 */
-	public DoubleMat sqrt(double a, double b)
-	{
-		Thrust.sqrt(this, a, b); return this;
-	}
-	public DoubleMat sqrt()
-	{
-		Thrust.sqrt(this); return this;
-	}
-	
-	/**
-	 * abs(a * x + b)
-	 */
-	public DoubleMat abs(double a, double b)
-	{
-		Thrust.abs(this, a, b); return this;
-	}
-	public DoubleMat abs()
-	{
-		Thrust.abs(this); return this;
-	}
-	
-	/**
-	 * (a * x + b) ^p
-	 */
-	public DoubleMat pow(double p, double a, double b)
-	{
-		Thrust.pow(this, p, a, b); return this;
-	}
-	public DoubleMat pow(double p)
-	{
-		Thrust.pow(this, p); return this;
-	}
-	
-	/**
-	 * (a * x + b)
-	 */
-	public DoubleMat linear(double a, double b)
-	{
-		Thrust.linear(this, a, b); return this;
-	}
-	
-	public double max()
-	{
-		return Thrust.max(this);
-	}
-
-	public double min()
-	{
-		return Thrust.min(this);
-	}
-
-	public double sum()
-	{
-		return Thrust.sum(this);
-	}
-
-	public double product()
-	{
-		return Thrust.product(this);
-	}
-	
-	public DoubleMat sort()
-	{
-		Thrust.sort(this);	return this;
-	}
-	
-	public DoubleMat fill(double val)
-	{
-		Thrust.fill(this, val);	return this;
-	}
-	
-	public DoubleMat copyFrom(DoubleMat other)
-	{
-		Thrust.copy(other, this);	return this;
 	}
 }
