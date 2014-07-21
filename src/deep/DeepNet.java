@@ -1,10 +1,9 @@
 package deep;
 
 import gpu.*;
-
 import java.util.*;
-
-import utils.PP;
+import utils.*;
+import utils.MiscUtil.ManagedIterator;
 import deep.units.*;
 
 public class DeepNet implements Iterable<ComputeUnit>
@@ -81,19 +80,12 @@ public class DeepNet implements Iterable<ComputeUnit>
 			@Override
 			public Iterator<Integer> iterator()
 			{
-				return new Iterator<Integer>()
+				return new ManagedIterator<Integer>()
 				{
 					LearningPlan plan = DeepNet.this.learningPlan;
-					boolean first = true;
 					@Override
-					public boolean hasNext()
+					public boolean hasNext_()
 					{
-						if (!first)
-						{
-							DeepNet.this.prepareNextEpoch();
-							++ plan.curEpoch;
-						}
-						first = false;
 						return plan.curEpoch < plan.totalEpochs;
 					}
 					@Override
@@ -102,7 +94,11 @@ public class DeepNet implements Iterable<ComputeUnit>
 						return plan.curEpoch;
 					}
 					@Override
-					public void remove() {}
+					public void trailer()
+					{
+						DeepNet.this.prepareNextEpoch();
+						++ plan.curEpoch;
+					}
 				};
 			}
 		};

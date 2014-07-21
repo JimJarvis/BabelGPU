@@ -3,6 +3,9 @@ package utils;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+
+import deep.DeepException;
 
 /**
  * Miscellaneous util methods. 
@@ -84,5 +87,44 @@ public class MiscUtil
 	public static int toIndex(int row, Coord c)
 	{
 		return c.j * row + c.i;
+	}
+	
+	/**
+	 * while (iter.hasNext_) { 
+	 * 		iter.next();
+	 * 		// for-each loop logic
+	 * 		iter.trailer() // called at the end of the loop
+	 * }
+	 */
+	public static abstract class ManagedIterator<T> implements Iterator<T>
+	{
+		private boolean first = true;
+		
+		public final boolean hasNext()
+		{
+			if (!first)
+				trailer();
+			first = false;
+			return hasNext_();
+		}
+		
+		public abstract boolean hasNext_();
+		
+		/**
+		 * For-each loop do at first of each loop
+		 */
+		public abstract T next();
+
+		/**
+		 * For-each loop do at last of each loop
+		 */
+		public abstract void trailer();
+
+		@Override
+		public final void remove()
+		{
+			throw new UnsupportedOperationException(
+					"ManagedIterator doesn't support remove()");
+		}
 	}
 }
