@@ -177,7 +177,7 @@ public class DeepNet implements Iterable<ComputeUnit>
 		for (ParamUnit w : this.getParams())
 			w.reInit();
 		learningPlan.reset();
-		inlet.prepareNextEpoch();
+		inlet.reset();
 		this.clearLoss();
 	}
 	

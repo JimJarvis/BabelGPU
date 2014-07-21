@@ -89,4 +89,12 @@ public abstract class InletUnit extends DataUnit
 	 * Reset the inlet stream to prepare for the next epoch from start
 	 */
 	public abstract void prepareNextEpoch();
+	
+	/**
+	 * Overridable, defaults to {@link #prepareNextEpoch()}
+	 */
+	public void reset()
+	{
+		this.prepareNextEpoch();
+	}
 }
