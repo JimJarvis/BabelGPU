@@ -27,7 +27,7 @@ public abstract class RegScheme extends LearningPlan.Scheme
 	 * @return regularization loss
 	 * @see #regularize(LearningPlan)
 	 */
-	protected abstract float regularize_(LearningPlan plan, ArrayList<ParamUnit> paramList);
+	protected abstract float regularize_(LearningPlan plan, ParamList paramList);
 	
 	/**
 	 * @return Preset scheme: L-2 regularizer
@@ -37,7 +37,7 @@ public abstract class RegScheme extends LearningPlan.Scheme
 		return new RegScheme()
 		{
 			@Override
-			protected float regularize_(LearningPlan plan, ArrayList<ParamUnit> paramList)
+			protected float regularize_(LearningPlan plan, ParamList paramList)
 			{
 				// L2 regularizer
 				float loss = 0;
