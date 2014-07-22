@@ -4,6 +4,8 @@ import gpu.*;
 
 public class SparseCrossEntropyTUnit extends TerminalUnit
 {
+	private static final long serialVersionUID = 1L;
+
 	public SparseCrossEntropyTUnit(String name, InletUnit inlet, boolean hasBias)
 	{
 		super(name, inlet, hasBias);

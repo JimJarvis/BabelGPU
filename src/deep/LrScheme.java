@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public abstract class LrScheme extends LearningPlan.Scheme
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Public main interface
 	 */
@@ -43,6 +45,7 @@ public abstract class LrScheme extends LearningPlan.Scheme
 	public static LrScheme dummyScheme()
 	{
 		return new LrScheme() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public float updateEpoch_(LearningPlan plan)
 			{ return this.defaultLr(); }
@@ -58,6 +61,7 @@ public abstract class LrScheme extends LearningPlan.Scheme
 	public static LrScheme constantDecayScheme()
 	{
 		return new LrScheme() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public float updateEpoch_(LearningPlan plan)
 			{
@@ -83,6 +87,8 @@ public abstract class LrScheme extends LearningPlan.Scheme
 	public static LrScheme epochDecayScheme(final float improvementTol, final float decayRate)
 	{
 		return new LrScheme() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public float updateEpoch_(LearningPlan plan)
 			{

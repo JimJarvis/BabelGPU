@@ -4,6 +4,7 @@ import deep.*;
 
 public abstract class ParamComputeUnit extends ComputeUnit
 {
+	private static final long serialVersionUID = 1L;
 	public Initializer initer = Initializer.dummyIniter;
 	public ParamUnit W;
 	

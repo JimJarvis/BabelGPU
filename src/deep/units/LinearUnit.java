@@ -1,14 +1,13 @@
 package deep.units;
 
-import utils.PP;
-import deep.DeepException;
-import deep.Initializer;
-import deep.RegScheme;
+import deep.*;
 import deep.RegScheme.L2RegScheme;
 import gpu.GpuBlas;
 
 public class LinearUnit extends ParamComputeUnit
 {
+	private static final long serialVersionUID = 1L;
+
 	public LinearUnit(String name, InletUnit inlet, int outDim, boolean hasBias, Initializer initer)
 	{
 		super(name, inlet, outDim, hasBias, initer);

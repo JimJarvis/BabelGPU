@@ -1,14 +1,15 @@
 package deep;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-import utils.CpuUtil;
-import utils.MiscUtil;
+import utils.*;
 import gpu.*;
 import deep.units.ParamUnit;
 
-public abstract class Initializer
+public abstract class Initializer implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private boolean hasBias = true;
 	
 	/**
@@ -43,7 +44,8 @@ public abstract class Initializer
 	 */
 	public static final Initializer dummyIniter = 
 			new Initializer() {
-        		@Override
+        		private static final long serialVersionUID = 1L;
+				@Override
         		public void init(FloatMat w) { }
         	};
 	
@@ -62,6 +64,7 @@ public abstract class Initializer
 	{
 		final float range = high - low;
 		return new Initializer() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void init(FloatMat w)
 			{
@@ -86,6 +89,7 @@ public abstract class Initializer
 	public static Initializer fillIniter(final float val)
 	{
 		return new Initializer() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void init(FloatMat w)
 			{
@@ -102,6 +106,7 @@ public abstract class Initializer
 	public static Initializer gaussianIniter(final float scalor)
 	{
 		return new Initializer() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void init(FloatMat w)
 			{
@@ -117,6 +122,7 @@ public abstract class Initializer
 	public static Initializer laplacianIniter(final float scalor)
 	{
 		return new Initializer() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void init(FloatMat w)
 			{
@@ -132,6 +138,7 @@ public abstract class Initializer
 	public static Initializer cauchyIniter(final float scalor)
 	{
 		return new Initializer() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void init(FloatMat w)
 			{
@@ -150,6 +157,7 @@ public abstract class Initializer
 	private static Initializer projKernelAggregIniter(final Initializer distrIniter)
 	{
 		Initializer origIniter = new Initializer() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void init(FloatMat w)
 			{
@@ -250,6 +258,8 @@ public abstract class Initializer
 		for (double d : relativeRatios)	relativeRatios[i++] = d / sum;
 		
 		Initializer mixOrigIniter = new Initializer() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void init(FloatMat w)
 			{

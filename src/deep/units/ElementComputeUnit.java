@@ -8,6 +8,7 @@ import gpu.GpuBlas;
  */
 public abstract class ElementComputeUnit extends ComputeUnit
 {
+	private static final long serialVersionUID = 1L;
 	protected float scalor = 1;
 	
 	/**

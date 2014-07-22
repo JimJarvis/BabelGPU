@@ -1,11 +1,7 @@
 package deep;
 
-import gpu.FloatMat;
-
 import java.util.ArrayList;
-
-import utils.CpuUtil;
-import utils.MiscUtil;
+import utils.*;
 import deep.units.*;
 
 /**

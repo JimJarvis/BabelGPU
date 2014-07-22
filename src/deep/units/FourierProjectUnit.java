@@ -10,6 +10,7 @@ import deep.Initializer;
  */
 public class FourierProjectUnit extends ComputeUnit
 {
+	private static final long serialVersionUID = 1L;
 	// This is NOT a learned parameter: it's a fixed random projection matrix
 	private ParamUnit projector;
 	private Initializer projIniter; // projection

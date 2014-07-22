@@ -5,7 +5,8 @@ import gpu.FloatMat;
 
 public class DataUnit extends Unit
 {
-    protected FloatMat data;
+    private static final long serialVersionUID = 1L;
+	protected FloatMat data;
     protected FloatMat gradient;
     protected ComputeUnit parent;
     

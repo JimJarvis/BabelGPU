@@ -8,6 +8,8 @@ import gpu.Thrust;
  */
 public class SumTUnit extends TerminalUnit
 {
+	private static final long serialVersionUID = 1L;
+
 	public SumTUnit(String name, InletUnit inlet, boolean hasBias)
 	{
 		super(name, inlet, hasBias);

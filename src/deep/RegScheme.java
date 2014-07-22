@@ -1,20 +1,14 @@
 package deep;
 
-import gpu.FloatMat;
-import gpu.GpuBlas;
-import gpu.Thrust;
-
-import java.util.ArrayList;
-
-import utils.PP;
-import deep.units.ParamComputeUnit;
-import deep.units.ParamUnit;
+import gpu.*;
+import deep.units.*;
 
 /**
  * Regularization scheme
  */
 public abstract class RegScheme extends LearningPlan.Scheme
 {
+	private static final long serialVersionUID = 1L;
 	/**
 	 * Main interface to outside
 	 */
@@ -51,6 +45,7 @@ public abstract class RegScheme extends LearningPlan.Scheme
 	 */
 	public static class L2RegScheme extends RegScheme
 	{
+		private static final long serialVersionUID = 1L;
 		@Override
 		protected float regLoss_(LearningPlan plan, ParamList paramList)
 		{

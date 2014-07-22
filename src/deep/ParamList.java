@@ -6,6 +6,8 @@ import deep.units.*;
 
 public class ParamList extends ArrayList<ParamUnit>
 {
+	private static final long serialVersionUID = 1L;
+
 	public ParamList()
 	{
 		super();

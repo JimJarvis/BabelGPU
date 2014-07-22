@@ -1,14 +1,10 @@
 package deep.units;
 
-import gpu.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
 import deep.DeepException;
 
 public abstract class TerminalUnit extends ComputeUnit
 {
+	private static final long serialVersionUID = 1L;
 	/**
 	 * Pure loss function
 	 */

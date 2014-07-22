@@ -5,6 +5,8 @@ import gpu.FloatMat;
 
 public class ParamUnit extends DataUnit
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Unless in debug mode, we don't explicitly store the parameter gradient
 	 * Instantiate a new FloatMat with (row, col)

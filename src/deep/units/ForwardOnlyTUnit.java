@@ -8,6 +8,8 @@ import deep.DeepException;
  */
 public class ForwardOnlyTUnit extends TerminalUnit
 {
+	private static final long serialVersionUID = 1L;
+
 	public ForwardOnlyTUnit(String name, InletUnit inlet)
 	{
 		super(name, inlet);

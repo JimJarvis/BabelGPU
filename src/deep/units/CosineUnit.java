@@ -4,6 +4,8 @@ import gpu.*;
 
 public class CosineUnit extends ElementComputeUnit
 {
+	private static final long serialVersionUID = 1L;
+
 	public CosineUnit(String name, InletUnit inlet, boolean hasBias, float scalor)
 	{
 		super(name, inlet, hasBias, scalor);

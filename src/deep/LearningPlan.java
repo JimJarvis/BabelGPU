@@ -1,13 +1,14 @@
 package deep;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import utils.CpuUtil;
-import utils.PP;
+import utils.*;
 
-public class LearningPlan
+public class LearningPlan implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	/*
 	 * Permanent section
 	 */
@@ -137,8 +138,9 @@ public class LearningPlan
 	 * A scheme (learning rate scheme, regularization scheme) 
 	 * should be linked to a LearningPlan
 	 */
-	static abstract class Scheme
+	static abstract class Scheme implements Serializable
 	{
+		private static final long serialVersionUID = 1L;
 		protected LearningPlan plan;
 		public void linkPlan(LearningPlan plan)
 		{

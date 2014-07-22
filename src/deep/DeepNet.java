@@ -1,13 +1,17 @@
 package deep;
 
 import gpu.*;
+
+import java.io.Serializable;
 import java.util.*;
+
 import utils.*;
 import utils.MiscUtil.ManagedIterator;
 import deep.units.*;
 
-public class DeepNet implements Iterable<ComputeUnit>
+public class DeepNet implements Iterable<ComputeUnit>, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	public String name;
 	public ComputeUnit head;
 	public InletUnit inlet;
