@@ -60,7 +60,7 @@ public class LinearUnit extends ParamComputeUnit
     		if (debug)
     		{
     			GpuBlas.mult(output.gradient(), input.data().transpose(), W.gradient());
-    			GpuBlas.scaleAdd(W.data(), W.gradient(), getPlan().reg);
+    			getPlan().regScheme.regGradUpdate(this);
     			if (hasBias) W.gradient().fillLastRow0();
     		}
 
@@ -74,7 +74,7 @@ public class LinearUnit extends ParamComputeUnit
                     				- lr, 1 - lr * getPlan().reg);
     		else
     		{
-    			getPlan().regScheme.regGradUpdate(this);
+    			getPlan().regScheme.regParamUpdate(this);
         		GpuBlas.mult(output.gradient(), input.data().transpose(), W.data(), -lr, 1);
     		}
     		if (hasBias)

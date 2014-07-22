@@ -22,10 +22,20 @@ public abstract class RegScheme extends LearningPlan.Scheme
 	/**
 	 * Use it inside {@link ParamComputeUnit#backward()}
 	 */
+	public final void regParamUpdate(ParamComputeUnit pcUnit)
+	{
+		if (plan.hasReg())
+    		regParamUpdate_(plan, pcUnit.W.data());
+	}
+	
+	/**
+	 * Mostly debug mode only, because W doesn't calculate grad explicitly
+	 * Use it inside {@link ParamComputeUnit#backward()}
+	 */
 	public final void regGradUpdate(ParamComputeUnit pcUnit)
 	{
 		if (plan.hasReg())
-    		regGradUpdate_(plan, pcUnit.W);
+    		regGradUpdate_(plan, pcUnit.W.data(), pcUnit.W.gradient());
 	}
 	
 	/**
@@ -34,9 +44,18 @@ public abstract class RegScheme extends LearningPlan.Scheme
 	protected abstract float regLoss_(LearningPlan plan, ParamList paramList);
 	
 	/**
-	 * Regularize parameter gradient. Update the reg term. W += -lr * reg * W 
+	 * Add regularization to the parameter. W += -lr * reg * W 
+	 * @param data = W.data()
 	 */
-	protected abstract void regGradUpdate_(LearningPlan plan, ParamUnit W);
+	protected abstract void regParamUpdate_(LearningPlan plan, FloatMat data);
+	
+	/**
+	 * Mainly in debug mode, because otherwise W won't explicitly calculate gradient. 
+	 * Update the regularized gradient
+	 * @param data = W.data()
+	 * @param grad = W.gradient()
+	 */
+	protected abstract void regGradUpdate_(LearningPlan plan, FloatMat data, FloatMat grad);
 	
 	/**
 	 * Preset scheme: L-2 square-sum regularizer
@@ -56,9 +75,16 @@ public abstract class RegScheme extends LearningPlan.Scheme
 		}
 
 		@Override
-		public void regGradUpdate_(LearningPlan plan, ParamUnit W)
+		public void regParamUpdate_(LearningPlan plan, FloatMat data)
 		{
-			GpuBlas.scale(W.data(), 1 - plan.lr * plan.reg);
+			GpuBlas.scale(data, 1 - plan.lr * plan.reg);
+		}
+
+		@Override
+		protected void regGradUpdate_(LearningPlan plan, FloatMat data,
+				FloatMat grad)
+		{
+			GpuBlas.scaleAdd(data, grad, plan.reg);
 		}
 	}
 	/**
