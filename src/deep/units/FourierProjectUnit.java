@@ -36,12 +36,15 @@ public class FourierProjectUnit extends ComputeUnit
 			
 		super.setup();
 		// Leave the 'parent' ParamComputeUnit null
-		projector = new ParamUnit(
-				"Param[projector]#" + this.name, 
-				outDim, 
-				input.dim());
-		projector.setNoGradient();
-		reInitProjector();
+		if (projector == null)
+		{
+    		projector = new ParamUnit(
+    				"Param[projector]#" + this.name, 
+    				outDim, 
+    				input.dim());
+    		projector.setNoGradient();
+    		reInitProjector();
+		}
 	}
 	
 	/**

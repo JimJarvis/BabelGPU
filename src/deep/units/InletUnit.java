@@ -1,16 +1,14 @@
 package deep.units;
 
 import com.googlecode.javacpp.IntPointer;
-
-import deep.DeepException;
-import deep.DeepNet;
+import deep.*;
 import gpu.FloatMat;
 
 public abstract class InletUnit extends DataUnit
 {
 	private static final long serialVersionUID = 1L;
-	public FloatMat goldMat;
-	public IntPointer goldLabels;
+	public transient FloatMat goldMat;
+	public transient IntPointer goldLabels;
 	public final int MaxBatchSize;
 	/**
 	 * Critical field: needed across all ComputeUnits in the entire net

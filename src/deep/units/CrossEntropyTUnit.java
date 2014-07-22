@@ -18,7 +18,7 @@ public class CrossEntropyTUnit extends TerminalUnit
 		super(name, inlet);
 	}
 
-	private FloatMat tmp_softmax = null;
+	private transient FloatMat tmp_softmax = null;
 	
 	@Override
 	protected float forward_terminal(boolean doesCalcLoss)

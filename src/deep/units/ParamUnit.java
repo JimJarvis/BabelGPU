@@ -1,5 +1,10 @@
 package deep.units;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import utils.FileUtil;
 import deep.*;
 import gpu.FloatMat;
 
@@ -68,5 +73,31 @@ public class ParamUnit extends DataUnit
 		if (parent == null)
 			throw new DeepException("Cannot reinitialize this parameter: parent null");
 		((ParamComputeUnit) parent).reInit();
+	}
+	
+	/* ***********************
+	 * Customized serialization: we only save 'data' field
+	 */
+	/**
+	 * 'data' field stored to disk by serialization
+	 */
+	public String getDataFilePath()
+	{
+		return FileUtil.join(this.parent.learningPlan.dir, name + ".float");
+	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		out.writeObject(data.saveable(getDataFilePath()));
+	}
+	
+	/**
+	 * Must have EXACTLY the same signature for JVM to serialize
+	 */
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		this.data = new FloatMat((FloatMat.Saveable) in.readObject());
 	}
 }

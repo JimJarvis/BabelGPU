@@ -18,7 +18,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	public TerminalUnit terminal;
 	public LearningPlan learningPlan;
 	
-	private boolean setup = false; // should only setup once
+	private transient boolean setup = false; // should only setup once
 	private boolean debug = false; // the whole net is in debug mode
 
 	// Parameter list in forward order: for updating regularization term

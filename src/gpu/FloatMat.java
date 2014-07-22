@@ -1,5 +1,9 @@
 package gpu;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.FloatBuffer;
 
 import gpu.NativeStruct.FloatDevicePointer;
@@ -58,19 +62,19 @@ public class FloatMat
 	}
 	
 	/**
-	 * Ctor from 2D host array
-	 */
-	public FloatMat(float[][] host)
-	{
-		this(flatten(host), host.length, host[0].length);
-	}
-	
-	/**
 	 * Ctor for 1D vector-array (column vector)
 	 */
 	public FloatMat(float[] host)
 	{
 		this(host, host.length, 1);
+	}
+
+	/**
+	 * Ctor from 2D host array
+	 */
+	public FloatMat(float[][] host)
+	{
+		this(flatten(host), host.length, host[0].length);
 	}
 	
 	/**
@@ -138,6 +142,14 @@ public class FloatMat
 	}
 	
 	/**
+	 * Construct from a Saveable loaded from disk via deserialization
+	 */
+	public FloatMat(Saveable saved)
+	{
+		this(saved.hostArray, saved.row, saved.col);
+	}
+	
+	/**
 	 * Useful in places where row/col info needs to be retrieved first, 
 	 * while the FloatMat itself can be instantiated later.
 	 * @return a dummy FloatMat with no host/device data, only dim info
@@ -155,6 +167,51 @@ public class FloatMat
 		this.row = row;
 		this.col = col;
 		this.ldim = row;
+	}
+	
+	/**
+	 * Serializable interface. Enable us to store to disk. 
+	 * We take pains to save float[] separately, because we can always deserialize 
+	 * a float[] even when class version changes. 
+	 */
+	public static class Saveable implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+		public int row;
+		public int col;
+		public String fileName;
+		public transient float[] hostArray;
+		/**
+		 * @param filePath stores float[] only
+		 */
+		public Saveable(FloatMat mat, String filePath)
+		{
+			this.row = mat.row;
+			this.col = mat.col;
+			this.hostArray = mat.toHostArray(true);
+			this.fileName = filePath;
+		}
+		
+		private void writeObject(ObjectOutputStream out) throws IOException
+		{
+			out.defaultWriteObject();
+			FileUtil.dump(hostArray, fileName);
+		}
+		
+		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			in.defaultReadObject();
+			this.hostArray = FileUtil.<float[]>load(fileName);
+		}
+	}
+	
+	/**
+	 * @param filePath a separate file that stores float[] ONLY
+	 * @return Savable to store to disk via serialization
+	 */
+	public Saveable saveable(String filePath)
+	{
+		return new Saveable(this, filePath);
 	}
 	
 	/**
