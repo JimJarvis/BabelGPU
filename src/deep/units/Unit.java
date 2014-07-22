@@ -1,6 +1,8 @@
 package deep.units;
 
 import java.io.Serializable;
+
+import deep.LearningPlan;
 public abstract class Unit implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -17,4 +19,6 @@ public abstract class Unit implements Serializable
 	{
 		this.debug = debug;
 	}
+	
+	public abstract LearningPlan getPlan();
 }

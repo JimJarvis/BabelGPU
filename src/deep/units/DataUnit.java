@@ -95,11 +95,12 @@ public class DataUnit extends Unit
 	/**
 	 * @return learning plan from parent
 	 */
+	@Override
 	public LearningPlan getPlan()
 	{
 		if (parent == null)
 			throw new DeepException("No ParentComputeUnit associated");
-		return parent.learningPlan;
+		return parent.getPlan();
 	}
 	
 	// Debug only

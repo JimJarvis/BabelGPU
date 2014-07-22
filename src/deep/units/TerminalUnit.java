@@ -45,7 +45,7 @@ public abstract class TerminalUnit extends ComputeUnit
 		inlet.nextGold();
 		
 		// Update regularization loss
-		this.lossReg += learningPlan.regScheme.regLoss();
+		this.lossReg += getPlan().regScheme.regLoss();
 		
 		if (hasBias)
 			input.data().fillLastRow0();
@@ -75,7 +75,7 @@ public abstract class TerminalUnit extends ComputeUnit
 	{
 		if (!doesCalcLoss)
 			throw new DeepException("Loss is not being calculated");
-		return this.lossPure / learningPlan.doneSampleSize;
+		return this.lossPure / getPlan().doneSampleSize;
 	}
 	
 	/**

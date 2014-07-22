@@ -9,7 +9,8 @@ public abstract class ComputeUnit extends Unit
 	public ComputeUnit next;
 	public ComputeUnit prev;
 	public InletUnit inlet;
-	public LearningPlan learningPlan;
+	
+	protected LearningPlan learningPlan;
 
 	protected int outDim;
 	// Do we include bias units?
@@ -90,9 +91,15 @@ public abstract class ComputeUnit extends Unit
 	/**
 	 * Do this BEFORE setup
 	 */
-	public void setLearningPlan(LearningPlan learningPlan)
+	public void setPlan(LearningPlan learningPlan)
 	{
 		this.learningPlan = learningPlan;
+	}
+	
+	@Override
+	public LearningPlan getPlan()
+	{
+		return this.learningPlan;
 	}
 	
 	/**

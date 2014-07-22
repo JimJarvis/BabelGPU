@@ -191,7 +191,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	{
 		if (!setup)
 		{
-			setLearningPlan(learningPlan);
+			setPlan(learningPlan);
 
 			for (ComputeUnit unit : this)
     			unit.setup();
@@ -215,12 +215,12 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	 * Must be called after setup()
 	 * @param learningPlan applies to all ComputeUnits and DataUnits
 	 */
-	public void setLearningPlan(LearningPlan learningPlan)
+	public void setPlan(LearningPlan learningPlan)
 	{
 		this.learningPlan = learningPlan;
 		this.learningPlan.net = this;
 		for (ComputeUnit unit : this)
-			unit.setLearningPlan(learningPlan);
+			unit.setPlan(learningPlan);
 	}
 
 	/**

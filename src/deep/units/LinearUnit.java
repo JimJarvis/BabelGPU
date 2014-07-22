@@ -60,21 +60,21 @@ public class LinearUnit extends ParamComputeUnit
     		if (debug)
     		{
     			GpuBlas.mult(output.gradient(), input.data().transpose(), W.gradient());
-    			GpuBlas.scaleAdd(W.data(), W.gradient(), learningPlan.reg);
+    			GpuBlas.scaleAdd(W.data(), W.gradient(), getPlan().reg);
     			if (hasBias) W.gradient().fillLastRow0();
     		}
 
     		// update W with reg
-    		float lr = learningPlan.lr;
+    		float lr = getPlan().lr;
     		
     		// Optimization specific to L2 regularizer
     		// division by batchSize should be done in the terminal unit
-    		if (learningPlan.regScheme instanceof L2RegScheme)
+    		if (getPlan().regScheme instanceof L2RegScheme)
         		GpuBlas.mult(output.gradient(), input.data().transpose(), W.data(), 
-                    				- lr, 1 - lr * learningPlan.reg);
+                    				- lr, 1 - lr * getPlan().reg);
     		else
     		{
-    			learningPlan.regScheme.regGradUpdate(this);
+    			getPlan().regScheme.regGradUpdate(this);
         		GpuBlas.mult(output.gradient(), input.data().transpose(), W.data(), -lr, 1);
     		}
     		if (hasBias)
