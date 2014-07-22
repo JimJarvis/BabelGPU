@@ -18,8 +18,8 @@ public class LearningPlan
 	public float reg; // Regularization
 	public int totalSampleSize;
 	public int totalEpochs;
-	public LrScheme lrScheme;
-	public RegScheme regScheme;
+	public LrScheme lrScheme; // default no LR decay
+	public RegScheme regScheme; // default L2-regularization
 	
 	/*
 	 * Varying section
@@ -45,7 +45,7 @@ public class LearningPlan
 
 		// Default schemes
 		this.setLrScheme(LrScheme.dummyScheme());
-		this.setRegScheme(RegScheme.squareSumScheme());
+		this.setRegScheme(RegScheme.l2Scheme());
 	}
 	
 	/**
@@ -57,6 +57,7 @@ public class LearningPlan
 	{
 		this.dir = other.dir;
 		this.lrStart = other.lrStart;
+		this.lr = lrStart;
 		this.reg = other.reg;
 		this.totalSampleSize = other.totalSampleSize;
 		this.totalEpochs = other.totalEpochs;

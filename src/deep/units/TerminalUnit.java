@@ -49,7 +49,7 @@ public abstract class TerminalUnit extends ComputeUnit
 		inlet.nextGold();
 		
 		// Update regularization loss
-		this.lossReg += learningPlan.regScheme.regularize();
+		this.lossReg += learningPlan.regScheme.regLoss();
 		
 		if (hasBias)
 			input.data().fillLastRow0();

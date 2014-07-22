@@ -1,11 +1,13 @@
 package deep;
 
 import gpu.FloatMat;
+import gpu.GpuBlas;
 import gpu.Thrust;
 
 import java.util.ArrayList;
 
 import utils.PP;
+import deep.units.ParamComputeUnit;
 import deep.units.ParamUnit;
 
 /**
@@ -16,35 +18,59 @@ public abstract class RegScheme extends LearningPlan.Scheme
 	/**
 	 * Main interface to outside
 	 */
-	public final float regularize()
+	public final float regLoss()
 	{
 		DeepNet net = plan.net;
 		return net.doesCalcLoss() && plan.hasReg() ?
-				regularize_(plan, net.getParams()) : 0;
+				regLoss_(plan, net.getParams()) : 0;
+	}
+	
+	/**
+	 * Use it inside {@link ParamComputeUnit#backward()}
+	 */
+	public final void regGradUpdate(ParamComputeUnit pcUnit)
+	{
+		if (plan.hasReg())
+    		regGradUpdate_(plan, pcUnit.W);
 	}
 	
 	/**
 	 * @return regularization loss
-	 * @see #regularize(LearningPlan)
 	 */
-	protected abstract float regularize_(LearningPlan plan, ParamList paramList);
+	protected abstract float regLoss_(LearningPlan plan, ParamList paramList);
 	
 	/**
-	 * @return Preset scheme: L-2 regularizer
+	 * Regularize parameter gradient. Update the reg term. W += -lr * reg * W 
 	 */
-	public static RegScheme squareSumScheme()
+	protected abstract void regGradUpdate_(LearningPlan plan, ParamUnit W);
+	
+	/**
+	 * Preset scheme: L-2 square-sum regularizer
+	 * We make this a subclass because units like LinearUnit 
+	 * can use the class info for further GPU optimization
+	 */
+	public static class L2RegScheme extends RegScheme
 	{
-		return new RegScheme()
+		@Override
+		protected float regLoss_(LearningPlan plan, ParamList paramList)
 		{
-			@Override
-			protected float regularize_(LearningPlan plan, ParamList paramList)
-			{
-				// L2 regularizer
-				float loss = 0;
-				for (ParamUnit W : paramList)
-					loss += Thrust.square_sum(W.data());
-				return 0.5f * loss * plan.reg;
-			}
-		};
+			float loss = 0;
+			for (ParamUnit W : paramList)
+				loss += Thrust.square_sum(W.data());
+			return 0.5f * loss * plan.reg;
+		}
+
+		@Override
+		public void regGradUpdate_(LearningPlan plan, ParamUnit W)
+		{
+			GpuBlas.scale(W.data(), 1 - plan.lr * plan.reg);
+		}
+	}
+	/**
+	 * @return Preset scheme: L-2 square-sum regularizer
+	 */
+	public static RegScheme l2Scheme()
+	{
+		return new L2RegScheme();
 	}
 }

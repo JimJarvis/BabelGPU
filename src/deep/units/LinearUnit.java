@@ -1,6 +1,10 @@
 package deep.units;
 
+import utils.PP;
+import deep.DeepException;
 import deep.Initializer;
+import deep.RegScheme;
+import deep.RegScheme.L2RegScheme;
 import gpu.GpuBlas;
 
 public class LinearUnit extends ParamComputeUnit
@@ -47,8 +51,6 @@ public class LinearUnit extends ParamComputeUnit
 
 		if (W.hasGradient())
 		{
-    		// update W with reg
-    		float lr = learningPlan.lrStart;
     		// In debug mode, we explicitly store the parameter gradient
     		if (debug)
     		{
@@ -57,9 +59,19 @@ public class LinearUnit extends ParamComputeUnit
     			if (hasBias) W.gradient().fillLastRow0();
     		}
 
+    		// update W with reg
+    		float lr = learningPlan.lr;
+    		
+    		// Optimization specific to L2 regularizer
     		// division by batchSize should be done in the terminal unit
-    		GpuBlas.mult(output.gradient(), input.data().transpose(), W.data(), 
-                				- lr, 1 - lr * learningPlan.reg);
+    		if (learningPlan.regScheme instanceof L2RegScheme)
+        		GpuBlas.mult(output.gradient(), input.data().transpose(), W.data(), 
+                    				- lr, 1 - lr * learningPlan.reg);
+    		else
+    		{
+    			learningPlan.regScheme.regGradUpdate(this);
+        		GpuBlas.mult(output.gradient(), input.data().transpose(), W.data(), -lr, 1);
+    		}
     		if (hasBias)
     			W.data().fillLastRow0();
 		}
