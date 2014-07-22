@@ -34,7 +34,9 @@ public class ParamList extends ArrayList<ParamUnit>
 		for (ParamUnit W : other)
 		{
 			ParamUnit newW = 
-					new ParamUnit(W.name + nameSuffix, W.data().row, W.data().col);
+					new ParamUnit(W.name + nameSuffix, 
+							(ParamComputeUnit) W.parent, 
+							W.data().row, W.data().col);
 			newW.copyDataFrom(W);
 			this.add(newW);
 		}

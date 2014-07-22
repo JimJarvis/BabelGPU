@@ -1,10 +1,7 @@
 package deep.units;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-import utils.FileUtil;
+import java.io.*;
+import utils.*;
 import deep.*;
 import gpu.FloatMat;
 
@@ -17,25 +14,11 @@ public class ParamUnit extends DataUnit
 	 * Instantiate a new FloatMat with (row, col)
 	 * @param parent the ParamComputeUnit that uses this parameter
 	 */
-	public ParamUnit(String name, ParamComputeUnit parent, int row, int col)
+	public ParamUnit(String name, ComputeUnit parent, int row, int col)
 	{
 		super(name, parent, new FloatMat(row, col));
 		setDummyGradient();
 	}
-	
-	/**
-	 * No parent ParamComputeUnit: this is not a usual ParamUnit
-	 * @see FourierProjectUnit
-	 */
-	public ParamUnit(String name, int row, int col)
-	{
-		this(name, null, row, col);
-	}
-	
-	/**
-	 * Copy ctor: make a partial copy of a submat of 'data'
-	 * @param 
-	 */
 	
 	@Override
 	public final int dim()

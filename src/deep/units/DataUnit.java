@@ -9,7 +9,7 @@ public class DataUnit extends Unit
     private static final long serialVersionUID = 1L;
 	protected transient FloatMat data;
     protected transient FloatMat gradient;
-    protected ComputeUnit parent;
+    public ComputeUnit parent;
     
     /**
      *  Dummy placeholder: if gradient == FloatMat.DUMMY, 
@@ -93,13 +93,13 @@ public class DataUnit extends Unit
 	}
 	
 	/**
-	 * @return learning plan from parent
+	 * @return learningPlan from parent
 	 */
 	@Override
 	public LearningPlan getPlan()
 	{
 		if (parent == null)
-			throw new DeepException("No ParentComputeUnit associated");
+			throw new DeepException("Not associated to a parent ComputeUnit");
 		return parent.getPlan();
 	}
 	

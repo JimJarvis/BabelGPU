@@ -35,11 +35,11 @@ public class FourierProjectUnit extends ComputeUnit
 			throw new DeepException("FourierProjectUnit requires that hasBias is set to true.");
 			
 		super.setup();
-		// Leave the 'parent' ParamComputeUnit null
 		if (projector == null)
 		{
     		projector = new ParamUnit(
     				"Param[projector]#" + this.name, 
+    				this,
     				outDim, 
     				input.dim());
     		projector.setNoGradient();
