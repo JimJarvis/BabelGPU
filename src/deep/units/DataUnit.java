@@ -1,5 +1,6 @@
 package deep.units;
 
+import deep.*;
 import utils.PP;
 import gpu.FloatMat;
 
@@ -89,6 +90,16 @@ public class DataUnit extends Unit
 	{
 		FloatMat.destroy(this.gradient);
 		this.gradient = null;
+	}
+	
+	/**
+	 * @return learning plan from parent
+	 */
+	public LearningPlan getPlan()
+	{
+		if (parent == null)
+			throw new DeepException("No ParentComputeUnit associated");
+		return parent.learningPlan;
 	}
 	
 	// Debug only

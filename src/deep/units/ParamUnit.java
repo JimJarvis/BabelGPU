@@ -83,7 +83,7 @@ public class ParamUnit extends DataUnit
 	 */
 	public String getDataFilePath()
 	{
-		return FileUtil.join(this.parent.learningPlan.dir, name + ".float");
+		return FileUtil.join(this.getPlan().dir, name + ".float");
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException

@@ -9,8 +9,7 @@ public abstract class ComputeUnit extends Unit
 	public ComputeUnit next;
 	public ComputeUnit prev;
 	public InletUnit inlet;
-
-	protected LearningPlan learningPlan;
+	public LearningPlan learningPlan;
 
 	protected int outDim;
 	// Do we include bias units?
