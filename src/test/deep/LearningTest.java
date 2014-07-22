@@ -14,8 +14,11 @@ public class LearningTest
 	static LearningPlan plan;
 	static int batch = 7;
 	static int totalSamples = 24;
-	static int totalEpochs = 5;
 	static float[] losses = new float[] {2, 5, 1, 4, 3}; // specify loss manually
+	static int totalEpochs = losses.length;
+	static DeepNet net;
+
+	final static float INF = Float.POSITIVE_INFINITY;
 	
 	@BeforeClass
 	public static void setUp()
@@ -38,6 +41,13 @@ public class LearningTest
 			@Override
 			public void prepareNextEpoch() { }
 		};
+		
+		net = 
+				DeepFactory.debugLinearLayers(inlet, 
+						new int[] {2, 1, 2}, 
+						MyTUnit.class,
+						Initializer.fillIniter(.1f));
+		plan.setLrScheme(LrScheme.constantDecayScheme());
 	}
 	
 	public static class MyTUnit extends TerminalUnit
@@ -67,21 +77,29 @@ public class LearningTest
 		public void backward() { }
 	};
 	
+	// After every test
+	@After
+	public void resetNet()
+	{
+		net.reset();
+		losses = new float[] {2, 5, 1, 4, 3};
+		plan.totalEpochs = totalEpochs = losses.length;
+	}
+	
 	@Test
 //	@Ignore
-	public void lrTest()
+	public void constantDecayTest()
 	{
-		DeepNet net = 
-				DeepFactory.debugLinearLayers(inlet, 
-						new int[] {2, 1, 2}, 
-						MyTUnit.class,
-						Initializer.fillIniter(.1f));
+		PP.pTitledSectionLine("Constant Decay");
 		plan.setLrScheme(LrScheme.constantDecayScheme());
 		net.run(plan);
 		PP.p(plan.record);
-		
-		PP.pSectionLine();
-		net.reset();
+	}
+	
+	@Test
+	public void epochDummyUpdateTest()
+	{
+		PP.pTitledSectionLine("Epoch Dummy Update");
 		plan.setLrScheme(new LrScheme()
 		{
 			@Override
@@ -95,6 +113,32 @@ public class LearningTest
 				return defaultLr();
 			}
 		});
+		net.run(plan);
+		PP.p(plan.record);
+	}
+	
+	@Test
+	public void epochDecayTest()
+	{
+		PP.pTitledSectionLine("Epoch Decay");
+		float decayRate = .5f;
+		losses = new float[] 
+				{5, 3, 2.9f, 2.7f, 2f, INF};  plan.totalEpochs = totalEpochs = losses.length;
+		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, decayRate));
+		net.run(plan);
+		PP.p(plan.record);
+		PP.p("\nCase 2\n");
+		net.reset();
+		losses = new float[] 
+				{INF, INF, 5, 3, 2, 6, 5}; plan.totalEpochs = totalEpochs = losses.length;
+		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, decayRate));
+		net.run(plan);
+		PP.p(plan.record);
+		PP.p("\nCase 3\n");
+		net.reset();
+		losses = new float[] 
+				{1, 2, INF, INF, 3, 2.9f, INF, 5, 4.9f}; plan.totalEpochs = totalEpochs = losses.length;
+		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, decayRate));
 		net.run(plan);
 		PP.p(plan.record);
 	}

@@ -26,7 +26,12 @@ public class MiscTest
 //		FileUtil.makeDir("kirito");
 //		FileUtil.makeTempDir("kirito", "");
 //		FileUtil.makeTempFile("kirito", ".txt", "");
-		
+		float lastLoss = Float.POSITIVE_INFINITY;
+		lastLoss = 400;
+		float curLoss = 399.59999f;
+		float improvement = (lastLoss - curLoss) / lastLoss;
+		boolean decay = Float.isNaN(improvement) || improvement < 0.001f;
+		PP.p(Float.POSITIVE_INFINITY > 2);
 		PP.p("DONE");
 //		for (String line : FileUtil.iterable("../BabelGPU", "test.sh")) PP.p(line);
 	}

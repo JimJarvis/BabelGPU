@@ -11,7 +11,6 @@ units="test.deep.LinearTest"
 units="test.deep.ElementComputeTest"
 units="test.deep.CombinedTest"
 units="test.deep.KernelApproxTest"
-units="test.gpu.SoftmaxTest"
 units="test.deep.LearningTest"
 units=$allunits
 

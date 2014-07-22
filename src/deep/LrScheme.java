@@ -1,5 +1,7 @@
 package deep;
 
+import java.util.ArrayList;
+
 public abstract class LrScheme extends LearningPlan.Scheme
 {
 	/**
@@ -72,23 +74,51 @@ public abstract class LrScheme extends LearningPlan.Scheme
 	}
 
 	/**
-	 * TODO
-	 * @return Preset learning scheme: 
-	 * let L2 = heldout loss of this epoch, and 
-	 * let L1 = heldout loss of the last epoch
-	 * In order to keep the same learning rate, we require that L2 >= L1(1+eps) 
-	 * So, if L2 < L1(1+eps), we should decay the learning rate. 
-	 * Equivalently, we decay if L2/L1 - 1 > -eps (because L1 is negative, change inequality direction) 
-	 * if L2 < L1, then L2/L1 > 1 then L2/L1 - 1 > 0, which is unacceptable, perform decay!
+	 * let curL = heldout loss of this epoch, and 
+	 * let lastL = heldout loss of the last epoch. 
+	 * In order to keep the same learning rate, we require that curL < lastL *(1 - improvementTol).
+	 * if doesn't hold, we decay lr *= decayRate 
+	 * if curL > lastL (we're doing worse), roll back to last parameters, decay LR and try again
 	 */
-	public static LrScheme epochDecayScheme(float improvementTol, float decayRate)
+	public static LrScheme epochDecayScheme(final float improvementTol, final float decayRate)
 	{
 		return new LrScheme() {
 			@Override
 			public float updateEpoch_(LearningPlan plan)
 			{
-				return 0;
+				ArrayList<Float> record = plan.record;
+				float curLoss = record.get(record.size()-1);
+				float lastLoss = plan.curEpoch == 0 ?
+						Float.POSITIVE_INFINITY :
+						record.get(record.size() - 2);
+
+				// If curLoss = INF, we're screwed
+				// If lastLoss = INF, curLoss isn't INF, we are good and don't 
+				boolean decay = Float.isInfinite(curLoss) 
+						|| ! Float.isInfinite(lastLoss)
+						&& (lastLoss - curLoss) / lastLoss < improvementTol;
+
+				// Instead of making progress, we're actually doing worse
+				boolean regress = plan.curEpoch != 0
+						&& (Float.isInfinite(curLoss)
+							|| curLoss > lastLoss);
+
+				DeepNet net = plan.net;
+				if (decay)
+				{   // Roll-back params to last epoch if our progress is actually regressive
+					if (regress)
+						net.restoreLastEpochParams();
+					else
+						net.recordLastEpochParams();
+					return plan.lr * decayRate;
+				}
+				else // no decay
+				{ // Record lastest theta
+					net.recordLastEpochParams();
+					return defaultLr();
+				}
 			}
+			
 			@Override
 			public float updateBatch_(LearningPlan plan)
 			{
