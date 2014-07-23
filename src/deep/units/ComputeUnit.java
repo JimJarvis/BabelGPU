@@ -18,14 +18,11 @@ public abstract class ComputeUnit extends Unit
 	// Do we store input/output data separately?
 	protected boolean mergeIO = false;
 
-	/**
-	 * ALWAYS equal to prev.output
-	 */
+	// ALWAYS equal to prev.output
 	public DataUnit input;
-	/**
-	 * ALWAYS equal to next.input
-	 */
+	// ALWAYS equal to next.input
 	public DataUnit output;
+	protected int outputSaveMode = 0; // for serialization
 	
 	public ComputeUnit(String name, InletUnit inlet)
 	{
@@ -78,14 +75,26 @@ public abstract class ComputeUnit extends Unit
 	{
 		if (mergeIO) // use memory efficiently
 			this.output = this.input;
-		else
+		else if (this.output == null || !this.output.doesSaveData())
 		{
 			this.output = new DataUnit(
 					"Data[out]#" + this.name, 
 					this, 
 					new FloatMat(outDim, inlet.MaxBatchSize));
 			this.output.initGradient();
+			this.output.setSaveMode(outputSaveMode);
 		}
+	}
+	
+	/**
+	 * Serialization. 
+	 * Default save nothing.
+	 */
+	public void setOutputSaveMode(int saveMode)
+	{
+		this.outputSaveMode = saveMode;
+		if (this.output != null)
+			output.setSaveMode(this.outputSaveMode);
 	}
 	
 	/**

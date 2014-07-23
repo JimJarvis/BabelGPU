@@ -142,23 +142,25 @@ public class FloatMat
 	}
 	
 	/**
-	 * Construct from a Saveable loaded from disk via deserialization
-	 */
-	public FloatMat(Saveable saved)
-	{
-		this(saved.hostArray, saved.row, saved.col);
-	}
-	
-	/**
 	 * Useful in places where row/col info needs to be retrieved first, 
 	 * while the FloatMat itself can be instantiated later.
 	 * @return a dummy FloatMat with no host/device data, only dim info
 	 */
-	public static FloatMat createDummyMat(int row, int col)
+	public static FloatMat createDummy(int row, int col)
 	{
 		FloatMat dummy = new FloatMat();
 		dummy.initDim(row, col);
 		return dummy;
+	}
+	
+	/**
+	 * A FloatMat is a dummy placeholder if it doesn't have either host or device data
+	 */
+	public static boolean isDummy(FloatMat mat)
+	{
+		return mat.hostArray == null 
+				&& mat.hostBuffer == null
+				&& mat.device == null;
 	}
 	
 	// Ctor helper
@@ -167,51 +169,6 @@ public class FloatMat
 		this.row = row;
 		this.col = col;
 		this.ldim = row;
-	}
-	
-	/**
-	 * Serializable interface. Enable us to store to disk. 
-	 * We take pains to save float[] separately, because we can always deserialize 
-	 * a float[] even when class version changes. 
-	 */
-	public static class Saveable implements Serializable
-	{
-		private static final long serialVersionUID = 1L;
-		public int row;
-		public int col;
-		public String fileName;
-		public transient float[] hostArray;
-		/**
-		 * @param filePath stores float[] only
-		 */
-		public Saveable(FloatMat mat, String filePath)
-		{
-			this.row = mat.row;
-			this.col = mat.col;
-			this.hostArray = mat.toHostArray(true);
-			this.fileName = filePath;
-		}
-		
-		private void writeObject(ObjectOutputStream out) throws IOException
-		{
-			out.defaultWriteObject();
-			FileUtil.dump(hostArray, fileName);
-		}
-		
-		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-		{
-			in.defaultReadObject();
-			this.hostArray = FileUtil.<float[]>load(fileName);
-		}
-	}
-	
-	/**
-	 * @param filePath a separate file that stores float[] ONLY
-	 * @return Savable to store to disk via serialization
-	 */
-	public Saveable saveable(String filePath)
-	{
-		return new Saveable(this, filePath);
 	}
 	
 	/**
@@ -624,6 +581,68 @@ public class FloatMat
 		return MiscUtil.toIndex(row, c);
 	}
 	
+	// ******************** Serialization ********************/
+	/**
+	 * Serializable interface. Enable us to store to disk. 
+	 * We take pains to save float[] separately, because we can always deserialize 
+	 * a float[] even when class version changes. 
+	 */
+	public static class Saveable implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+		public int row;
+		public int col;
+		public String fileName;
+		public transient float[] hostArray;
+		public boolean isDummy;
+		/**
+		 * @param filePath stores float[] only
+		 */
+		public Saveable(FloatMat mat, String filePath)
+		{
+			this.row = mat.row;
+			this.col = mat.col;
+			this.hostArray = mat.toHostArray(true);
+	        // handle DummyMat case
+			isDummy = this.hostArray == null;
+			this.fileName = filePath;
+		}
+		
+		private void writeObject(ObjectOutputStream out) throws IOException
+		{
+			out.defaultWriteObject();
+			if (!isDummy) 
+				FileUtil.dump(hostArray, fileName);
+		}
+		
+		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			in.defaultReadObject();
+			if (!isDummy)
+				this.hostArray = FileUtil.<float[]>load(fileName);
+		}
+	}
+
+	/**
+	 * @param filePath a separate file that stores float[] ONLY
+	 * @return Saveable to store to disk via serialization
+	 */
+	public static Saveable saveable(FloatMat mat, String filePath)
+	{
+		return new Saveable(mat, filePath);
+	}
+
+	/**
+	 * Reconstruct from a Saveable loaded from disk via deserialization
+	 */
+	public static FloatMat desaveable(Saveable saved)
+	{
+		if (saved.isDummy)
+			return FloatMat.createDummy(saved.row, saved.col);
+		else
+			return new FloatMat(saved.hostArray, saved.row, saved.col);
+	}
+
 	// ******************** Interface to Thrust API ****************** /
 	/**
 	 * Get the thrust pointer

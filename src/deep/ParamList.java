@@ -26,6 +26,7 @@ public class ParamList extends ArrayList<ParamUnit>
 	
 	/**
 	 * Construct from an existing param list: deep copying data
+	 * SaveMode will be the same as the old one. 
 	 * @param nameSuffix name the new ParamUnits based on the old
 	 */
 	public ParamList(ParamList other, String nameSuffix)
@@ -38,6 +39,7 @@ public class ParamList extends ArrayList<ParamUnit>
 							(ParamComputeUnit) W.parent, 
 							W.data().row, W.data().col);
 			newW.copyDataFrom(W);
+			newW.setSaveMode(W.saveMode);
 			this.add(newW);
 		}
 	}

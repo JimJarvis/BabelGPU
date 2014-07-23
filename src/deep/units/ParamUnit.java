@@ -1,7 +1,6 @@
 package deep.units;
 
 import java.io.*;
-import utils.*;
 import deep.*;
 import gpu.FloatMat;
 
@@ -12,12 +11,14 @@ public class ParamUnit extends DataUnit
 	/**
 	 * Unless in debug mode, we don't explicitly store the parameter gradient
 	 * Instantiate a new FloatMat with (row, col)
+	 * saveMode defaults to SAVE_GRAD: serialize 'data' to disk
 	 * @param parent the ParamComputeUnit that uses this parameter
 	 */
 	public ParamUnit(String name, ComputeUnit parent, int row, int col)
 	{
 		super(name, parent, new FloatMat(row, col));
 		setDummyGradient();
+		this.saveMode = DataUnit.SAVE_DATA;
 	}
 	
 	@Override
@@ -58,29 +59,15 @@ public class ParamUnit extends DataUnit
 		((ParamComputeUnit) parent).reInit();
 	}
 	
-	/* ***********************
-	 * Customized serialization: we only save 'data' field
-	 */
-	/**
-	 * 'data' field stored to disk by serialization
-	 */
-	public String getDataFilePath()
-	{
-		return FileUtil.join(this.getPlan().dir, name + ".float");
-	}
-	
+	// Internal serialization: copy this for subclasses
 	private void writeObject(ObjectOutputStream out) throws IOException
 	{
-		out.defaultWriteObject();
-		out.writeObject(data.saveable(getDataFilePath()));
+		this.serialize(out);
 	}
 	
-	/**
-	 * Must have EXACTLY the same signature for JVM to serialize
-	 */
+	// Internal serialization: copy this for subclasses
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
-		in.defaultReadObject();
-		this.data = new FloatMat((FloatMat.Saveable) in.readObject());
+		this.deserialize(in);
 	}
 }

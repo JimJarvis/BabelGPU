@@ -35,7 +35,8 @@ public class FourierProjectUnit extends ComputeUnit
 			throw new DeepException("FourierProjectUnit requires that hasBias is set to true.");
 			
 		super.setup();
-		if (projector == null)
+		// Either it's the first-time setup, or we are loading from disk and we aren't saving anything
+		if (projector == null || !projector.doesSaveData())
 		{
     		projector = new ParamUnit(
     				"Param[projector]#" + this.name, 

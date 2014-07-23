@@ -22,11 +22,11 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	private boolean debug = false; // the whole net is in debug mode
 
 	// Parameter list in forward order: for updating regularization term
-	protected ParamList paramList = null;
+	public ParamList paramList = null;
 	// Best parameter data so far
-	protected ParamList bestParamList = null;
+	public ParamList bestParamList = null;
 	// From last epoch
-	protected ParamList lastEpochParamList = null;
+	public ParamList lastEpochParamList = null;
 
 	public DeepNet(String name, InletUnit inlet, ComputeUnit... units)
 	{
@@ -140,10 +140,21 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 		};
 	}
 
-	@SuppressWarnings("unused")
+	/**
+	 * Setup a learning plan and run
+	 * @see #run()
+	 */
 	public void run(LearningPlan learningPlan)
 	{
-		setup(learningPlan);
+		this.setup(learningPlan);
+		this.run();
+	}
+	/**
+	 * Assume setup() is already called
+	 */
+	@SuppressWarnings("unused")
+	public void run()
+	{
 		for (int epoch : this.epochIter())
 			for (int doneSample : this.batchIter())
 			{
@@ -240,6 +251,25 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	{
 		for (ComputeUnit unit : this)
 			unit.setBias(hasBias);
+	}
+	
+	/**
+	 * Default: save nothing
+	 */
+	public void setUnitOutputSaveMode(int saveMode)
+	{
+		for (ComputeUnit unit : this)
+			unit.setOutputSaveMode(saveMode);
+	}
+
+	/**
+	 * Default: save only 'data'
+	 */
+	public void setParamSaveMode(int saveMode)
+	{
+		for (ComputeUnit unit : this)
+			if (unit instanceof ParamComputeUnit)
+				((ParamComputeUnit) unit).setParamSaveMode(saveMode);
 	}
 
 	/**

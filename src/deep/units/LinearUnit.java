@@ -19,23 +19,15 @@ public class LinearUnit extends ParamComputeUnit
 	}
 	
 	@Override
-	protected void setupW()
+	protected void setupW_()
 	{
-		// W isn't null if we load from serialized data on disk. 
-		if (W == null)
-		{
-    		this.initer.setBias(hasBias);
-    		this.W = new ParamUnit(
-    				"Param#" + this.name,
-    				this,
-    				this.outDim, 
-    				this.input.dim());
-    		reInit();
-		}
-		if (debug)
-			this.W.initGradient();
-		else
-			this.W.setDummyGradient();
+		this.initer.setBias(hasBias);
+		this.W = new ParamUnit(
+				"Param#" + this.name,
+				this,
+				this.outDim, 
+				this.input.dim());
+		reInit();
 	}
 	
 	@Override

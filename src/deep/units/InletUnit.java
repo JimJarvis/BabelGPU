@@ -36,14 +36,14 @@ public abstract class InletUnit extends DataUnit
 	 * NOTE: you're responsible for adding an extra row for bias here
 	 * @param actuallyAlloc true to actually allocate memory for 'data'. 
 	 * false to fill 'data' with a dummy FloatMat that only has row/col dim info
-	 * @see FloatMat#createDummyMat(int, int)
+	 * @see FloatMat#createDummy(int, int)
 	 */
 	public InletUnit(String name, int dim, int MaxBatchSize, boolean actuallyAlloc)
 	{
 		super(name, null, 
 				actuallyAlloc ? 
 						new FloatMat(dim, MaxBatchSize) :
-						FloatMat.createDummyMat(dim, MaxBatchSize), 
+						FloatMat.createDummy(dim, MaxBatchSize), 
 				null);
 		this.MaxBatchSize = MaxBatchSize;
 	}
