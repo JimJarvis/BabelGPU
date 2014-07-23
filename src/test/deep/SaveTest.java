@@ -112,6 +112,17 @@ public class SaveTest
 		public void backward() { }
 	};
 	
+	// MUST declare static and non-anonymous for serialization to work
+	static class MyEpochSaver extends DeepNet.EpochSaver
+	{
+		private static final long serialVersionUID = 1L;
+		@Override
+		public void save(DeepNet net)
+		{
+			PP.p("Saving when epoch", net.learningPlan.curEpoch, "is done");
+		}
+	}
+	
 	@Test
 //	@Ignore
 	public void saveTest()
@@ -119,6 +130,7 @@ public class SaveTest
 //		net.enableDebug(true);
 		net.setUnitOutputSaveMode(DataUnit.SAVE_DATA);
 		net.setParamSaveMode(SAVE_BOTH);
+		net.setEpochSaver(new MyEpochSaver());
 		net.run(plan);
 		PP.p("OUTPUT units");
 		for (ComputeUnit cu : net)

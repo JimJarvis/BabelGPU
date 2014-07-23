@@ -1,15 +1,8 @@
 package test;
 
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.util.ArrayList;
-import java.util.Random;
-
-import utils.CpuUtil;
-import utils.FileUtil;
-import utils.PP;
+import java.util.*;
+import deep.DeepNet;
+import utils.*;
 
 public class MiscTest
 {
@@ -32,8 +25,9 @@ public class MiscTest
 		float improvement = (lastLoss - curLoss) / lastLoss;
 		boolean decay = Float.isNaN(improvement) || improvement < 0.001f;
 		PP.p(Float.POSITIVE_INFINITY > 2);
-		PP.p("DONE");
 //		for (String line : FileUtil.iterable("../BabelGPU", "test.sh")) PP.p(line);
+		
+		PP.p("DONE");
 	}
 
 }

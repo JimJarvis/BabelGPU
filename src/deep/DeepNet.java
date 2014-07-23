@@ -370,7 +370,9 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	{
 		// Make sure we get the latest list of params
 		// a non-empty paramList with null entries means the parameters aren't set yet
-		if (paramList != null && paramList.size() != 0 && paramList[0] != null)
+		if (paramList != null 
+				&& paramList.size() != 0 
+				&& paramList.get(0) != null)
 			return paramList;
 		
 		return this.paramList = new ParamList(this);
