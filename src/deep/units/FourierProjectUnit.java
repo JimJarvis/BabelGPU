@@ -36,7 +36,7 @@ public class FourierProjectUnit extends ComputeUnit
 			
 		super.setup();
 		// Either it's the first-time setup, or we are loading from disk and we aren't saving anything
-		if (projector == null || !projector.doesSaveData())
+		if (this.needsSetup(projector))
 		{
     		projector = new ParamUnit(
     				"Param[projector]#" + this.name, 

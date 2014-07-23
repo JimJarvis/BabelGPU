@@ -75,7 +75,7 @@ public abstract class ComputeUnit extends Unit
 	{
 		if (mergeIO) // use memory efficiently
 			this.output = this.input;
-		else if (this.output == null || !this.output.doesSaveData())
+		else if (needsSetup(this.output))
 		{
 			this.output = new DataUnit(
 					"Data[out]#" + this.name, 
@@ -84,6 +84,18 @@ public abstract class ComputeUnit extends Unit
 			this.output.initGradient();
 			this.output.setSaveMode(outputSaveMode);
 		}
+	}
+	
+	/**
+	 * Judges if a DataUnit/ParamUnit needs to be setup ('new' ctor). 
+	 * null means first-time: of course initialize it. 
+	 * If it doesn't saveData, we'll have to reconstruct this unit. 
+	 * @see #setupOutput()
+	 * @see ParamComputeUnit#setupW()
+	 */
+	protected boolean needsSetup(DataUnit unit)
+	{
+		return unit == null || ! unit.doesSaveData();
 	}
 	
 	/**

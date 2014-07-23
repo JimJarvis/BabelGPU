@@ -48,10 +48,9 @@ public abstract class ParamComputeUnit extends ComputeUnit
 	public final void setupW()
 	{
 		// Either it's the first-time setup, or we are loading from disk and we aren't saving anything
-		if (W == null || !W.doesSaveData())
-		{
+		if (this.needsSetup(W))
 			setupW_();
-		}
+		
 		this.W.setSaveMode(paramSaveMode);
 		if (debug)
 			this.W.initGradient();
