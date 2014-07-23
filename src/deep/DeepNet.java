@@ -14,9 +14,12 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	private static final long serialVersionUID = 1L;
 	public String name;
 	public ComputeUnit head;
-	public InletUnit inlet;
+	public transient InletUnit inlet;
 	public TerminalUnit terminal;
 	public LearningPlan learningPlan;
+	// Called at the end of every epoch to save stuff
+	// User defined. Default save nothing. 
+	public EpochSaver epochSaver = DummySaver;
 	
 	private transient boolean setup = false; // should only setup once
 	private boolean debug = false; // the whole net is in debug mode
@@ -34,7 +37,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 		this.head = units[0];
 		this.terminal = (TerminalUnit) units[units.length - 1];
 		this.inlet = inlet;
-		head.input = inlet;
+		head.input = this.inlet;
 		this.inlet.setParent(head);
 		chain(units);
 	}
@@ -42,6 +45,19 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	public DeepNet(String name, InletUnit inlet, ArrayList<ComputeUnit> units)
 	{
 		this(name, inlet, units.toArray(new ComputeUnit[units.size()]));
+	}
+	
+	/**
+	 * Link an Inlet with head ComputeUnit. 
+	 * Useful for deserialization
+	 */
+	public void linkInlet(InletUnit inlet)
+	{
+		this.inlet = inlet;
+		head.input = this.inlet;
+		this.inlet.setParent(head);
+		for (ComputeUnit unit : this)
+			unit.inlet = inlet;
 	}
 
 	/**
@@ -76,6 +92,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	/**
 	 * Iterate over epochs. 
 	 * At the end of every epoch, {@link #prepareNextEpoch()}
+	 * and {@link #epochSaver}
 	 * @return current epoch index
 	 */
 	public Iterable<Integer> epochIter()
@@ -102,6 +119,8 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 					{
 						DeepNet.this.prepareNextEpoch();
 						++ plan.curEpoch;
+						// Saves whatever necessary
+						DeepNet.this.epochSaver.save(DeepNet.this);
 					}
 				};
 			}
@@ -254,25 +273,6 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	}
 	
 	/**
-	 * Default: save nothing
-	 */
-	public void setUnitOutputSaveMode(int saveMode)
-	{
-		for (ComputeUnit unit : this)
-			unit.setOutputSaveMode(saveMode);
-	}
-
-	/**
-	 * Default: save only 'data'
-	 */
-	public void setParamSaveMode(int saveMode)
-	{
-		for (ComputeUnit unit : this)
-			if (unit instanceof ParamComputeUnit)
-				((ParamComputeUnit) unit).setParamSaveMode(saveMode);
-	}
-
-	/**
 	 * Fill all compute units with default generated name
 	 * @return this
 	 */
@@ -307,6 +307,58 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 		for (ComputeUnit unit : this)
 			unitMap.put(unit.name, unit);
 		return unitMap;
+	}
+	
+	// ******************** Serialization ********************/
+	/**
+	 * Default: save nothing
+	 */
+	public void setUnitOutputSaveMode(int saveMode)
+	{
+		for (ComputeUnit unit : this)
+			unit.setOutputSaveMode(saveMode);
+	}
+
+	/**
+	 * Default: save only 'data'
+	 */
+	public void setParamSaveMode(int saveMode)
+	{
+		for (ComputeUnit unit : this)
+			if (unit instanceof ParamComputeUnit)
+				((ParamComputeUnit) unit).setParamSaveMode(saveMode);
+	}
+	
+	/**
+	 * Called at the end of each epoch to save whatever necessary
+	 * @see DeepNet#epochIter()
+	 */
+	public static abstract class EpochSaver implements Serializable
+	{
+		private static final long serialVersionUID = 1L;
+		public abstract void save(DeepNet net);
+	}
+	
+	/**
+	 * Saves nothing
+	 */
+	public static final EpochSaver DummySaver = 
+			new EpochSaver()
+			{
+				private static final long serialVersionUID = 1L;
+				@Override
+				public void save(DeepNet net) { }
+			};
+	
+	/**
+	 * Default: save nothing
+	 * NOTE: for Java serialization to work, MUST declare an explicit static subclass 
+	 * that extends EpochSaver. DO NOT use anonoymous class, because it will 
+	 * implicitly store a reference to your own enclosing class.
+	 */
+	public void setEpochSaver(EpochSaver saver)
+	{
+		this.epochSaver = saver;
 	}
 
 	// ******************** ParamList management ********************/
@@ -464,7 +516,9 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 
 	public void enableDebug() {	this.enableDebug(true); }
 
-	// ******************** DEBUG only ********************/
+	//**************************************************/
+	//******************* DEBUG only *******************/
+	//**************************************************/
 	public void runDebug(LearningPlan learningPlan, boolean hasBias)
 	{
 	 	this.enableDebug();

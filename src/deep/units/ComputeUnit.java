@@ -8,7 +8,7 @@ public abstract class ComputeUnit extends Unit
 	private static final long serialVersionUID = 1L;
 	public ComputeUnit next;
 	public ComputeUnit prev;
-	public InletUnit inlet;
+	public transient InletUnit inlet;
 	
 	protected LearningPlan learningPlan;
 

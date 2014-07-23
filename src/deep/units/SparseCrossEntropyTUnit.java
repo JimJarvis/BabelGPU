@@ -16,7 +16,7 @@ public class SparseCrossEntropyTUnit extends TerminalUnit
 		super(name, inlet);
 	}
 
-	private FloatMat tmp_outLogProb;
+	private transient FloatMat tmp_outLogProb;
 	
 	@Override
 	protected float forward_terminal(boolean doesCalcLoss)

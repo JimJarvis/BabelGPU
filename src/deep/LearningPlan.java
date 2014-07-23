@@ -113,6 +113,9 @@ public class LearningPlan implements Serializable
 	// ******************** Schemes ********************/
 	/**
 	 * NOTE: do not set the public field directly!!!
+	 * NOTE: for Java serialization to work, MUST declare an explicit static subclass 
+	 * that extends RegScheme. DO NOT use anonoymous class, because it will 
+	 * implicitly store a reference to your own enclosing class.
 	 */
 	public void setRegScheme(RegScheme scheme)
 	{
@@ -122,6 +125,9 @@ public class LearningPlan implements Serializable
 
 	/**
 	 * NOTE: do not set the public field directly!!!
+	 * NOTE: for Java serialization to work, MUST declare an explicit static subclass 
+	 * that extends LrScheme. DO NOT use anonoymous class, because it will 
+	 * implicitly store a reference to your own enclosing class.
 	 */
 	public void setLrScheme(LrScheme scheme)
 	{
