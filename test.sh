@@ -12,6 +12,7 @@ units="test.deep.ElementComputeTest"
 units="test.deep.CombinedTest"
 units="test.deep.KernelApproxTest"
 units="test.deep.LearningTest"
+units="test.deep.SaveTest"
 units=$allunits
 
 cp gpu_src/*.h bin/gpu/
@@ -32,7 +33,7 @@ fi
 
 echo ;echo
 echo 'Testing ...'; echo
-if [[ $# -eq 0 ]]; then
+if [[ $# -ne 0 ]]; then
 java -Djava.library.path="E:/Dropbox/Programming/Java/Libraries/JCuda" -cp ".;E:/Dropbox/Programming/Java/Libraries/JCuda/jcuda-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcublas-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcurand-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar" test/$main
 else
 java -Djava.library.path="E:/Dropbox/Programming/Java/Libraries/JCuda" -cp ".;E:/Dropbox/Programming/Java/Libraries/JCuda/jcuda-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcublas-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JCuda/jcurand-0.6.0.jar;E:/Dropbox/Programming/Java/Libraries/JavaCpp/javacpp.jar;E:/Dropbox/Programming/Java/Libraries/JUnit/junit-4.jar;E:/Dropbox/Programming/Java/Libraries/JUnit/hamcrest.jar" org.junit.runner.JUnitCore $units
