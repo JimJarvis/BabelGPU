@@ -92,6 +92,11 @@ public abstract class LrScheme extends LearningPlan.Scheme
 			@Override
 			public float updateEpoch_(LearningPlan plan)
 			{
+				DeepNet net = plan.net;
+				// Loss-based dynamic decay cannot go without loss calculation
+				if (! net.doesCalcLoss())
+					return defaultLr();
+
 				ArrayList<Float> record = plan.record;
 				float curLoss = record.get(record.size()-1);
 				float lastLoss = plan.curEpoch == 0 ?
@@ -109,7 +114,6 @@ public abstract class LrScheme extends LearningPlan.Scheme
 						&& (Float.isInfinite(curLoss)
 							|| curLoss > lastLoss);
 
-				DeepNet net = plan.net;
 				if (decay)
 				{   // Roll-back params to last epoch if our progress is actually regressive
 					if (regress)
