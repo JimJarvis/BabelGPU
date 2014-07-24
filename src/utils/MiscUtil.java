@@ -179,6 +179,14 @@ public class MiscUtil
 			return doubles;
 		}
 	}
+	/**
+	 * Comma separated
+	 */
+	public static class StringArrayConverter implements IStringConverter<String[]>
+	{
+		@Override
+		public String[] convert(String arg0) { return arg0.split("[,]"); }
+	}
 	
 	/**
 	 * Rows comma separated, cols colon separated
@@ -219,5 +227,27 @@ public class MiscUtil
 			}
 			return dmat;
 		}
+	}
+	
+	/**
+	 * Given a string concat by a letter and a double, split them up. 
+	 * E.g.  "lap3.45" split into "lap" and 3.45
+	 * If the number doesn't exist, return null for 'Double' field
+	 */
+	public static Pair<String, Double> splitStrNum(String arg)
+	{
+		int s = 0; // split point
+		char c;
+		do
+			if (s == arg.length()) // no number 
+				return new Pair<>(arg, null);
+			else
+                c = arg.charAt(s++);
+		while ('a' <= c && c <= 'z'
+				|| 'A' <= c && c <= 'Z'
+				|| c == '_');
+		return new Pair<>(
+				arg.substring(0, s-1), 
+                Double.parseDouble(arg.substring(s-1)));
 	}
 }

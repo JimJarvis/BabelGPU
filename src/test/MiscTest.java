@@ -27,6 +27,8 @@ public class MiscTest
 		PP.p(Float.POSITIVE_INFINITY > 2);
 //		for (String line : FileUtil.iterable("../BabelGPU", "test.sh")) PP.p(line);
 		
+		PP.p(MiscUtil.splitStrNum("Z_a-3.4"));
+		PP.p(MiscUtil.splitStrNum("Z_a"));
 		PP.p("DONE");
 	}
 
