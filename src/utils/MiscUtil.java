@@ -128,8 +128,10 @@ public class MiscUtil
 		}
 	}
 	
+	//**************************************************/
+	//******************* JCommander converter classes *******************/
+	//**************************************************/
 	/**
-	 * JCommander converter class
 	 * Comma separated
 	 */
 	public static class IntArrayConverter implements IStringConverter<int[]>
@@ -145,9 +147,7 @@ public class MiscUtil
 			return ints;
 		}
 	}
-	
 	/**
-	 * JCommander converter class
 	 * Comma separated
 	 */
 	public static class FloatArrayConverter implements IStringConverter<float[]>
@@ -163,9 +163,7 @@ public class MiscUtil
 			return floats;
 		}
 	}
-	
 	/**
-	 * JCommander converter class
 	 * Comma separated
 	 */
 	public static class DoubleArrayConverter implements IStringConverter<double[]>
@@ -179,6 +177,47 @@ public class MiscUtil
 			for (String str : strs)
 				doubles[i++] = Double.parseDouble(str);
 			return doubles;
+		}
+	}
+	
+	/**
+	 * Rows comma separated, cols colon separated
+	 */
+	public static class StringMatConverter implements IStringConverter<String[][]>
+	{
+		@Override
+		public String[][] convert(String arg0)
+		{
+			String[] rowstrs = arg0.split("[;]");
+			String[][] smat = new String[rowstrs.length][];
+			int r = 0;
+			for (String row : rowstrs)
+				smat[r++] = row.split("[,]");
+			return smat;
+		}
+	}
+	
+	/**
+	 * Rows comma separated, cols colon separated
+	 */
+	public static class DoubleMatConverter implements IStringConverter<double[][]>
+	{
+		@Override
+		public double[][] convert(String arg0)
+		{
+			String[] rowstrs = arg0.split("[;]");
+			double[][] dmat = new double[rowstrs.length][];
+			int c, r = 0;
+			for (String row : rowstrs)
+			{
+				String[] elestrs = row.split("[,]");
+				c = 0;
+				dmat[r] = new double[elestrs.length];
+				for (String ele : elestrs)
+					dmat[r][c ++] = Double.parseDouble(ele);
+				++ r;
+			}
+			return dmat;
 		}
 	}
 }
