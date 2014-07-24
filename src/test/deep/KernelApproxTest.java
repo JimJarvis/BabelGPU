@@ -32,8 +32,8 @@ public class KernelApproxTest
 		// We test case where hasBias is true
 		origData = grand.genUniformFloat(origDim + 1, batchSize, 0, 2);
 		origData.fillLastRow1();
-		newData = new FloatMat(newDim + 1, batchSize);
-		projector = new FloatMat(newDim + 1, origDim + 1);
+//		newData = new FloatMat(newDim + 1, batchSize);
+//		projector = new FloatMat(newDim + 1, origDim + 1);
 	}
 	
 	/**
@@ -42,18 +42,33 @@ public class KernelApproxTest
 	abstract class KernelDebugger
 	{
 		protected float gamma;
-		private ProjKernel kernelType;
+		ProjKernel kernelType;
+		DeepNet net;
+		
 		public KernelDebugger(ProjKernel kernelType, float gamma)
 		{
 			this.gamma = gamma;
 			this.kernelType = kernelType;
-			Initializer projIniter = Initializer.projKernelIniter(kernelType, gamma);
-			projIniter.setBias(true);
-			projIniter.init(projector);
-			GpuBlas.scale(
-					GpuBlas.mult(projector, origData, newData).cos(), 
-					(float) Math.sqrt(2.0 / newDim));
-			newData.fillLastRow0();
+			InletUnit inlet = new InletUnit("FourierInlet", origData)
+			{
+				private static final long serialVersionUID = 1L;
+				@Override
+				protected int nextBatch_()
+				{
+					return origData.col;
+				}
+				@Override
+				public void nextGold() { }
+				@Override
+				public void prepareNextEpoch() { }
+			};
+			
+			net = DeepFactory.fourierProjectionNet(
+					inlet, 
+					new int[] {newDim}, 
+					Initializer.projKernelIniter(kernelType, gamma));
+			net.setup(new LearningPlan("", "", -1, -1, origData.col, 1));
+			inlet.nextBatch();
 		}
 		
 		// Otherwise use the common 'gamma'
@@ -69,6 +84,9 @@ public class KernelApproxTest
 			PP.pTitledSectionLine("Kernel test: " + this.kernelType);
 			double sumVal = 0, sumErr = 0; // w.r.t. exact kernel calculation
 			double exact, approx;
+			
+			net.forwprop();
+			newData = net.terminal.output.data().fillLastRow0();
 			
 			int pairN = batchSize - 1;
 			for (int i = 0; i < pairN; i++)
@@ -87,7 +105,7 @@ public class KernelApproxTest
 			
 			PP.pTitledSectionLine("Error Report", "-", 10);
 	        PP.setSep();
-			PP.setPrecision(2); 
+			PP.setPrecision(4); 
 
 			double avgPercentErr = sumErr / sumVal * 100;
 			PP.setScientific(true);
