@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import deep.DeepException;
+import com.beust.jcommander.IStringConverter;
 
 /**
  * Miscellaneous util methods. 
@@ -125,6 +125,60 @@ public class MiscUtil
 		{
 			throw new UnsupportedOperationException(
 					"ManagedIterator doesn't support remove()");
+		}
+	}
+	
+	/**
+	 * JCommander converter class
+	 * Comma separated
+	 */
+	public static class IntArrayConverter implements IStringConverter<int[]>
+	{
+		@Override
+		public int[] convert(String arg0)
+		{
+			String[] strs = arg0.split("[,]");
+			int[] ints = new int[strs.length];
+			int i = 0;
+			for (String str : strs)
+				ints[i++] = Integer.parseInt(str);
+			return ints;
+		}
+	}
+	
+	/**
+	 * JCommander converter class
+	 * Comma separated
+	 */
+	public static class FloatArrayConverter implements IStringConverter<float[]>
+	{
+		@Override
+		public float[] convert(String arg0)
+		{
+			String[] strs = arg0.split("[,]");
+			float[] floats = new float[strs.length];
+			int i = 0;
+			for (String str : strs)
+				floats[i++] = Float.parseFloat(str);
+			return floats;
+		}
+	}
+	
+	/**
+	 * JCommander converter class
+	 * Comma separated
+	 */
+	public static class DoubleArrayConverter implements IStringConverter<double[]>
+	{
+		@Override
+		public double[] convert(String arg0)
+		{
+			String[] strs = arg0.split("[,]");
+			double[] doubles = new double[strs.length];
+			int i = 0;
+			for (String str : strs)
+				doubles[i++] = Double.parseDouble(str);
+			return doubles;
 		}
 	}
 }
