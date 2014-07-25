@@ -300,6 +300,9 @@ public abstract class Initializer implements Serializable
 			ProjKernel[] projKernels, float[] gammas, double ... relativeRatios)
 	{
 		int N = projKernels.length;
+		if (N == 1) // only 1 initer, delegate
+			return projKernelIniter(projKernels[0], gammas[0]);
+			
 		Initializer[] distrIniters = new Initializer[N];
 		ProjKernel type;
 		for (int i = 0; i < N; ++i)
