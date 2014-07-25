@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 import deep.DeepNet;
+import utils.FileUtil.Writer;
+import utils.MiscUtil.*;
 import utils.*;
 
 public class MiscTest
@@ -21,12 +23,7 @@ public class MiscTest
 //		FileUtil.makeDir("kirito");
 //		FileUtil.makeTempDir("kirito", "");
 //		FileUtil.makeTempFile("kirito", ".txt", "");
-		float lastLoss = Float.POSITIVE_INFINITY;
-		lastLoss = 400;
-		float curLoss = 399.59999f;
-		float improvement = (lastLoss - curLoss) / lastLoss;
-		boolean decay = Float.isNaN(improvement) || improvement < 0.001f;
-		PP.p(Float.POSITIVE_INFINITY > 2);
+		
 //		for (String line : FileUtil.iterable("../BabelGPU", "test.sh")) PP.p(line);
 		
 		PP.p(MiscUtil.splitStrNum("Z_a-3.4"));
@@ -42,7 +39,7 @@ public class MiscTest
 		PP.po(zipped.o1[0]);
 		
 		String A[] = new String[] {"lap2.3", "j_a-4", "_AZ63.2", "dud-2.4e3"};
-		Pair<String, Double> psd[] = MiscUtil.map(A, new MiscUtil.DualFunc<String, Pair<String, Double>>()
+		Pair<String, Double> psd[] = MiscUtil.map(A, new DualFunc<String, Pair<String, Double>>()
 				{
 					@Override
 					public Pair<String, Double> apply(String in)

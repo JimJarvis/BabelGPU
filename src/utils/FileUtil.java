@@ -86,7 +86,7 @@ public class FileUtil
 	/**
 	 * Reads a file line by line, works in for-each loop
 	 */
-	public static Iterable<String> iterable(String file, String... file_)
+	public static Iterable<String> lineIter(String file, String... file_)
 	{
 		final String filePath = join(file, file_);
 		return new Iterable<String>()
@@ -475,10 +475,74 @@ public class FileUtil
 		return listDir(dir, globMatcher(pattern), deep);
 	}
 	
-	
 	/**
 	 * Recursive traversal default to false. Matches everything
 	 * @see #listDir(String, String, boolean) listDir(dir, null, false)
 	 */
 	public static ArrayList<String> listDir(String dir) {	 return listDir(dir, DummyMatcher, false);	}
+	
+	/**
+	 * Writes to a file
+	 */
+	public static class Writer
+	{
+		private BufferedWriter writer;
+		
+		/**
+		 * @param append false to overwrite an existing file
+		 */
+		public Writer(boolean append, String file, String... file_)
+		{
+			try {
+				writer = new BufferedWriter(
+						new FileWriter(join(file, file_), append));
+			}
+			catch (IOException e) { e.printStackTrace(); }
+		}
+		/**
+		 * Default append = false
+		 */
+		public Writer(String file, String ... file_)
+		{
+			this(false, file, file_);
+		}
+		
+		/**
+		 * Write without new line
+		 */
+		public void write(Object ... objs)
+		{
+			try { writer.write(PP.all2str(objs)); }
+			catch (IOException e) { e.printStackTrace(); }
+		}
+		
+		/**
+		 * Write with new line
+		 */
+		public void writeln(Object ... objs)
+		{
+			try { writer.write(PP.all2str(objs) + "\n"); }
+			catch (IOException e) { e.printStackTrace(); }
+		}
+
+		/**
+		 * Write a single object without newline
+		 */
+		public void write_(Object objs)
+		{
+			try { writer.write(PP.o2str(objs)); }
+			catch (IOException e) { e.printStackTrace(); }
+		}
+		
+		/**
+		 * Write a single object with new line
+		 */
+		public void writeln_(Object objs)
+		{
+			try { writer.write(PP.o2str(objs) + "\n"); }
+			catch (IOException e) { e.printStackTrace(); }
+		}
+		
+		public void close() {	quietClose(writer);	}
+	}
 }
