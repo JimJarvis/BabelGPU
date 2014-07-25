@@ -216,6 +216,24 @@ public class CpuUtil
 		return out;
 	}
 	
+	public static float[] toPrimitive(Float[] arr)
+	{
+		float[] ans = new float[arr.length];
+		int i = 0;
+		for (float x : arr)
+			ans[i ++] = x;
+		return ans;
+	}
+	
+	public static Float[] toWrapper(float[] arr)
+	{
+		Float[] ans = new Float[arr.length];
+		int i = 0;
+		for (Float x : arr)
+			ans[i ++] = x;
+		return ans;
+	}
+	
 	//**************************************************/
 	//******************* DOUBLE *******************/
 	//**************************************************/
@@ -390,5 +408,23 @@ public class CpuUtil
 		for (int i = 0 ; i < in.length ; i++)
 			out[i] = (float) in[i];
 		return out;
+	}
+	
+	public static double[] toPrimitive(Double[] arr)
+	{
+		double[] ans = new double[arr.length];
+		int i = 0;
+		for (double x : arr)
+			ans[i ++] = x;
+		return ans;
+	}
+	
+	public static Double[] toWrapper(double[] arr)
+	{
+		Double[] ans = new Double[arr.length];
+		int i = 0;
+		for (Double x : arr)
+			ans[i ++] = x;
+		return ans;
 	}
 }
