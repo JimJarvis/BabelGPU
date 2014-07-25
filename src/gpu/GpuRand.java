@@ -111,11 +111,26 @@ public class GpuRand
 	}
 	
 	/**
-	 * Fill a FloatMat with normal distribution
+	 * Thrust version: fill a FloatMat with normal distribution
+	 * If too many elements (2^25), will take too long and trigger a CudaTimeout error. 
 	 * @param mean 
 	 * @param stdev standard deviation
 	 */
-	public FloatMat genNormalFloat(FloatMat A, double mean, double stdev)
+	public FloatMat genNormalFloat(FloatMat A, double mean, double stddev)
+	{
+		Thrust.fill_rand_normal(A, (float) mean, (float) stddev);
+		return A;
+	}
+	
+	/**
+	 * cuRAND version: fill a FloatMat with normal distribution
+	 * @param mean 
+	 * @param stdev standard deviation
+	 * @deprecated doesn't work with createOffset 
+	 * if the offset is not an even number, the method throws MisalignedAddress cuda exception 
+	 * but faster than {@link #genUniformFloat(FloatMat) thrust version}
+	 */
+	public FloatMat genNormalFloatCurand(FloatMat A, double mean, double stdev)
 	{
 		// Ugliest hack in the history of programming
 		// WARNING: curandGenNormal doesn't work on array with odd number of elements!!

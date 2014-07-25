@@ -47,7 +47,8 @@ public class RandTest
 		m.destroy();
 		
 		PP.p("Normal 2^26 floats");
-		m = rand.genNormalFloat(1 << 27, 0, 3);
+		m = rand.genNormalFloat(1 << 25, 0, 3);
+		GpuUtil.synchronize();
 		timer.readFromLast();
 		m.toHostArray();
 		timer.readFromLast();

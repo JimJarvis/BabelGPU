@@ -409,6 +409,15 @@ public class Thrust
     		throw new GpuException("Transpose operation cannot have the same 'in' and 'out'");
     	Natives.gpu_transpose(x.getThrustPointer(), x.row, x.col, out.getThrustPointer());
     }
+    
+    /**
+     * Thrust version of random normal distr generator
+     * The cuRAND one breaks when offset isn't an even integer. 
+     */
+    public static void fill_rand_normal(FloatMat x, float mean, float stddev)
+    {
+    	Natives.gpu_fill_rand_normal(x.getThrustPointer(), x.size(), mean, stddev);
+    }
 
     // ******************** Softmax/labeling methods ****************** /
     // helper for labeling

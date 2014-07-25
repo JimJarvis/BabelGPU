@@ -189,6 +189,11 @@ public class Natives
     public static native void gpu_transpose(
     		@ByVal FloatDevicePointer in, int row, int col, @ByVal FloatDevicePointer out);
     
+    /**
+     * Fill with random gaussian distribution
+     */
+    public static native void gpu_fill_rand_normal(
+    		@ByVal FloatDevicePointer begin, int size, float mean, float stddev);
     
     // ******************** Softmax/labeling specific methods ****************** /
     /**
