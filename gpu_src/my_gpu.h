@@ -183,11 +183,11 @@ namespace MyGpu
 
 	// Thrust normal distribution. cuRAND one breaks under certain conditions, like misaligned address
 	template<typename T>
-	struct normal_rand_struct 
+	struct rand_normal_struct 
 	{
 		thrust::minstd_rand rng;
 		thrust::random::normal_distribution<T> dist;
-		normal_rand_struct(T mean, T stddev) : dist(mean, stddev) { }
+		rand_normal_struct(T mean, T stddev) : dist(mean, stddev) { }
 		__device__ __host__
 		T operator()(uint64_t index)
 		{
@@ -198,12 +198,12 @@ namespace MyGpu
 	};
 
 	template <typename T>
-	inline void gpu_normal_rand(device_ptr<T> begin, int size, T mean, T stddev)
+	inline void gpu_fill_rand_normal(device_ptr<T> begin, int size, T mean, T stddev)
 	{
 		transform(thrust::make_counting_iterator<int>(0), 
 				  thrust::make_counting_iterator<int>(size), 
 				  begin, 
-				  normal_rand_struct<T>(mean, stddev));
+				  rand_normal_struct<T>(mean, stddev));
 	}
 
 	///////***** OTHER functions *****///////
