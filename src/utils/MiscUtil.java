@@ -238,7 +238,7 @@ public class MiscUtil
 		@Override
 		public String[][] convert(String arg0)
 		{
-			String[] rowstrs = arg0.split("[;]");
+			String[] rowstrs = arg0.split("[:]");
 			String[][] smat = new String[rowstrs.length][];
 			int r = 0;
 			for (String row : rowstrs)
@@ -255,7 +255,7 @@ public class MiscUtil
 		@Override
 		public double[][] convert(String arg0)
 		{
-			String[] rowstrs = arg0.split("[;]");
+			String[] rowstrs = arg0.split("[:]");
 			double[][] dmat = new double[rowstrs.length][];
 			int c, r = 0;
 			for (String row : rowstrs)
