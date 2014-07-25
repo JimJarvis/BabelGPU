@@ -91,10 +91,13 @@ public class DeepFactory
 	 * The layers will all be Rahimi projectors
 	 * The last one will be a dummy ForwardOnly terminal
 	 * @param layerDims for projectors
+	 * @param activationLayers ElementComputeUnits
 	 * @param projIniters must match layerDims in length
 	 */
 	public static DeepNet fourierProjectionNet(
-			InletUnit inlet, int[] layerDims, Initializer... projIniters)
+			InletUnit inlet, int[] layerDims, 
+			Class<? extends ElementComputeUnit>[] activationLayers, 
+			Initializer... projIniters)
 	{
 		if (projIniters.length != layerDims.length)
 			throw new DeepException("Exactly 1 projection initer for each layer: len(projIniter)==len(layerDims)");
@@ -105,14 +108,29 @@ public class DeepFactory
 		for (i = 0; i < layerDims.length; i++)
 		{
 			units.add(new FourierProjectUnit("", inlet, layerDims[i], projIniters[i]));
+//			eleUnit = new CosineUnit("", inlet, (float) Math.sqrt(2.0 / layerDims[i]));
 			// scalor = sqrt(2/D) where D is #new features
-			eleUnit = new CosineUnit("", inlet, (float) Math.sqrt(2.0 / layerDims[i]));
+			eleUnit = defaultElementComputeCtor(
+					activationLayers[i], inlet, 
+					(float) Math.sqrt(2.0 / layerDims[i]));
 			eleUnit.setMergeIO(true);
 			units.add(eleUnit);
 		}
 		units.add(new ForwardOnlyTUnit("", inlet));
 		return 
 			new DeepNet("FourierProjectionNet(foward-only)", inlet, units).genDefaultUnitName();
+	}
+	
+	/**
+	 * Defaults to CosineUnit activations
+	 * @see #fourierProjectionNet(InletUnit, int[], CosineUnit[], Initializer...)
+	 */
+	public static DeepNet fourierProjectionNet(
+			InletUnit inlet, int[] layerDims, Initializer... projIniters)
+	{
+		return fourierProjectionNet(inlet, layerDims, 
+				MiscUtil.repeatedArray(CosineUnit.class, layerDims.length), 
+				projIniters);
 	}
 	
 	public static DeepNet debugLinearLayers(
@@ -152,7 +170,9 @@ public class DeepFactory
 	private static TerminalUnit defaultTerminalCtor(InletUnit inlet, Class<? extends TerminalUnit> terminalClass)
 	{
 		try {
-			return terminalClass.getConstructor(String.class, InletUnit.class).newInstance("", inlet);
+			return terminalClass
+					.getConstructor(String.class, InletUnit.class)
+					.newInstance("", inlet);
 		}
 		catch (Exception e)
 		{
@@ -166,8 +186,8 @@ public class DeepFactory
 			Class<? extends ElementComputeUnit> pureClass, InletUnit inlet, float scalor)
 	{
 		try {
-			return pureClass.getConstructor(
-					String.class, InletUnit.class, float.class)
+			return pureClass
+					.getConstructor(String.class, InletUnit.class, float.class)
 					.newInstance("", inlet, scalor);
 		}
 		catch (Exception e)
