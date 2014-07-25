@@ -18,6 +18,8 @@
 #include <thrust/functional.h>
 #include <thrust/extrema.h>
 #include <thrust/sort.h>
+#include <thrust/random/linear_congruential_engine.h>
+#include <thrust/random/normal_distribution.h>
 #include <algorithm>
 #include <cstdlib>
 using namespace thrust;
@@ -177,6 +179,31 @@ namespace MyGpu
 	inline void gpu_linear(device_ptr<T> begin, int size, T a = 1, T b = 0)
 	{
 		gpu_linear<T>(begin, size, begin, a, b);
+	}
+
+	// Thrust normal distribution. cuRAND one breaks under certain conditions, like misaligned address
+	template<typename T>
+	struct normal_rand_struct 
+	{
+		thrust::minstd_rand rng;
+		thrust::random::normal_distribution<T> dist;
+		normal_rand_struct(T mean, T stddev) : dist(mean, stddev) { }
+		__device__ __host__
+		T operator()(uint64_t index)
+		{
+			// skip past numbers used in previous threads
+			rng.discard(index);
+			return dist(rng);
+		}
+	};
+
+	template <typename T>
+	inline void gpu_normal_rand(device_ptr<T> begin, int size, T mean, T stddev)
+	{
+		transform(thrust::make_counting_iterator<int>(0), 
+				  thrust::make_counting_iterator<int>(size), 
+				  begin, 
+				  normal_rand_struct<T>(mean, stddev));
 	}
 
 	///////***** OTHER functions *****///////

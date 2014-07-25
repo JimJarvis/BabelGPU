@@ -334,9 +334,19 @@ void test_tranpose()
 	printD(Out, 6);
 }
 
+void test_normal_rand()
+{
+	//float in[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+	//device_vector<float> In = getDf(in, 12);
+	device_vector<float> In(12);
+	gpu_normal_rand<float>(&In[0], 9, 30.0, 2.5);
+	printD(In, 12);
+}
+
 
 int main()
 {
+	test_normal_rand();
 	test_tranpose();
 	test_sigmoid();
 	test_softmax_minus_id_batch();
