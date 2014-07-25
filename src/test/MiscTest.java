@@ -51,6 +51,15 @@ public class MiscTest
 		
 		PP.p(CpuUtil.cumultProduct(new int[] {3, 5, 10, 7}));
 		
+		Writer ww = new Writer("bin", "dud.txt");
+		ww.setTee(true);
+		a = new Integer[] {3, 4, 5};
+		ww.write(a);
+		ww.writeln(a);
+		ww.writeO(a);
+		ww.writelnO(a);
+		ww.write("Done");
+		
 		PP.p("DONE");
 	}
 }

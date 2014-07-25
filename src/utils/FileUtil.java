@@ -487,6 +487,7 @@ public class FileUtil
 	public static class Writer
 	{
 		private BufferedWriter writer;
+		private boolean tee = false;
 		
 		/**
 		 * @param append false to overwrite an existing file
@@ -508,11 +509,21 @@ public class FileUtil
 		}
 		
 		/**
+		 * Print to both the file and stdout like unix "tee" command. 
+		 * Default: false
+		 */
+		public void setTee(boolean tee) { this.tee = tee; }
+		
+		/**
 		 * Write without new line
 		 */
 		public void write(Object ... objs)
 		{
-			try { writer.write(PP.all2str(objs)); }
+			try { 
+				writer.write(PP.all2str(objs));
+				if (tee) PP.p_(objs);
+				writer.flush();
+			}
 			catch (IOException e) { e.printStackTrace(); }
 		}
 		
@@ -521,25 +532,37 @@ public class FileUtil
 		 */
 		public void writeln(Object ... objs)
 		{
-			try { writer.write(PP.all2str(objs) + "\n"); }
+			try { 
+				writer.write(PP.all2str(objs) + "\n");
+				if (tee)	PP.p(objs);
+				writer.flush();
+			}
 			catch (IOException e) { e.printStackTrace(); }
 		}
 
 		/**
 		 * Write a single object without newline
 		 */
-		public void write_(Object objs)
+		public void writeO(Object obj)
 		{
-			try { writer.write(PP.o2str(objs)); }
+			try {
+				writer.write(PP.o2str(obj));
+				if (tee)	PP.po_(obj);
+				writer.flush();
+			}
 			catch (IOException e) { e.printStackTrace(); }
 		}
 		
 		/**
 		 * Write a single object with new line
 		 */
-		public void writeln_(Object objs)
+		public void writelnO(Object obj)
 		{
-			try { writer.write(PP.o2str(objs) + "\n"); }
+			try {
+				writer.write(PP.o2str(obj) + "\n");
+				if (tee)	PP.po(obj);
+				writer.flush();
+			}
 			catch (IOException e) { e.printStackTrace(); }
 		}
 		
