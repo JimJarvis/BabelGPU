@@ -136,8 +136,7 @@ public class MiscUtil
 	 */
 	public static interface DualFunc<In, Out>
 	{
-		public Out apply(In obj);
-		public Class<Out> outClass();
+		public Out apply(In in);
 	}
 	
 	/**
@@ -145,7 +144,7 @@ public class MiscUtil
 	 */
 	public static interface MonoFunc<T>
 	{
-		public T apply(T obj);
+		public T apply(T in);
 	}
 	
 	/**
@@ -153,7 +152,8 @@ public class MiscUtil
 	 */
 	public static <In, Out> Out[] map(In[] input, DualFunc<In, Out> f)
 	{
-		Out[] ans = (Out[]) Array.newInstance(f.outClass(), input.length);
+		Out[] ans = (Out[]) Array.newInstance(
+				((Out) new Object()).getClass(), input.length);
 		int i = 0;
 		for (In in : input)
 			ans[i ++] = f.apply(in);

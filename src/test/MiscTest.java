@@ -1,5 +1,6 @@
 package test;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import deep.DeepNet;
@@ -39,19 +40,16 @@ public class MiscTest
 		PP.po(p);
 		PP.po(Pair.zip(p));
 		
-		Integer A[] = new Integer[] {3, 4, 5, 1};
-		PP.po(MiscUtil.map(A, new MiscUtil.DualFunc<Integer, String>()
+		String A[] = new String[] {"lap2.3", "j_a-4", "_AZ63.2", "dud-2.4e3"};
+		PP.po(MiscUtil.map(A, new MiscUtil.DualFunc<String, Pair<String, Double>>()
 				{
 					@Override
-					public String apply(Integer obj)
+					public Pair<String, Double> apply(String in)
 					{
-						return obj*2 + "dudulu";
+						return MiscUtil.splitStrNum(in);
 					}
-					@Override
-					public Class<String> outClass() { return String.class; }
 				}));
 		
 		PP.p("DONE");
 	}
-
 }
