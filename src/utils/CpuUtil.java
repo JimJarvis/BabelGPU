@@ -40,6 +40,26 @@ public class CpuUtil
 		return randInts(size, 0, high);
 	}
 	
+	/**
+	 * Cumulative product
+	 * For linear units memory usage
+	 * [a, b, c, d] => a*b + b*c + c*d
+	 */
+	public static int cumultProduct(int[] A)
+	{
+		int ans = 0;
+		for (int i = 0; i < A.length-1; i++)
+			ans += A[i] * A[i+1];
+		return ans;
+	}
+	
+	public static int sum(int[] A)
+	{
+		int ans = 0;
+		for (int a : A) ans += a;
+		return ans;
+	}
+	
 	//**************************************************/
 	//******************* FLOAT *******************/
 	//**************************************************/

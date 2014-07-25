@@ -52,6 +52,8 @@ public class MiscTest
 				}, Pair.class);
 		PP.po(psd);
 		
+		PP.p(CpuUtil.cumultProduct(new int[] {3, 5, 10, 7}));
+		
 		PP.p("DONE");
 	}
 }

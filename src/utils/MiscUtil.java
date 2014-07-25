@@ -128,6 +128,44 @@ public class MiscUtil
 		}
 	}
 	
+	/**
+	 * Append to tail
+	 */
+	public static <T> T[] append(T[] arr, T last)
+	{
+	    final int N = arr.length;
+	    arr = java.util.Arrays.copyOf(arr, N+1);
+	    arr[N] = last;
+	    return arr;
+	}
+	public static int[] append(int[] arr, int last)
+	{
+	    final int N = arr.length;
+	    arr = java.util.Arrays.copyOf(arr, N+1);
+	    arr[N] = last;
+	    return arr;
+	}
+	
+	/**
+	 * Prepend to head
+	 */
+	public static <T> T[] prepend(T first, T[] arr)
+	{
+	    final int N = arr.length;
+	    arr = java.util.Arrays.copyOf(arr, N+1);
+	    System.arraycopy(arr, 0, arr, 1, N);
+	    arr[0] = first;
+	    return arr;
+	}
+	public static int[] prepend(int first, int[] arr)
+	{
+	    final int N = arr.length;
+	    arr = java.util.Arrays.copyOf(arr, N+1);
+	    System.arraycopy(arr, 0, arr, 1, N);
+	    arr[0] = first;
+	    return arr;
+	}
+	
 	//**************************************************/
 	//*********** Functional programming interface *******/
 	//**************************************************/
