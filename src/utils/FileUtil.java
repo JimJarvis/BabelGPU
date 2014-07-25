@@ -515,9 +515,25 @@ public class FileUtil
 		public void setTee(boolean tee) { this.tee = tee; }
 		
 		/**
+		 * @see PP#setPrecision(int)
+		 */
+		public static void setPrecision(int prec)
+		{
+			PP.setPrecision(prec);
+		}
+		
+		/**
+		 * @see PP#setScientific(boolean)
+		 */
+		public static void setScientific(boolean isScientific)
+		{
+			PP.setScientific(isScientific);
+		}
+		
+		/**
 		 * Write without new line
 		 */
-		public void write(Object ... objs)
+		public void write_(Object ... objs)
 		{
 			try { 
 				writer.write(PP.all2str(objs));
@@ -530,7 +546,7 @@ public class FileUtil
 		/**
 		 * Write with new line
 		 */
-		public void writeln(Object ... objs)
+		public void write(Object ... objs)
 		{
 			try { 
 				writer.write(PP.all2str(objs) + "\n");
@@ -543,7 +559,7 @@ public class FileUtil
 		/**
 		 * Write a single object without newline
 		 */
-		public void writeO(Object obj)
+		public void writeO_(Object obj)
 		{
 			try {
 				writer.write(PP.o2str(obj));
@@ -556,7 +572,7 @@ public class FileUtil
 		/**
 		 * Write a single object with new line
 		 */
-		public void writelnO(Object obj)
+		public void writeO(Object obj)
 		{
 			try {
 				writer.write(PP.o2str(obj) + "\n");

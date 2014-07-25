@@ -54,11 +54,11 @@ public class MiscTest
 		Writer ww = new Writer("bin", "dud.txt");
 		ww.setTee(true);
 		a = new Integer[] {3, 4, 5};
+		ww.write_(a);
 		ww.write(a);
-		ww.writeln(a);
+		ww.writeO_(a);
 		ww.writeO(a);
-		ww.writelnO(a);
-		ww.write("Done");
+		ww.write_("Done");
 		
 		PP.p("DONE");
 	}
