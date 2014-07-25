@@ -38,17 +38,19 @@ public class MiscTest
         s = new String[] {null, null, null, null, "dud"};
 		Pair<Integer, String>[] p = Pair.unzip(new Pair<>(a, s));
 		PP.po(p);
-		PP.po(Pair.zip(p));
+		Pair<Integer[], String[]> zipped = Pair.zip(p);
+		PP.po(zipped.o1[0]);
 		
 		String A[] = new String[] {"lap2.3", "j_a-4", "_AZ63.2", "dud-2.4e3"};
-		PP.po(MiscUtil.map(A, new MiscUtil.DualFunc<String, Pair<String, Double>>()
+		Pair<String, Double> psd[] = MiscUtil.map(A, new MiscUtil.DualFunc<String, Pair<String, Double>>()
 				{
 					@Override
 					public Pair<String, Double> apply(String in)
 					{
 						return MiscUtil.splitStrNum(in);
 					}
-				}));
+				}, Pair.class);
+		PP.po(psd);
 		
 		PP.p("DONE");
 	}

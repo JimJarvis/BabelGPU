@@ -49,20 +49,55 @@ public class Pair<A, B> implements Comparable<Pair>, Serializable
 	}
 	
 	/**
-	 * Python zip. 
+	 * Python zip
+	 * Must explicitly give class info. Ugly java generics. 
 	 */
-	public static <A, B> Pair<A[], B[]> zip(Pair<A, B>[] pairs)
+	public static <A, B> Pair<A[], B[]> zip(Pair<A, B>[] pairs, Class ca, Class cb)
 	{
 		int N = pairs.length;
 		// Ugly workaround for Java's ugly generic erasure
-		A[] a = (A[]) Array.newInstance(((A) new Object()).getClass(), N);
-		B[] b = (B[]) Array.newInstance(((B) new Object()).getClass(), N);
+		// hunt for the first A that isn't null
+		A[] a = (A[]) Array.newInstance(ca, N);
+		B[] b = (B[]) Array.newInstance(cb, N);
 		for (int i = 0; i < N; ++i)
 		{
 			a[i] = pairs[i].o1;
 			b[i] = pairs[i].o2;
 		}
 		return new Pair<>(a, b);
+	}
+	
+	/**
+	 * Python zip. 
+	 * Ugly workaround, deduct class type from a concrete element. 
+	 */
+	public static <A, B> Pair<A[], B[]> zip(Pair<A, B>[] pairs)
+	{
+		int N = pairs.length;
+		if (N == 0)
+			throw new RuntimeException("Can't zip empty array");
+		int i = -1;
+		Class ca = null, cb = null;
+		while (++ i < N)
+			if (pairs[i].o1 != null)
+			{
+				ca = pairs[i].o1.getClass();
+				break;
+			}
+		if (ca == null)
+			throw new RuntimeException(
+					"Can't zip: all instances of the first element are null");
+		i = -1;
+		while (++ i < N)
+			if (pairs[i].o2 != null)
+			{
+				cb = pairs[i].o2.getClass();
+				break;
+			}
+		if (cb == null)
+			throw new RuntimeException(
+					"Can't zip: all instances of the second element are null");
+		return zip(pairs, ca, cb);
 	}
 	
 	/**
