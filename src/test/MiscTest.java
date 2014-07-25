@@ -1,6 +1,7 @@
 package test;
 
 import java.util.*;
+
 import deep.DeepNet;
 import utils.*;
 
@@ -29,6 +30,15 @@ public class MiscTest
 		
 		PP.p(MiscUtil.splitStrNum("Z_a-3.4"));
 		PP.p(MiscUtil.splitStrNum("Z_a"));
+		
+		Integer[] a = new Integer[] {3, null, 5, 6};
+		a = new Integer[] {8, null, null, null, null};
+		String[] s = new String[] {"aa", "bbb", "c", "dddd"};
+        s = new String[] {null, null, null, null, "dud"};
+		Pair<Integer, String>[] p = Pair.unzip(new Pair<>(a, s));
+		PP.po(p);
+		PP.po(Pair.zip(p));
+		
 		PP.p("DONE");
 	}
 
