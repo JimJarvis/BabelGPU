@@ -39,6 +39,18 @@ public class MiscTest
 		PP.po(p);
 		PP.po(Pair.zip(p));
 		
+		Integer A[] = new Integer[] {3, 4, 5, 1};
+		PP.po(MiscUtil.map(A, new MiscUtil.DualFunc<Integer, String>()
+				{
+					@Override
+					public String apply(Integer obj)
+					{
+						return obj*2 + "dudulu";
+					}
+					@Override
+					public Class<String> outClass() { return String.class; }
+				}));
+		
 		PP.p("DONE");
 	}
 

@@ -129,8 +129,51 @@ public class MiscUtil
 	}
 	
 	//**************************************************/
-	//******************* JCommander converter classes *******************/
+	//*********** Functional programming interface *******/
 	//**************************************************/
+	/**
+	 * Input and Output have different types
+	 */
+	public static interface DualFunc<In, Out>
+	{
+		public Out apply(In obj);
+		public Class<Out> outClass();
+	}
+	
+	/**
+	 * Input and Output have the same types
+	 */
+	public static interface MonoFunc<T>
+	{
+		public T apply(T obj);
+	}
+	
+	/**
+	 * Functional: map operation
+	 */
+	public static <In, Out> Out[] map(In[] input, DualFunc<In, Out> f)
+	{
+		Out[] ans = (Out[]) Array.newInstance(f.outClass(), input.length);
+		int i = 0;
+		for (In in : input)
+			ans[i ++] = f.apply(in);
+		return ans;
+	}
+
+	/**
+	 * Functional: map operation
+	 */
+	public static <T> T[] map(T[] input, MonoFunc<T> f)
+	{
+		T[] ans = (T[]) Array.newInstance(
+				input.getClass().getComponentType(), input.length);
+		int i = 0;
+		for (T in : input)
+			ans[i ++] = f.apply(in);
+		return ans;
+	}
+	
+	//********** JCommander converter classes *************/
 	/**
 	 * Comma separated
 	 */
