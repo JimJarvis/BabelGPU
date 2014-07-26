@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -479,7 +480,26 @@ public class FileUtil
 	 * Recursive traversal default to false. Matches everything
 	 * @see #listDir(String, String, boolean) listDir(dir, null, false)
 	 */
-	public static ArrayList<String> listDir(String dir) {	 return listDir(dir, DummyMatcher, false);	}
+	public static ArrayList<String> listDir(String dir, String... dir_)
+	{	 
+		return listDir(join(dir, dir_), DummyMatcher, false);
+	}
+	
+	/**
+	 * Save the jar executable to a specific dir
+	 * Useful to keep a copy of the program to reproduce results in the future
+	 */
+	public static void saveJar(Class main, String dir, String... dir_)
+	{
+		String source = main.getResource(main.getSimpleName() + ".class").getFile();
+		if(source.startsWith("/"))
+			throw new RuntimeException("The executable attempted to save is not a JAR.");
+		source = ClassLoader.getSystemClassLoader().getResource(source).getFile();
+		source = source.substring(0, source.lastIndexOf('!'));
+		if (source.startsWith("file:"))
+			source = source.substring("file:".length());
+		copy(source, join(dir, dir_));
+	}
 	
 	/**
 	 * Writes to a file
