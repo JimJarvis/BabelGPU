@@ -176,13 +176,27 @@ public class MiscUtil
 	{
 		public Out apply(In in);
 	}
+	/**
+	 * Supports index enumeration
+	 */
+	public static interface IndexedDualFunc<In, Out>
+	{
+		public Out apply(In in, int idx);
+	}
 	
 	/**
-	 * Input and Output have the same types
+	 * Supports index enumeration
 	 */
 	public static interface MonoFunc<T>
 	{
 		public T apply(T in);
+	}
+	/**
+	 * Input and Output have the same types
+	 */
+	public static interface IndexedMonoFunc<T>
+	{
+		public T apply(T in, int idx);
 	}
 	
 	/**
@@ -196,6 +210,20 @@ public class MiscUtil
 			ans[i ++] = f.apply(in);
 		return ans;
 	}
+	/**
+	 * Functional: map operation with index
+	 */
+	public static <In, Out> Out[] map(In[] input, IndexedDualFunc<In, Out> f, Class outClass)
+	{
+		Out[] ans = (Out[]) Array.newInstance(outClass, input.length);
+		int i = 0;
+		for (In in : input)
+		{
+			ans[i] = f.apply(in, i);
+			++ i;
+		}
+		return ans;
+	}
 
 	/**
 	 * Functional: map operation
@@ -207,6 +235,21 @@ public class MiscUtil
 		int i = 0;
 		for (T in : input)
 			ans[i ++] = f.apply(in);
+		return ans;
+	}
+	/**
+	 * Functional: map operation
+	 */
+	public static <T> T[] map(T[] input, IndexedMonoFunc<T> f)
+	{
+		T[] ans = (T[]) Array.newInstance(
+				input.getClass().getComponentType(), input.length);
+		int i = 0;
+		for (T in : input)
+		{
+			ans[i] = f.apply(in, i);
+			++ i;
+		}
 		return ans;
 	}
 	
