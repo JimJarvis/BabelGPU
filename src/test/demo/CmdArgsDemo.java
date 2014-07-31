@@ -53,8 +53,8 @@ public class CmdArgsDemo
 				"-bool", 
 				"-intarr", "3,9,20,-5", 
 				"-floatarr", "-0.3,1.21,4.9e-3,-.6e5",
-				"-doublemat", "1.2,-3.4;5.6,7.8;-9.0,2.3",
-				"-strmat", "lap,gauss,cauchy;mid;a,b,cc,ddd",
+				"-doublemat", "1.2,-3.4,,5.6,7.8,,-9.0,2.3",
+				"-strmat", "lap,gauss,cauchy,,mid,,a,b,cc,ddd",
 				"--help"};
 		CmdArgs cmd = new CmdArgs();
 		JCommander jcmder = new JCommander(cmd, args);

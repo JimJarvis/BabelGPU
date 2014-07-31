@@ -312,14 +312,14 @@ public class MiscUtil
 	}
 	
 	/**
-	 * Rows comma separated, cols colon separated
+	 * Rows comma separated, cols double comma separated
 	 */
 	public static class StringMatConverter implements IStringConverter<String[][]>
 	{
 		@Override
 		public String[][] convert(String arg0)
 		{
-			String[] rowstrs = arg0.split("[:]");
+			String[] rowstrs = arg0.split(",,");
 			String[][] smat = new String[rowstrs.length][];
 			int r = 0;
 			for (String row : rowstrs)
@@ -329,14 +329,14 @@ public class MiscUtil
 	}
 	
 	/**
-	 * Rows comma separated, cols colon separated
+	 * Rows comma separated, cols double comma separated
 	 */
 	public static class DoubleMatConverter implements IStringConverter<double[][]>
 	{
 		@Override
 		public double[][] convert(String arg0)
 		{
-			String[] rowstrs = arg0.split("[:]");
+			String[] rowstrs = arg0.split(",,");
 			double[][] dmat = new double[rowstrs.length][];
 			int c, r = 0;
 			for (String row : rowstrs)
