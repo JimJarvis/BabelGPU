@@ -3,6 +3,7 @@ package deep;
 import java.util.ArrayList;
 
 import utils.CpuUtil;
+import utils.PP;
 
 public abstract class LrScheme extends LearningPlan.Scheme
 {
@@ -128,7 +129,9 @@ public abstract class LrScheme extends LearningPlan.Scheme
 					else
 					{
 						net.recordLastEpochParams();
-						return plan.lr * improveDecayRate;
+						return plan.lr * 
+								(CpuUtil.isInfNaN(curLoss) ? 
+										worseDecayRate : improveDecayRate);
 					}
 				}
 				else // no decay

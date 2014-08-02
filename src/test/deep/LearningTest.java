@@ -131,7 +131,7 @@ public class LearningTest
 		PP.p("\nCase 2\n");
 		net.reset();
 		losses = new float[] 
-				{INF, INF, 5, 3, 2, 6, 5}; plan.totalEpochs = totalEpochs = losses.length;
+				{INF, INF, INF, 3, 2, 6, 5}; plan.totalEpochs = totalEpochs = losses.length;
 		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, worseDecayRate, improveDecayRate));
 		net.run(plan);
 		PP.p(plan.record);
