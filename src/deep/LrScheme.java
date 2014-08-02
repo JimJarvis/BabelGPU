@@ -2,6 +2,8 @@ package deep;
 
 import java.util.ArrayList;
 
+import utils.CpuUtil;
+
 public abstract class LrScheme extends LearningPlan.Scheme
 {
 	private static final long serialVersionUID = 1L;
@@ -81,10 +83,11 @@ public abstract class LrScheme extends LearningPlan.Scheme
 	 * let curL = heldout loss of this epoch, and 
 	 * let lastL = heldout loss of the last epoch. 
 	 * In order to keep the same learning rate, we require that curL < lastL *(1 - improvementTol).
-	 * if doesn't hold, we decay lr *= decayRate 
-	 * if curL > lastL (we're doing worse), roll back to last parameters, decay LR and try again
+	 * if doesn't hold, we decay lr *= improveDecayRate 
+	 * if curL > lastL (we're doing worse), roll back to last parameters, lr *= worseDecayRate
 	 */
-	public static LrScheme epochDecayScheme(final float improvementTol, final float decayRate)
+	public static LrScheme epochDecayScheme(
+			final float improvementTol, final float worseDecayRate, final float improveDecayRate)
 	{
 		return new LrScheme() {
 			private static final long serialVersionUID = 1L;
@@ -105,22 +108,28 @@ public abstract class LrScheme extends LearningPlan.Scheme
 
 				// If curLoss = INF, we're screwed
 				// If lastLoss = INF, curLoss isn't INF, we are good and don't 
-				boolean decay = Float.isInfinite(curLoss) 
-						|| ! Float.isInfinite(lastLoss)
+				boolean decay = CpuUtil.isInfNaN(curLoss) 
+						|| ! CpuUtil.isInfNaN(lastLoss)
 						&& (lastLoss - curLoss) / lastLoss < improvementTol;
 
 				// Instead of making progress, we're actually doing worse
-				boolean regress = plan.curEpoch != 0
-						&& (Float.isInfinite(curLoss)
+				boolean worse = plan.curEpoch != 0
+						&& (CpuUtil.isInfNaN(curLoss)
 							|| curLoss > lastLoss);
 
 				if (decay)
 				{   // Roll-back params to last epoch if our progress is actually regressive
-					if (regress)
+					if (worse)
+					{
 						net.restoreLastEpochParams();
+						return plan.lr * worseDecayRate;
+					}
+					// we aren't making as much progress as we'd like
 					else
+					{
 						net.recordLastEpochParams();
-					return plan.lr * decayRate;
+						return plan.lr * improveDecayRate;
+					}
 				}
 				else // no decay
 				{ // Record lastest theta

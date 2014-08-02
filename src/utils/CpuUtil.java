@@ -60,6 +60,14 @@ public class CpuUtil
 		return ans;
 	}
 	
+	/**
+	 * @return isInfinite or isNaN
+	 */
+	public static boolean isInfNaN(float f)
+	{
+		return Float.isInfinite(f) || Float.isNaN(f);
+	}
+	
 	//**************************************************/
 	//******************* FLOAT *******************/
 	//**************************************************/

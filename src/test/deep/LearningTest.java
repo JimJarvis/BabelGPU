@@ -121,24 +121,25 @@ public class LearningTest
 	public void epochDecayTest()
 	{
 		PP.pTitledSectionLine("Epoch Decay");
-		float decayRate = .5f;
+		float worseDecayRate = .5f;
+		float improveDecayRate = .9f;
 		losses = new float[] 
 				{5, 3, 2.9f, 2.7f, 2f, INF};  plan.totalEpochs = totalEpochs = losses.length;
-		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, decayRate));
+		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, worseDecayRate, improveDecayRate));
 		net.run(plan);
 		PP.p(plan.record);
 		PP.p("\nCase 2\n");
 		net.reset();
 		losses = new float[] 
 				{INF, INF, 5, 3, 2, 6, 5}; plan.totalEpochs = totalEpochs = losses.length;
-		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, decayRate));
+		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, worseDecayRate, improveDecayRate));
 		net.run(plan);
 		PP.p(plan.record);
 		PP.p("\nCase 3\n");
 		net.reset();
 		losses = new float[] 
 				{1, 2, INF, INF, 3, 2.9f, INF, 5, 4.9f}; plan.totalEpochs = totalEpochs = losses.length;
-		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, decayRate));
+		plan.setLrScheme(LrScheme.epochDecayScheme(0.2f, worseDecayRate, improveDecayRate));
 		net.run(plan);
 		PP.p(plan.record);
 	}
