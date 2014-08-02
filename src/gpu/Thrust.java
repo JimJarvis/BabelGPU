@@ -239,26 +239,32 @@ public class Thrust
 	
 	/**
 	 * Generate standard Laplacian distribution from uniform i.i.d
+	 * Correct for infinity values -> 0
 	 */
 	public static void laplacian(FloatMat x)
 	{
 		gpu_laplacian(x.getThrustPointer(), x.size(), 1, 0, 1);
+		correct_inf(x);
 	}
 	public static void laplacian(FloatMat x, FloatMat out)
 	{
 		gpu_laplacian(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0, 1);
+		correct_inf(x);
 	}
 	
 	/**
 	 * Generate standard Cauchy distribution from uniform i.i.d
+	 * Correct for infinity values -> 0
 	 */
 	public static void cauchy(FloatMat x)
 	{
 		gpu_cauchy(x.getThrustPointer(), x.size(), 1, 0, 1);
+		correct_inf(x);
 	}
 	public static void cauchy(FloatMat x, FloatMat out)
 	{
 		gpu_cauchy(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1, 0, 1);
+		correct_inf(x);
 	}
 	
 	public static float sum(FloatMat x)
@@ -417,6 +423,14 @@ public class Thrust
     public static void fill_rand_normal(FloatMat x, float mean, float stddev)
     {
     	Natives.gpu_fill_rand_normal(x.getThrustPointer(), x.size(), mean, stddev);
+    }
+    
+    /**
+     * Correct any infinity values to 0
+     */
+    public static void correct_inf(FloatMat x)
+    {
+    	Natives.gpu_correct_inf(x.getThrustPointer(), x.size());
     }
 
     // ******************** Softmax/labeling methods ****************** /

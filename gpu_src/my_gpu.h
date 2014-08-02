@@ -196,7 +196,6 @@ namespace MyGpu
 			return dist(rng);
 		}
 	};
-
 	template <typename T>
 	inline void gpu_fill_rand_normal(device_ptr<T> begin, int size, T mean, T stddev)
 	{
@@ -204,6 +203,23 @@ namespace MyGpu
 				  thrust::make_counting_iterator<int>(size), 
 				  begin, 
 				  rand_normal_struct<T>(mean, stddev));
+	}
+
+	// Correct all infinity to 0
+	template <typename T>
+	struct correct_inf_struct
+	{
+		T replaceVal;
+		correct_inf_struct(T _replaceVal) : replaceVal(_replaceVal) {}
+		__device__ __host__ T operator()(T x)
+		{
+			return fabs(x) > 1e5 ? replaceVal : x;
+		}
+	};
+	template <typename T>
+	inline void gpu_correct_inf(device_ptr<T> begin, int size, T replaceVal = 0)
+	{
+		transform(begin, begin + size, begin, correct_inf_struct<T>(replaceVal));
 	}
 
 	///////***** OTHER functions *****///////

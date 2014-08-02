@@ -195,6 +195,11 @@ public class Natives
     public static native void gpu_fill_rand_normal(
     		@ByVal FloatDevicePointer begin, int size, float mean, float stddev);
     
+    /**
+     * Correct any infinity values to 0
+     */
+    public static native void gpu_correct_inf(@ByVal FloatDevicePointer begin, int size);
+    
     // ******************** Softmax/labeling specific methods ****************** /
     /**
      * To calculate softmax() only, no subtraction from id[]
