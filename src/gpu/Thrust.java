@@ -269,47 +269,47 @@ public class Thrust
 	
 	/**
 	 * Triangular wave, full
-	 * @param scale range from -scale to +scale, default = 1
 	 * @param halfPeriod [0, halfPeriod), default = PI/2
+	 * @param scale range from -scale to +scale, default = 1
 	 */
-	public static void triangular_wave(FloatMat x, float scale, float halfPeriod)
+	public static void triangular_wave(FloatMat x, float halfPeriod, float scale)
 	{
 		gpu_triangular_wave(x.getThrustPointer(), x.size(), 1f/halfPeriod, 0, scale);
 	}
 	public static void trianglar_wave(FloatMat x)
 	{
-		triangular_wave(x, 1, (float) (Math.PI/2));
+		triangular_wave(x, (float) (Math.PI/2), 1);
 	}
-	public static void trianglar_wave(FloatMat x, FloatMat out, float scale, float halfPeriod)
+	public static void trianglar_wave(FloatMat x, FloatMat out, float halfPeriod, float scale)
 	{
 		gpu_triangular_wave(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1f/halfPeriod, 0, scale);
 	}
 	public static void trianglar_wave(FloatMat x, FloatMat out)
 	{
-		trianglar_wave(x, out, 1, (float) (Math.PI/2));
+		trianglar_wave(x, out, (float) (Math.PI/2), 1);
 	}
 	
 	
 	/**
 	 * Triangular wave, positive only
-	 * @param scale range from 0 to +scale, default = 1
 	 * @param halfPeriod [0, halfPeriod), default = PI/2
+	 * @param scale range from 0 to +scale, default = 1
 	 */
-	public static void trianglar_wave_positive(FloatMat x, float scale, float halfPeriod)
+	public static void trianglar_wave_positive(FloatMat x, float halfPeriod, float scale)
 	{
 		gpu_triangular_wave_positive(x.getThrustPointer(), x.size(), 1f/halfPeriod, 0, scale);
 	}
 	public static void trianglar_wave_positive(FloatMat x)
 	{
-		trianglar_wave_positive(x, 1, (float) (Math.PI/2));
+		trianglar_wave_positive(x, (float) (Math.PI/2), 1);
 	}
-	public static void trianglar_wave_positive(FloatMat x, FloatMat out, float scale, float halfPeriod)
+	public static void trianglar_wave_positive(FloatMat x, FloatMat out, float halfPeriod, float scale)
 	{
 		gpu_triangular_wave_positive(x.getThrustPointer(), x.size(), out.getThrustPointer(), 1f/halfPeriod, 0, scale);
 	}
 	public static void trianglar_wave_positive(FloatMat x, FloatMat out)
 	{
-		trianglar_wave_positive(x, out, 1, (float) (Math.PI/2));
+		trianglar_wave_positive(x, out, (float) (Math.PI/2), 1);
 	}
 
 	

@@ -30,8 +30,7 @@ public class CosineUnit extends ElementComputeUnit
 	@Override
 	public void backward_element()
 	{
-		FloatMat grad = input.gradient();
-		Thrust.sin(input.data(), grad, 1, 0, -1);
+		Thrust.sin(input.data(), input.gradient(), 1, 0, -1);
 	}
 
 }
