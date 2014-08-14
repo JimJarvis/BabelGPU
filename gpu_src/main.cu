@@ -343,20 +343,19 @@ void test_rand_normal()
 	printD(In, 12);
 }
 
-
 int main()
 {
-	test_rand_normal();
-	test_tranpose();
-	test_sigmoid();
-	test_softmax_minus_id_batch();
-	test_softmax_batch();
-	test_set_row_col();
-	test_exp_double();
-	test_sort_copy_swap_double();
-	test_exp();
-	test_exp_out_pointer();
-	test_sort_copy_swap();
+	//test_rand_normal();
+	//test_tranpose();
+	//test_sigmoid();
+	//test_softmax_minus_id_batch();
+	//test_softmax_batch();
+	//test_set_row_col();
+	//test_exp_double();
+	//test_sort_copy_swap_double();
+	//test_exp();
+	//test_exp_out_pointer();
+	//test_sort_copy_swap();
 
 	return 0;
 }

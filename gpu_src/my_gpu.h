@@ -24,6 +24,9 @@
 #include <cstdlib>
 using namespace thrust;
 
+#define _HD_ template<typename T> __host__ __device__ inline
+#define PI 3.14159265358979
+
 // Macro defines functors for linear transformations inside an elementary unary function
 // for example, functor: m * exp(a * x + b) 
 // default m = 1, a = 1 and b = 0
@@ -110,42 +113,34 @@ namespace MyGpu
 	GEN_transf_2(fmod);
 
 	/* Other non-standard functions */
-	template<typename T> __host__ __device__
-	inline T sigmoid(T x) { return 1.0 / (1 + exp(-x)); }
+	_HD_ T sigmoid(T x) { return 1.0 / (1 + exp(-x)); }
 	GEN_transf(sigmoid);
 	// Sigmoid derivative: x .* (1 - x)
-	template<typename T> __host__ __device__
-	inline T sigmoid_deriv(T x) { return x * (1 - x); }
+	_HD_ T sigmoid_deriv(T x) { return x * (1 - x); }
 	GEN_transf(sigmoid_deriv);
 
 	// simple square routine
-	template<typename T> __host__ __device__
-	inline T square(T x) { return x * x; }
+	_HD_ T square(T x) { return x * x; }
 	GEN_transf(square);
 	// simple cube routine
-	template<typename T> __host__ __device__
-	inline T cube(T x) { return x * x * x; }
+	_HD_ T cube(T x) { return x * x * x; }
 	GEN_transf(cube);
 	// simple reciprocal routine
-	template<typename T> __host__ __device__
-	inline T reciprocal(T x) { return 1.0/x; }
+	_HD_ T reciprocal(T x) { return 1.0/x; }
 	GEN_transf(reciprocal);
 
 	// Random distribution generators
 	// Cauchy CDF: given a uniform random var, transform it to be cauchy
-	template<typename T> __host__ __device__
-	inline T cauchy(T x) { return tan(M_PI * (x - 0.5)); }
+	_HD_ T cauchy(T x) { return tan(M_PI * (x - 0.5)); }
 	GEN_transf(cauchy);
 
 	// Laplacian CDF: given a uniform random var, transform it to be lap
 	// if < 0, return -1; > 0, return 1
-	template<typename T> __host__ __device__
-	inline T signum(T val)
+	_HD_ T signum(T val)
 	{
 		return (0 < val) - (val < 0);
 	}
-	template<typename T> __host__ __device__
-	inline T laplacian(T x)
+	_HD_ T laplacian(T x)
 	{ 
 		x -= 0.5;
 		return -signum(x) * log(1 - 2 * fabs(x));
@@ -180,6 +175,30 @@ namespace MyGpu
 	{
 		gpu_linear<T>(begin, size, begin, a, b);
 	}
+
+	/* Triangular wave */
+	template <typename T>
+	struct functor_triangular_wave
+	{
+		const T scale, halfPeriod;
+		functor_triangular_wave(T _scale = 1, T _halfPeriod = PI / 2) : scale(_scale), halfPeriod(_halfPeriod) {}
+		__host__ __device__ T operator()(const T& x) const
+		{ 
+			return scale * fabs(fmod(fabs(x / halfPeriod), 2) - 1);
+		}
+	};
+	template<typename T>
+	inline void gpu_triangular_wave(
+		device_ptr<T> begin, int size, device_ptr<T> out, T scale = 1, T halfPeriod = PI / 2)
+	{
+		transform(begin, begin + size, out, functor_triangular_wave<T>(scale, halfPeriod));
+	}
+	template<typename T>
+	inline void gpu_triangular_wave(device_ptr<T> begin, int size, T scale = 1, T halfPeriod = PI / 2)
+	{
+		gpu_triangular_wave<T>(begin, size, begin, scale, halfPeriod);
+	}
+
 
 	// Thrust normal distribution. cuRAND one breaks under certain conditions, like misaligned address
 	template<typename T>
@@ -222,7 +241,9 @@ namespace MyGpu
 		transform(begin, begin + size, begin, correct_inf_struct<T>(replaceVal));
 	}
 
-	///////***** OTHER functions *****///////
+	/**********************************************/
+	/*********** Other functions  ***********/
+	/**********************************************/
 	template <typename T>
 	inline T gpu_min(device_ptr<T> begin, int size) 
 	{
