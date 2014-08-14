@@ -117,7 +117,19 @@ public class Natives
     public static native void gpu_cauchy(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
     public static native void gpu_cauchy(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
-    // other
+    /**
+     * Triangular wave
+     */
+    public static native void gpu_triangular_wave(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_triangular_wave(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
+    
+    /**
+     * Triangular wave positive only
+     */
+    public static native void gpu_triangular_wave_positive(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_triangular_wave_positive(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
+    
+    /***** other ******/
     public static native float gpu_max(@ByVal FloatDevicePointer begin, int size);
     public static native float gpu_min(@ByVal FloatDevicePointer begin, int size);
 

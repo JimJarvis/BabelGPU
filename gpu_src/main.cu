@@ -1,7 +1,6 @@
 #include "my_gpu.h"
 #include "my_kernel.h"
 #include <iostream>
-#define PI 3.14159265358979
 #define range &D[0],D.size()
 #define pr(stuff) std::cout << stuff << std::endl
 using namespace MyGpu;
@@ -356,6 +355,10 @@ int main()
 	//test_exp();
 	//test_exp_out_pointer();
 	//test_sort_copy_swap();
+	device_vector<float> In(12);
+	gpu_fill_rand_normal<float>(&In[0], 9, 30.0, 2.5);
+	gpu_triangular_wave(&In[0], 10);
+	printD(In, 12);
 
 	return 0;
 }

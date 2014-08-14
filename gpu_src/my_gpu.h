@@ -177,27 +177,21 @@ namespace MyGpu
 	}
 
 	/* Triangular wave */
-	template <typename T>
-	struct functor_triangular_wave
+	// full wave
+	_HD_ T triangular_wave(T x)
 	{
-		const T scale, halfPeriod;
-		functor_triangular_wave(T _scale = 1, T _halfPeriod = PI / 2) : scale(_scale), halfPeriod(_halfPeriod) {}
-		__host__ __device__ T operator()(const T& x) const
-		{ 
-			return scale * fabs(fmod(fabs(x / halfPeriod), 2) - 1);
-		}
-	};
-	template<typename T>
-	inline void gpu_triangular_wave(
-		device_ptr<T> begin, int size, device_ptr<T> out, T scale = 1, T halfPeriod = PI / 2)
-	{
-		transform(begin, begin + size, out, functor_triangular_wave<T>(scale, halfPeriod));
+		// Must explicitly cast to 'float', otherwise compiler will falsely
+		// invoke the std::fmod() that only runs on host
+		return 2*fabs(fmod(fabs(x), float(2)) - 1)-1;
 	}
-	template<typename T>
-	inline void gpu_triangular_wave(device_ptr<T> begin, int size, T scale = 1, T halfPeriod = PI / 2)
+	GEN_transf(triangular_wave);
+
+	// postive only
+	_HD_ T triangular_wave_positive(T x)
 	{
-		gpu_triangular_wave<T>(begin, size, begin, scale, halfPeriod);
+		return fabs(fmod(fabs(x), float(2)) - 1);
 	}
+	GEN_transf(triangular_wave_positive);
 
 
 	// Thrust normal distribution. cuRAND one breaks under certain conditions, like misaligned address

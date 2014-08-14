@@ -9,6 +9,7 @@ public class MiscTest
 	public static void main(String[] args)
 	{
 		GpuBlas.init();
+		
 		FloatMat aa = new FloatMat(300000000, 1, false);
 		Initializer.uniformRandIniter(1).init(aa);
 		Timer t = Timer.getInstance();
