@@ -56,6 +56,14 @@ public abstract class Initializer implements Serializable
 	{
 		gRand.resetSeed(GpuRand.SEED);
 	}
+	
+	/**
+	 * Reset random generator to specified seed
+	 */
+	public static void resetRand(long seed)
+	{
+		gRand.resetSeed(seed);
+	}
 
 	/**
 	 * Initialize uniform random parameter matrix from low to high
