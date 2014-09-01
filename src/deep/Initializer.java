@@ -340,4 +340,22 @@ public abstract class Initializer implements Serializable
 				MiscUtil.repeatedArray(gamma, projKernels.length),
 				relativeRatios);
 	}
+	
+	// ******************** Copy initer ********************/
+	public static Initializer copyIniter(final ParamUnit otherW)
+	{
+		return new Initializer()
+		{
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void init(FloatMat w) { }
+			@Override
+			public void init(ParamUnit W)
+			{
+				if (W.data() != null)
+					W.data().destroy();
+				W.setData(otherW.data());
+			}
+		};
+	}
 }

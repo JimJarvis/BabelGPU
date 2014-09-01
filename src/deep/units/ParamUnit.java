@@ -32,6 +32,8 @@ public class ParamUnit extends DataUnit
 	 */
 	@Override
 	public FloatMat data() { return this.data; }
+	
+	public void setData(FloatMat data) { this.data = data; }
 
 	/**
 	 * Simply 'gradient'. No colOffset
