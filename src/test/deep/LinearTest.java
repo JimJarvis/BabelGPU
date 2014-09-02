@@ -32,7 +32,7 @@ public class LinearTest
 	{
 		DeepNet linearLayers = 
 				DeepFactory.debugLinearLayers(
-						uniRandInlet(2, 3, InletMode.GoldSumTo1),
+						uniRandInlet(2, 3, true),
 						new int[] {5, 6, outDim},
 						CrossEntropyTUnit.class, 
 						Initializer.uniformRandIniter(1));
@@ -47,7 +47,7 @@ public class LinearTest
 	{
 		DeepNet linearLayers = 
 				DeepFactory.debugLinearLayers(
-						uniRandInlet(1, 0, InletMode.GoldLabel),
+						uniRandInlet(1, 0, true),
 						new int[] {8, 3, outDim},
 						SparseCrossEntropyTUnit.class, 
 						Initializer.uniformRandIniter(1));

@@ -44,7 +44,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	
 	public DeepNet(String name, InletUnit inlet, ArrayList<ComputeUnit> units)
 	{
-		this(name, inlet, units.toArray(new ComputeUnit[units.size()]));
+		this(name, inlet, MiscUtil.toArray(units, ComputeUnit.class));
 	}
 	
 	/**
@@ -204,7 +204,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	public void reset()
 	{
 		Initializer.resetRand();
-		for (ParamUnit w : this.getParams())
+		for (ParamUnit w : this.getParamList())
 			w.reInit();
 		learningPlan.reset();
 		inlet.reset();
@@ -236,7 +236,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
     					break;
     			}
 
-			getParams(); // refresh param-list
+			getParamList(); // refresh param-list
 			setup = true;
 		}
 	}
@@ -309,6 +309,17 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 		return unitMap;
 	}
 	
+	/**
+	 * @return compute unit list
+	 */
+	public ArrayList<ComputeUnit> getUnitList()
+	{
+		ArrayList<ComputeUnit> unitList = new ArrayList<>();
+		for (ComputeUnit unit : this)
+			unitList.add(unit);
+		return unitList;
+	}
+	
 	// ******************** Serialization ********************/
 	/**
 	 * Default: save nothing
@@ -366,7 +377,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	 * set this.paramList
 	 * @return all ParamUnit from all ParamComputeUnits, in forward order
 	 */
-	public ParamList getParams()
+	public ParamList getParamList()
 	{
 		// Make sure we get the latest list of params
 		// a non-empty paramList with null entries means the parameters aren't set yet
@@ -378,6 +389,13 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 		return this.paramList = new ParamList(this);
 	}
 	
+	public void clearParamLists()
+	{
+		this.paramList = null;
+		this.bestParamList = null;
+		this.lastEpochParamList = null;
+	}
+	
 	/**
 	 * Copy the current params to bestParamList if this is indeed the best epoch. 
 	 * Best param units are deep copies of paramList, and their names suffixed by '_best'
@@ -386,7 +404,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	public void recordBestParams()
 	{
 		if (bestParamList == null)
-			bestParamList = new ParamList(getParams(), "_best");
+			bestParamList = new ParamList(getParamList(), "_best");
 		else
 			bestParamList.copyDataFrom(paramList);
 	}
@@ -407,7 +425,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	public void recordLastEpochParams()
 	{
 		if (lastEpochParamList == null)
-			lastEpochParamList = new ParamList(getParams(), "_last");
+			lastEpochParamList = new ParamList(getParamList(), "_last");
 		else
 		// Copies data over
 			lastEpochParamList.copyDataFrom(paramList);
@@ -532,7 +550,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 	 	this.printDebug(true);
 		
 		// Handle debug networks that have no params
-		if (this.getParams().size() == 0)
+		if (this.getParamList().size() == 0)
 			inlet.initGradient();
 
 		int i = 1;
@@ -586,7 +604,7 @@ public class DeepNet implements Iterable<ComputeUnit>, Serializable
 		this.setup(learningPlan);
 		this.reset(); inlet.nextBatch();
 		
-		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) this.getParams().clone();
+		ArrayList<ParamUnit> params = (ArrayList<ParamUnit>) this.getParamList().clone();
 		// We also do gradient checking for pure computing networks that have no parameters
 		boolean hasParams = params.size() != 0;
 		

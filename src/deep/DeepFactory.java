@@ -1,6 +1,7 @@
 package deep;
 
 import java.util.ArrayList;
+
 import utils.*;
 import deep.units.*;
 
@@ -25,7 +26,7 @@ public class DeepFactory
 			units.add(new LinearUnit("", inlet, layerDims[i], initers[i]) );
 			units.add(new SigmoidUnit("", inlet));
 		}
-		units.add(new SquareErrorTUnit("", inlet));
+		units.add(new SparseCrossEntropyTUnit("", inlet));
 
 		return 
 			new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
@@ -57,6 +58,27 @@ public class DeepFactory
 	{
 		return simpleSigmoidNet(inlet, layerDims, 
 				MiscUtil.repeatedArray(initer, layerDims.length));
+	}
+	
+	/**
+	 * Add one more layer to simple sigmoid net
+	 */
+	public static DeepNet growSimpleSigmoidNet(DeepNet oldNet, int newLayerDim)
+	{
+		ArrayList<ComputeUnit> units = oldNet.getUnitList();
+		TerminalUnit terminal = (TerminalUnit) MiscUtil.get(units, -1);
+		InletUnit inlet = oldNet.inlet;
+		// add sigmoid linear layer
+		MiscUtil.set(units, -1, 
+				new LinearUnit("", inlet, newLayerDim, 
+				Initializer.uniformRandIniter((float) Math.sqrt(3 / newLayerDim))));
+		units.add(new SigmoidUnit("", inlet));
+		units.add(terminal);
+		
+		DeepNet newNet = 
+			new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
+		
+		return newNet;
 	}
 	
 	/**

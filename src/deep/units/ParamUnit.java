@@ -61,6 +61,15 @@ public class ParamUnit extends DataUnit
 		((ParamComputeUnit) parent).reInit();
 	}
 	
+	/**
+	 * Set initer if its parent ParamComputeUnit supports 
+	 */
+	public void setIniter(Initializer initer)
+	{
+		if (parent != null)
+			((ParamComputeUnit) parent).initer = initer;
+	}
+	
 	// Internal serialization: copy this for subclasses
 	private void writeObject(ObjectOutputStream out) throws IOException
 	{

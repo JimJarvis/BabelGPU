@@ -44,11 +44,47 @@ public class MiscUtil
 	/**
 	 * @return primitive array
 	 */
-	public static <T> T[] toArray(ArrayList<T> list)
+	public static <T> T[] toArray(ArrayList<T> list, Class cl)
 	{
-		T[] arr = (T[]) new Object[list.size()];
+		T[] arr = (T[]) Array.newInstance(cl, list.size());
 		list.toArray(arr);
 		return arr;
+	}
+	
+	/**
+	 * Get element. Python style indexing
+	 */
+	public static <T> T get(ArrayList<T> list, int i)
+	{
+		if (i < 0)	i += list.size();
+		return list.get(i);
+	}
+	
+	/**
+	 * Get element. Python style indexing
+	 */
+	public static <T> T get(T[] arr, int i)
+	{
+		if (i < 0)	i += arr.length;
+		return arr[i];
+	}
+	
+	/**
+	 * Set element. Python style indexing
+	 */
+	public static <T> void set(ArrayList<T> list, int i, T ele)
+	{
+		if (i < 0)	i += list.size();
+		list.set(i, ele);
+	}
+	
+	/**
+	 * Set element. Python style indexing
+	 */
+	public static <T> void set(T[] arr, int i, T ele)
+	{
+		if (i < 0)	i += arr.length;
+		arr[i] = ele;
 	}
 	
 	/**

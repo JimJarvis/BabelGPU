@@ -16,7 +16,7 @@ public abstract class RegScheme extends LearningPlan.Scheme
 	{
 		DeepNet net = plan.net;
 		return net.doesCalcLoss() && plan.hasReg() ?
-				regLoss_(plan, net.getParams()) : 0;
+				regLoss_(plan, net.getParamList()) : 0;
 	}
 	
 	/**
