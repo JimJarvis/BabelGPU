@@ -33,7 +33,7 @@ public class ElementComputeTest
 		DeepNet net = 
 				DeepFactory.debugElementComputeLayers(
 						SigmoidUnit.class, 
-						uniRandInlet(2, 1, InletMode.GoldSumTo1), 
+						uniRandInlet(2, 1, true), 
 						1, scalor, 
 						CrossEntropyTUnit.class);
 		net.name = "Sigmoid + CrossEntropy";
@@ -63,7 +63,7 @@ public class ElementComputeTest
 		DeepNet net = 
 				DeepFactory.debugElementComputeLayers(
 						CosineUnit.class, 
-						uniRandInlet(2, 1, InletMode.GoldSumTo1), 
+						uniRandInlet(2, 1, true), 
 						2, scalor, 
 						CrossEntropyTUnit.class);
 		net.name = "Cosine + CrossEntropy";
@@ -78,7 +78,7 @@ public class ElementComputeTest
 		DeepNet net = 
 				DeepFactory.debugElementComputeLayers(
 						CosineUnit.class, 
-						uniRandInlet(3, 1, InletMode.GoldLabel), 
+						uniRandInlet(3, 1, true), 
 						3, scalor, 
 						SparseCrossEntropyTUnit.class);
 		net.name = "Cosine + SparseCrossEntropy";

@@ -32,7 +32,7 @@ public class CombinedTest
 	{
 		DeepNet fourierNet =
 				DeepFactory.fourierProjectionNet(
-						uniRandInlet(3, 0, InletMode.GoldLabel), 
+						uniRandInlet(3, 0), 
 //						uniformInlet(1, 0), 
 						new int[] {5, 4, 10, outDim}, 
 						new Initializer[] {
@@ -49,7 +49,7 @@ public class CombinedTest
 	@Ignore
 	public void debugFourierTest()
 	{
-		InletUnit inlet = uniRandInlet(3, 0, InletMode.GoldLabel);
+		InletUnit inlet = uniRandInlet(3, 0);
 		int[] projDims = new int[] {5, 10, 6};
 		int[] linearDims = new int[] {8, 6, outDim};
 
