@@ -68,6 +68,13 @@ public class MiscUtil
 		if (i < 0)	i += arr.length;
 		return arr[i];
 	}
+	/**
+	 * Get element. Python style indexing
+	 */
+	public static int get(int[] arr, int i) { if (i < 0)	i += arr.length; return arr[i]; }
+	
+	public static <T> boolean isEmpty(T[] arr) { return arr.length == 0; }
+	public static boolean isEmpty(int[] arr) { return arr.length == 0; }
 	
 	/**
 	 * Set element. Python style indexing
