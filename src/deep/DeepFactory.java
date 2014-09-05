@@ -24,7 +24,8 @@ public class DeepFactory
 		for (int i = 0; i < layerDims.length; i++)
 		{
 			units.add(new LinearUnit("", inlet, layerDims[i], initers[i]) );
-			units.add(new SigmoidUnit("", inlet));
+			if (i != layerDims.length - 1) // if not the last
+                units.add(new SigmoidUnit("", inlet));
 		}
 		units.add(new SparseCrossEntropyTUnit("", inlet));
 
@@ -69,10 +70,9 @@ public class DeepFactory
 		TerminalUnit terminal = (TerminalUnit) MiscUtil.get(units, -1);
 		InletUnit inlet = oldNet.inlet;
 		// add sigmoid linear layer
-		MiscUtil.set(units, -1, 
-				new LinearUnit("", inlet, newLayerDim, 
-				Initializer.uniformRandIniter((float) Math.sqrt(3 / newLayerDim))));
-		units.add(new SigmoidUnit("", inlet));
+		MiscUtil.set(units, -1, new SigmoidUnit("", inlet));
+		units.add(new LinearUnit("", inlet, newLayerDim, 
+				Initializer.uniformRandIniter((float) Math.sqrt(3.0 / newLayerDim))));
 		units.add(terminal);
 		
 		DeepNet newNet = 

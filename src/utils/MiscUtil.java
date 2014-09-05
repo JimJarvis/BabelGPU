@@ -76,6 +76,25 @@ public class MiscUtil
 	public static <T> boolean isEmpty(T[] arr) { return arr.length == 0; }
 	public static boolean isEmpty(int[] arr) { return arr.length == 0; }
 	
+	public static <T> T[] subArr(T[] arr, int start, int len)
+	{
+		if (arr.length == 0)		return arr;
+		T[] ans = (T[]) Array.newInstance(arr[0].getClass(), len);
+		int pt = 0;
+		for (int i = start; i < start + len; ++i)
+			ans[pt ++] = arr[i];
+		return ans;
+	}
+	
+	public static float[] subArr(float[] arr, int start, int len)
+	{
+		float[] ans = new float[len];
+		int pt = 0;
+		for (int i = start; i < start + len; ++i)
+			ans[pt ++] = arr[i];
+		return ans;
+	}
+	
 	/**
 	 * Set element. Python style indexing
 	 */
