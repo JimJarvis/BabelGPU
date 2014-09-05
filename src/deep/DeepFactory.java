@@ -63,8 +63,9 @@ public class DeepFactory
 	
 	/**
 	 * Add one more layer to simple sigmoid net
+	 * @param initZero true to init all to zero. False to init to random numbers. 
 	 */
-	public static DeepNet growSimpleSigmoidNet(DeepNet oldNet, int newLayerDim)
+	public static DeepNet growSimpleSigmoidNet(DeepNet oldNet, int newLayerDim, boolean initZero)
 	{
 		ArrayList<ComputeUnit> units = oldNet.getUnitList();
 		TerminalUnit terminal = (TerminalUnit) MiscUtil.get(units, -1);
@@ -72,7 +73,8 @@ public class DeepFactory
 		// add sigmoid linear layer
 		MiscUtil.set(units, -1, new SigmoidUnit("", inlet));
 		units.add(new LinearUnit("", inlet, newLayerDim, 
-				Initializer.uniformRandIniter((float) Math.sqrt(3.0 / newLayerDim))));
+				initZero ? Initializer.fillIniter(0) :
+					Initializer.uniformRandIniter((float) Math.sqrt(3.0 / newLayerDim))));
 		units.add(terminal);
 		
 		DeepNet newNet = 

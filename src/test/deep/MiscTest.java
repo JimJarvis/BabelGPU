@@ -30,7 +30,7 @@ public class MiscTest
 		PP.pSectionLine();
 		PP.pTitledSectionLine("NEW");
 		Initializer.resetRand(197000);
-		net = DeepFactory.growSimpleSigmoidNet(net, 3);
+		net = DeepFactory.growSimpleSigmoidNet(net, 3, false);
 		net.setup(new LearningPlan("", null, 3, 1, 100, 10));
 		PP.p(net.getParamList());
 	}
