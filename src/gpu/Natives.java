@@ -129,6 +129,18 @@ public class Natives
     public static native void gpu_triangular_wave_positive(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
     public static native void gpu_triangular_wave_positive(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
     
+    /**
+     * Rectified linear function: x > 0 ? x : 0
+     */
+    public static native void gpu_rectified_linear(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_rectified_linear(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
+    
+    /**
+     * Rectified linear function: x > 0 ? 1 : 0
+     */
+    public static native void gpu_rectified_linear_deriv(@ByVal FloatDevicePointer begin, int size, float a, float b, float m);
+    public static native void gpu_rectified_linear_deriv(@ByVal FloatDevicePointer begin, int size, @ByVal FloatDevicePointer out, float a, float b, float m);
+    
     /***** other ******/
     public static native float gpu_max(@ByVal FloatDevicePointer begin, int size);
     public static native float gpu_min(@ByVal FloatDevicePointer begin, int size);

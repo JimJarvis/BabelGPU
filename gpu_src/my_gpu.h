@@ -193,6 +193,17 @@ namespace MyGpu
 	}
 	GEN_transf(triangular_wave_positive);
 
+	_HD_ T rectified_linear(T x)
+	{
+		return x > 0 ? x : 0;
+	}
+	GEN_transf(rectified_linear);
+
+	_HD_ T rectified_linear_deriv(T x)
+	{
+		return x > 0 ? 1 : 0;
+	}
+	GEN_transf(rectified_linear_deriv);
 
 	// Thrust normal distribution. cuRAND one breaks under certain conditions, like misaligned address
 	template<typename T>

@@ -29,10 +29,8 @@ public class MiscTest
 		FloatMat b = new FloatMat(B.clone());
 		FloatMat m = b.clone();
 		FloatMat a = new FloatMat(A.clone());
-		PP.p(Thrust.square_sum(a));
-		PP.p(Thrust.square_sum(b));
-		PP.p(Thrust.abs_sum(a));
-		PP.p(Thrust.abs_sum(b));
+        Thrust.rectified_linear_deriv(b);
+		PP.p(b);
 		
 		System.exit(0);
 		

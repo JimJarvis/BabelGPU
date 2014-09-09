@@ -312,7 +312,40 @@ public class Thrust
 		trianglar_wave_positive(x, out, (float) (Math.PI/2), 1);
 	}
 
+	/**
+	 * x > 0 ? x : 0
+	 */
+	public static void rectified_linear(FloatMat x, float a, float b, float m)
+	{
+		gpu_rectified_linear(x.getThrustPointer(), x.size(), a, b, m);
+	}
+	/**
+	 * x > 0 ? x : 0
+	 */
+	public static void rectified_linear(FloatMat x,  FloatMat out, float a, float b, float m)
+	{
+		gpu_rectified_linear(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
+	}
+	public static void rectified_linear(FloatMat x) {  rectified_linear(x, 1, 0, 1); }
+	public static void rectified_linear(FloatMat x, FloatMat out) {  rectified_linear(x, out, 1, 0, 1); }
 	
+
+	/**
+	 * x > 0 ? x : 0
+	 */
+	public static void rectified_linear_deriv(FloatMat x, float a, float b, float m)
+	{
+		gpu_rectified_linear_deriv(x.getThrustPointer(), x.size(), a, b, m);
+	}
+	/**
+	 * x > 0 ? x : 0
+	 */
+	public static void rectified_linear_deriv(FloatMat x,  FloatMat out, float a, float b, float m)
+	{
+		gpu_rectified_linear_deriv(x.getThrustPointer(), x.size(), out.getThrustPointer(), a, b, m);
+	}
+	public static void rectified_linear_deriv(FloatMat x) {  rectified_linear_deriv(x, 1, 0, 1); }
+	public static void rectified_linear_deriv(FloatMat x, FloatMat out) {  rectified_linear_deriv(x, out, 1, 0, 1); }
 	
 	public static float sum(FloatMat x)
 	{
