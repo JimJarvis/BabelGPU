@@ -13,32 +13,46 @@ public class DeepFactory
 	/**
 	 * @param number of neurons in each layer, 
 	 * from the first hidden layer to output layer (included)
-	 * @param initers for each layer
+	 * @param initers for each layer. If only 1 initer, we repeat it for all layers
 	 */
-	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer... initers)
+	public static DeepNet simpleForwardNet(
+			InletUnit inlet, int[] layerDims, 
+			Class<? extends ElementComputeUnit>[] activationLayers, 
+			Initializer... initers)
 	{
-		if (initers.length < layerDims.length)
+		int layerN = layerDims.length;
+		
+		if (initers.length == 1) // repeat for all layers
+			initers = MiscUtil.repeatedArray(initers[0], layerN);
+		else if (initers.length < layerN)
 			throw new DeepException("Not enough initializers for each layer");
 		
+		if (activationLayers.length != layerN - 1)
+			throw new DeepException(
+					"Number of activation layers should be 1 less than number of layerDims, "
+					+ "because the last layer will always be SparseCrossEntropy");
+
 		ArrayList<ComputeUnit> units = new ArrayList<>();
-		for (int i = 0; i < layerDims.length; i++)
+		for (int i = 0; i < layerN; i++)
 		{
 			units.add(new LinearUnit("", inlet, layerDims[i], initers[i]) );
-			if (i != layerDims.length - 1) // if not the last
-                units.add(new SigmoidUnit("", inlet));
+			if (i != layerN - 1) // if not the last
+                units.add(defaultElementComputeCtor(activationLayers[i], inlet, 1));
 		}
 		units.add(new SparseCrossEntropyTUnit("", inlet));
 
 		return 
-			new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
+			new DeepNet("SimpleForwardNet", inlet, units).genDefaultUnitName();
 	}
-	
+
 	/**
 	 * @param number of neurons in each layer
 	 * from the first hidden layer to output layer (included)
 	 * We use the sqrt(6 / (L_in + L_out)) default init scheme
 	 */
-	public static DeepNet simpleSigmoidNet(InletUnit inlet, int ... layerDims)
+	public static DeepNet simpleForwardNet(InletUnit inlet, 
+			Class<? extends ElementComputeUnit>[] activationLayers, 
+			int ... layerDims)
 	{
 		int layerN = layerDims.length;
 		Initializer[] initers = new Initializer[layerN];
@@ -49,38 +63,68 @@ public class DeepFactory
 			float symmInitRange = (float) Math.sqrt(6 / (L_in + L_out));
 			initers[i] = Initializer.uniformRandIniter(symmInitRange);
 		}
-		return simpleSigmoidNet(inlet, layerDims, initers);
+		return simpleForwardNet(inlet, layerDims, activationLayers, initers);
 	}
-	
+
 	/**
-	 * Use single initer for all layers
+	 * Repeated activation layers with sqrt(3/(L1 + L2)) initer
 	 */
-	public static DeepNet simpleSigmoidNet(InletUnit inlet, int[] layerDims, Initializer initer)
+	public static DeepNet simpleForwardNet(InletUnit inlet, 
+			Class<? extends ElementComputeUnit> activationLayer, 
+			int ... layerDims)
 	{
-		return simpleSigmoidNet(inlet, layerDims, 
+		return simpleForwardNet(inlet,
+				MiscUtil.repeatedArray(activationLayer, layerDims.length - 1),
+				layerDims);
+	}
+
+	/**
+	 * Repeated activation layers with a single repeated initer
+	 */
+	public static DeepNet simpleForwardNet(InletUnit inlet, 
+			Class<? extends ElementComputeUnit> activationLayer, 
+			Initializer initer, int ... layerDims)
+	{
+		return simpleForwardNet(inlet, layerDims, 
+				MiscUtil.repeatedArray(activationLayer, layerDims.length - 1),
 				MiscUtil.repeatedArray(initer, layerDims.length));
 	}
 	
+
+	public static DeepNet simpleSigmoidNet(InletUnit inlet, int ... layerDims)
+	{
+		return simpleForwardNet(inlet, 
+				MiscUtil.repeatedArray(SigmoidUnit.class, layerDims.length - 1), layerDims);
+	}
+	
 	/**
-	 * Add one more layer to simple sigmoid net
+	 * Add one more layer to simple forward net
 	 * @param initZero true to init all to zero. False to init to random numbers. 
 	 */
-	public static DeepNet growSimpleSigmoidNet(DeepNet oldNet, int newLayerDim, boolean initZero)
+	public static DeepNet growSimpleForwardNet(
+			DeepNet oldNet, int newLayerDim, 
+			Class<? extends ElementComputeUnit> activationLayer,
+			boolean initZero)
 	{
 		ArrayList<ComputeUnit> units = oldNet.getUnitList();
 		TerminalUnit terminal = (TerminalUnit) MiscUtil.get(units, -1);
 		InletUnit inlet = oldNet.inlet;
 		// add sigmoid linear layer
-		MiscUtil.set(units, -1, new SigmoidUnit("", inlet));
+		MiscUtil.set(units, -1, defaultElementComputeCtor(activationLayer, inlet, 1));
 		units.add(new LinearUnit("", inlet, newLayerDim, 
 				initZero ? Initializer.fillIniter(0) :
 					Initializer.uniformRandIniter((float) Math.sqrt(3.0 / newLayerDim))));
 		units.add(terminal);
 		
 		DeepNet newNet = 
-			new DeepNet("SimpleSigmoidNet", inlet, units).genDefaultUnitName();
+			new DeepNet("SimpleForwardNet", inlet, units).genDefaultUnitName();
 		
 		return newNet;
+	}
+	
+	public static DeepNet growSimpleSigmoidNet(DeepNet oldNet, int newLayerDim, boolean initZero)
+	{
+		return growSimpleForwardNet(oldNet, newLayerDim, SigmoidUnit.class, initZero);
 	}
 	
 	/**
