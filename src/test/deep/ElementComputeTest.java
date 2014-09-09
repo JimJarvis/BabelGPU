@@ -85,4 +85,19 @@ public class ElementComputeTest
 //		sigmoidLayers.runDebug(plan, hasBias);
 		check(net, 1e-1f, 1e5f, false);
 	}
+	
+	@Test
+//	@Ignore
+	public void rectifiedLayersCrossEntropyTest()
+	{
+		DeepNet net = 
+				DeepFactory.debugElementComputeLayers(
+						RectifiedUnit.class, 
+						uniRandInlet(2, 1, true), 
+						3, scalor, 
+						CrossEntropyTUnit.class);
+		net.name = "Rectified + CrossEntropy";
+//		sigmoidLayers.runDebug(plan, hasBias);
+		check(net, 1e-1f, 1e5f, false);
+	}
 }
