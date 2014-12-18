@@ -127,6 +127,34 @@ public class DeepFactory
 		return growSimpleForwardNet(oldNet, newLayerDim, SigmoidUnit.class, initZero);
 	}
 	
+	
+	/**
+	 * Add one more layer to fourier stack net
+	 * @param initZero true to init all to zero. False to init to random numbers. 
+	 */
+	public static DeepNet growFourierStackNet(
+			DeepNet oldNet, int newFourierDim, int newLinearDim, 
+			Initializer projIniter,
+//			Class<? extends ElementComputeUnit> activationLayer,
+			boolean initZero)
+	{
+		ArrayList<ComputeUnit> units = oldNet.getUnitList();
+		TerminalUnit terminal = (TerminalUnit) MiscUtil.get(units, -1);
+		InletUnit inlet = oldNet.inlet;
+		// add sigmoid linear layer
+		MiscUtil.set(units, -1, new FourierProjectUnit("", inlet, newFourierDim, projIniter));
+		units.add(new CosineUnit("", inlet, (float) Math.sqrt(2.0 / newFourierDim)));
+		units.add(new LinearUnit("", inlet, newLinearDim, 
+				initZero ? Initializer.fillIniter(0) :
+					Initializer.uniformRandIniter((float) Math.sqrt(3.0 / newLinearDim))));
+		units.add(terminal);
+		
+		DeepNet newNet = 
+			new DeepNet("FourierStackNet", inlet, units).genDefaultUnitName();
+		
+		return newNet;
+	}
+	
 	/**
 	 * The first (layerDims.length - 1) layers will all be Rahimi projectors
 	 * The last one will be SparseCrossEntropy terminal
